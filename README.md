@@ -1,10 +1,7 @@
-# BETkoks projektas
+## BETkoks projektas
 PSI lab. grupes repo
 
-Nariai:
-
-Kipras Šaparauskas
-
-Balys Vabalas
-
-Dominykas Misius
+## Nariai:
+1. Kipras Šaparauskas
+2. Balys Žalneravičius (vabalas)
+3. Dominykas Misius
