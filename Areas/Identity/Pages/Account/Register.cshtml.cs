@@ -101,12 +101,15 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
 
             [Required]
             [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "First letter must be uppercase.")]
+            [Display(Name = "First name")]
             public string FirstName { get; set; }
             [Required]
             [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "First letter must be uppercase.")]
+            [Display(Name = "Last name")]
             public string LastName { get; set; }
             [Required]
             [RegularExpression(@"^\d{7}$", ErrorMessage = "Incorrect student ID number.")]
+            [Display(Name = "Student Id")]
             public string StudentId { get; set; }
         }
 
@@ -127,14 +130,14 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
 
                 var user = new ApplicationUser
                 {
-                    UserName = Input.Email,
+                    UserName = Input.StudentId,
                     Email = Input.Email,
                     FirstName = Input.FirstName,
                     LastName = Input.LastName,
                     StudentId = Input.StudentId
                 };
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.StudentId, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
