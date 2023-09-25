@@ -11495,24 +11495,19 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Dominykas\\.nuget\\packages\\": {},
-    "C:\\Users\\Dominykas\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder": {}
+    "C:\\Users\\Kipras\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Dominykas\\source\\repos\\OnlineNotes\\OnlineNotes.csproj",
+      "projectUniqueName": "C:\\Users\\Kipras\\Documents\\SEProject\\bet_koks\\OnlineNotes.csproj",
       "projectName": "OnlineNotes",
-      "projectPath": "C:\\Users\\Dominykas\\source\\repos\\OnlineNotes\\OnlineNotes.csproj",
-      "packagesPath": "C:\\Users\\Dominykas\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Dominykas\\source\\repos\\OnlineNotes\\obj\\",
+      "projectPath": "C:\\Users\\Kipras\\Documents\\SEProject\\bet_koks\\OnlineNotes.csproj",
+      "packagesPath": "C:\\Users\\Kipras\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Kipras\\Documents\\SEProject\\bet_koks\\obj\\",
       "projectStyle": "PackageReference",
-      "fallbackFolders": [
-        "C:\\Users\\Dominykas\\AppData\\Roaming\\Godot\\mono\\GodotNuGetFallbackFolder"
-      ],
       "configFilePaths": [
-        "C:\\Users\\Dominykas\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Users\\Dominykas\\AppData\\Roaming\\NuGet\\config\\Godot.Offline.Config",
+        "C:\\Users\\Kipras\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
