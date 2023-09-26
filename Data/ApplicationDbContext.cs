@@ -11,5 +11,6 @@ namespace OnlineNotes.Data
         {
         }
         public DbSet<OnlineNotes.Models.Note>? Note { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }
