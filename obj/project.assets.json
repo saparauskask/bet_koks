@@ -11495,11 +11495,25 @@
     ]
   },
   "packageFolders": {
+<<<<<<< HEAD
+    "C:\\Users\\vabalas\\.nuget\\packages\\": {}
+=======
     "C:\\Users\\Kipras\\.nuget\\packages\\": {}
+>>>>>>> c2e3c57d94fe2cf9ba47d329384f29e1ebea1360
   },
   "project": {
     "version": "1.0.0",
     "restore": {
+<<<<<<< HEAD
+      "projectUniqueName": "C:\\Users\\vabalas\\git\\bet_koks\\OnlineNotes.csproj",
+      "projectName": "OnlineNotes",
+      "projectPath": "C:\\Users\\vabalas\\git\\bet_koks\\OnlineNotes.csproj",
+      "packagesPath": "C:\\Users\\vabalas\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\vabalas\\git\\bet_koks\\obj\\",
+      "projectStyle": "PackageReference",
+      "configFilePaths": [
+        "C:\\Users\\vabalas\\AppData\\Roaming\\NuGet\\NuGet.Config",
+=======
       "projectUniqueName": "C:\\Users\\Kipras\\Documents\\SEProject\\bet_koks\\OnlineNotes.csproj",
       "projectName": "OnlineNotes",
       "projectPath": "C:\\Users\\Kipras\\Documents\\SEProject\\bet_koks\\OnlineNotes.csproj",
@@ -11508,6 +11522,7 @@
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Kipras\\AppData\\Roaming\\NuGet\\NuGet.Config",
+>>>>>>> c2e3c57d94fe2cf9ba47d329384f29e1ebea1360
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
