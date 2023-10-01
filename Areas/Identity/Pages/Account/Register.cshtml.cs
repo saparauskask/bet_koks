@@ -46,67 +46,51 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
             _emailSender = emailSender;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+
         [BindProperty]
         public InputModel Input { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string ReturnUrl { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+
+            /*
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
             public string Email { get; set; }
+            */
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            
             [Required]
             [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Password")]
             public string Password { get; set; }
 
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
+            
             [DataType(DataType.Password)]
             [Display(Name = "Confirm password")]
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            /*
             [Required]
             [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "First letter must be uppercase.")]
             [Display(Name = "First name")]
             public string FirstName { get; set; }
+            */
+
+            /*
             [Required]
             [RegularExpression(@"^[A-Z][a-z]*$", ErrorMessage = "First letter must be uppercase.")]
             [Display(Name = "Last name")]
             public string LastName { get; set; }
+            */
+
             [Required]
             [RegularExpression(@"^\d{7}$", ErrorMessage = "Incorrect student ID number.")]
             [Display(Name = "Student Id")]
@@ -124,22 +108,22 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
         {
             returnUrl ??= Url.Content("~/");
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-            if (ModelState.IsValid)
+            if (ModelState.IsValid) // ModelState??
             {
                 //var user = CreateUser(); orignal creation of the user
 
                 var user = new ApplicationUser
                 {
                     UserName = Input.StudentId,
-                    Email = Input.Email,
-                    FirstName = Input.FirstName,
-                    LastName = Input.LastName,
+                    //Email = Input.Email,
+                    //FirstName = Input.FirstName,
+                    //LastName = Input.LastName,
                     StudentId = Input.StudentId,
-                    EmailConfirmed = true
+                    EmailConfirmed = true// ?
                 };
 
                 await _userStore.SetUserNameAsync(user, Input.StudentId, CancellationToken.None);
-                await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                //await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None); // not required anymore?
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
