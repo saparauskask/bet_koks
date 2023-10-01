@@ -53,6 +53,7 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
         public string ReturnUrl { get; set; }
 
         public IList<AuthenticationScheme> ExternalLogins { get; set; }
+        public IdentityResult Result { get; private set; }
 
         public class InputModel
         {
@@ -124,15 +125,16 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.StudentId, CancellationToken.None);
                 //await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None); // not required anymore?
-                var result = await _userManager.CreateAsync(user, Input.Password);
 
-                if (result.Succeeded)
+                //var result = await _userManager.CreateAsync(user, Input.Password);
+                Result = await _userManager.CreateAsync(user, Input.Password);
+
+                if (Result.Succeeded)
                 {
                     _logger.LogInformation("User created a new account with password.");
-
                     //await _signInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    return RedirectToAction("Index", "Home"); // TODO. Add notification when registered successfully
+                    //return RedirectToAction("Index", "Home");
                     /*    
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -157,7 +159,7 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
                         }
                     */
                 }
-                foreach (var error in result.Errors)
+                foreach (var error in Result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
                 }
