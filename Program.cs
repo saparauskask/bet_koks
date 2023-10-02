@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Models;
+using OnlineNotes.Models.Services;
 
 namespace OnlineNotes
 {
@@ -19,6 +21,9 @@ namespace OnlineNotes
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
+
+            builder.Services.Configure<OpenAIConfig>(builder.Configuration.GetSection("OpenAI"));
+            builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 
             var app = builder.Build();
 
