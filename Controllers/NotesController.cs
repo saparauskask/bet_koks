@@ -37,12 +37,16 @@ namespace OnlineNotes.Controllers
                 return NotFound();
             }
 
+            ViewBag.NoteId = id;
             var note = await _context.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (note == null)
             {
                 return NotFound();
             }
+
+            
 
             return View(note);
         }

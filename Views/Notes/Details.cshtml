@@ -24,7 +24,30 @@
         </dd>
     </dl>
 </div>
+
+<div>
+    <h4>Comments</h4>
+    <hr />
+    @if (Model.Comments.Any())
+    {
+        <ul>
+            @foreach (var comment in Model.Comments)
+            {
+                <li>@comment.Contents</li>
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No comments available for this note.</p>
+    }
+</div>
+
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Back to List</a> |
+    <a asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model.Id">Write a comment</a>
+    <div>
+        Note ID: @ViewBag.NoteId
+    </div>
 </div>
