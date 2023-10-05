@@ -10,7 +10,7 @@
     <script>
         function accountCreatedAlert() {
         alert("Your account was created successfully");
-        window.location.href = '@Url.Action("Index", "Home")';
+        window.location.href = '@Url.Action("Index", "Notes")';
         }
 
     @{ if (Model.Result != null && Model.Result.Succeeded)

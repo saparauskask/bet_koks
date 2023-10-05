@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Services.OpenAIServices;
 
 namespace OnlineNotes
 {
@@ -19,6 +20,7 @@ namespace OnlineNotes
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
+            builder.Services.AddScoped<IOpenAIService,  OpenAIService>();
 
             var app = builder.Build();
 
@@ -29,7 +31,7 @@ namespace OnlineNotes
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Notes/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
@@ -44,7 +46,7 @@ namespace OnlineNotes
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{controller=Home}/{action=Index}/{id?}");
+                pattern: "{controller=Notes}/{action=Index}/{id?}");
             app.MapRazorPages();
 
             app.Run();
