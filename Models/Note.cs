@@ -5,6 +5,7 @@
         public int Id { get; set; }
         public string Title { get; set; }
         public string Contents { get; set; }
-        public ICollection<Comment> Comments { get; set; }
+        // Collection navigation containing dependents
+        public ICollection<Comment> Comments { get; } = new List<Comment>();
     }
 }

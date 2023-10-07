@@ -16,8 +16,9 @@
             <input asp-for="Contents" class="form-control" />
             <span asp-validation-for="Contents" class="text-danger"></span>
         </div>
-        <!--<input type="hidden" name="noteId" value="@ViewBag.NoteId" /> -->
-        <input type="hidden" name="noteId" value="8" />
+        <input type="hidden" asp-for="NoteId" value="@ViewBag.Message" />
+        <input type="hidden" asp-for="Note" value="@ViewBag.AssociatedNote" />
+        <input type="hidden" asp-for="CreationDate" value="@ViewBag.CreationDate" />
         <div class="form-group">
             <input type="submit" value="Create" class="btn btn-primary" />
         </div>
@@ -28,9 +29,12 @@
     <a asp-controller="Notes" asp-action="Index">Back to Index</a>
 </div>
 
-<div asp-validation-summary="All" class="text-danger"></div>
+<div asp-validation-summary="All" class="text-danger">
+</div>
 <div>
-    Note ID: @ViewBag.NoteId
+    Note ID: @ViewBag.Message
+    CreationDate: @ViewBag.CreationDate
+    NoteRefference: @ViewBag.AssociatedNote
 </div>
 
 @section Scripts {
