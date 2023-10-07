@@ -12,7 +12,7 @@
     We are developing a web application using Microsoft .NET, aimed at facilitating collaborative note-taking for individuals attending lectures.
 
 ## BRANCHING STRATEGY
-![](bin/betkoks_branching_stategy.png)
+![](betkoks_branching_stategy.png)
 
 ## BRANCH NAMING
     main - official realese.
