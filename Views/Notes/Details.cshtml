@@ -36,19 +36,35 @@
 <div>
     <h4>Comments</h4>
     <hr />
+   
     @if (Model.Comments.Any())
     {
-        <ul>
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>Date Created</th>
+                <th></th>
+            </tr>
+            <tbody>
             @foreach (var comment in Model.Comments)
             {
-                <li>@comment.Contents | @comment.CreationDate | @comment.Id | Delete</li>
-                
+                <tr>
+                    <td>
+                        @comment.Contents
+                    </td>
+                    <td>
+                        @comment.CreationDate
+                    </td>
+                    <td>
+                        Delete
+                    </td>
+                </tr>
             }
-        </ul>
-    }
-    else
+            </tbody>
+        </table>
+    } else
     {
-        <p>No comments available for this note.</p>
+        <p> There are no comments to display</p>
     }
 </div>
 
