@@ -1,4 +1,6 @@
-﻿namespace OnlineNotes.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace OnlineNotes.Models
 {
     public class Comment
     {
@@ -8,7 +10,7 @@
 
         // Foreign key to associate with a Note
         public int NoteId { get; set; }
-         //Required reference navigation to principal
+        //Required reference navigation to principal
         public Note Note { get; set; } = null!;
     }
 }

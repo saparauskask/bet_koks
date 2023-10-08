@@ -41,7 +41,8 @@
         <ul>
             @foreach (var comment in Model.Comments)
             {
-                <li>@comment.Contents | @comment.CreationDate | @comment.Id</li>
+                <li>@comment.Contents | @comment.CreationDate | @comment.Id | Delete</li>
+                
             }
         </ul>
     }
