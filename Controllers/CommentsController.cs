@@ -10,7 +10,6 @@ namespace OnlineNotes.Controllers
     {
         private readonly ApplicationDbContext _context;
         private int _noteId;
-        //private Note? associatedNote;
 
         public CommentsController(ApplicationDbContext context)
         {
@@ -22,8 +21,6 @@ namespace OnlineNotes.Controllers
         {
             _noteId = noteId;
             ViewBag.Message = noteId;
-            //associatedNote = _context?.Note?.FirstOrDefault(n => n.Id == _noteId); // TODO what if null
-            //ViewBag.AssociatedNote = associatedNote;
             ViewBag.CreationDate = DateTime.Now;
             return View();
         }
@@ -44,6 +41,26 @@ namespace OnlineNotes.Controllers
             } 
 
             return View(comment); // Show the form with validation errors
+        }
+
+        public IActionResult Delete(int id)
+        {
+            if (_context.Comment == null)
+            {
+                return NotFound();
+            }
+
+            var comment = _context.Comment.Find(id);
+
+            if (comment == null)
+            {
+                return NotFound();
+            }
+
+            ViewBag.Id = id;
+            ViewBag.Contents = comment.Contents;
+            ViewBag.CreationDate = comment.CreationDate;
+            return View();
         }
     }
 }

@@ -1,0 +1,16 @@
+﻿@model OnlineNotes.Models.Comment
+
+@{
+    ViewData["Title"] = "Delete";
+}
+
+<h1>Are you sure you want to delete this?</h1>
+<div>
+    <p><b>Date of creation: </b> @ViewBag.CreationDate</p>
+    <br />
+    <p><b>Contents:</b></p>
+    <p>@ViewBag.Contents</p>
+</div>
+<div>
+    <a asp-controller="Notes" asp-action="Index">Back to Index</a>
+</div>

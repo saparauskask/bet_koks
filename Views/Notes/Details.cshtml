@@ -56,7 +56,7 @@
                         @comment.CreationDate
                     </td>
                     <td>
-                        Delete
+                            <a asp-controller="Comments" asp-action="Delete" asp-route-Id="@comment.Id">Delete</a>
                     </td>
                 </tr>
             }
@@ -72,7 +72,5 @@
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a> |
     <a asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model.Id">Write a comment</a>
-    <div>
-        Note ID: @Model.Id
-    </div>
+    
 </div>
