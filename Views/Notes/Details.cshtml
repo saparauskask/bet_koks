@@ -47,8 +47,8 @@
     <button class="btn btn-primary" id="explainButton" style="margin-bottom:10px">Explain it like im 5</button>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+    <a class="btn btn-primary" asp-action="Index">Back to List</a>
 </div>
 
 @section scripts {
