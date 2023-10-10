@@ -5,18 +5,53 @@ namespace OnlineNotes.Services.OpenAIServices
 {
     public class OpenAIService : IOpenAIService
     {
-        OpenAIAPI api;
+        readonly OpenAIAPI api;
 
         public OpenAIService()
         {
-            // TODO: Hide the API key
-            api = new OpenAIAPI("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");
+            api = new OpenAIAPI(ReadApiKey());
         }
 
         public async Task<string> CompleteSentence(string input)
         {
-            string? result = await api.Completions.GetCompletion(input);
-            return result;
+            try
+            {
+                string? result = await api.Completions.GetCompletion(input);
+                return result;
+            }
+            catch (Exception ex) 
+            {
+                Console.WriteLine(ex.Message);
+                return "Something went wrong, the request could not be completed";
+            }
         }
+
+       private string? ReadApiKey()
+       {
+            string apiKeyFilePath = ".env";
+            try
+            {
+                using (FileStream fileStream = new FileStream(apiKeyFilePath, FileMode.Open, FileAccess.Read))
+                using (StreamReader reader = new StreamReader(fileStream))
+                {
+                    string apiKey = reader.ReadToEnd().Trim();
+
+                    if (!string.IsNullOrEmpty(apiKey))
+                    {
+                        return apiKey;
+                    }
+                    else
+                    {
+                        Console.WriteLine("API Key is empty or not found in the file.");
+                        return null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return null;
+        }  
     }
 }
