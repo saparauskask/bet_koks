@@ -23,15 +23,12 @@
                 <textarea asp-for="Contents" class="form-control" style="height:500px; resize:none"></textarea>
                 <span asp-validation-for="Contents" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <div style="margin-top:10px" class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a class="btn btn-secondary" asp-action="Index">Back to List</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

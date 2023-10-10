@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
+using OnlineNotes.Services.OpenAIServices;
 
 namespace OnlineNotes.Controllers
 {
@@ -16,10 +17,12 @@ namespace OnlineNotes.Controllers
     public class NotesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IOpenAIService _openAIService;
 
-        public NotesController(ApplicationDbContext context)
+        public NotesController(ApplicationDbContext context, IOpenAIService openAIService)
         {
             _context = context;
+            _openAIService = openAIService;
         }
 
         // GET: Notes
@@ -88,6 +91,12 @@ namespace OnlineNotes.Controllers
                 return NotFound();
             }
             return View(note);
+        }
+
+        public async Task<IActionResult> ExplainTask(string input)
+        {
+            string completionResult = await _openAIService.CompleteSentence(input);
+            return Content(completionResult, "text/plain");
         }
 
         // POST: Notes/Edit/5

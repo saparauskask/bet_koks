@@ -30,6 +30,16 @@
         <dd class = "col-sm-12">
             <pre>@Html.DisplayFor(model => model.Contents)</pre>
         </dd>
+
+        <div id="explainField" hidden>
+            <dt class="col-sm-2">
+                Explained like you're 5
+            </dt>
+            <dd class="col-sm-12" id="resultField">
+                
+            </dd>
+        </div>
+
     </dl>
 </div>
 
@@ -69,8 +79,31 @@
 </div>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a> |
-    <a asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model.Id">Write a comment</a>
-    
+    <button class="btn btn-info" id="explainButton" style="margin-bottom:10px">Explain it like im 5</button>
 </div>
+<div>
+    <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
+    <a class="btn btn-primary" asp-action="Index">Back to List</a>
+    <a asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model.Id">Write a comment</a>
+</div>
+
+@section scripts {
+    <script>
+        document.getElementById("explainButton").addEventListener("click", function () {
+            // Get the user input from the text input field
+            var userInput = "explain it like im 5: @Model.Contents";
+
+            // Send a request to the action with the user input
+            fetch('@Url.Action("ExplainTask", "Notes")?input=' + encodeURIComponent(userInput))
+                .then(response => response.text())
+                .then(text => {
+                    document.getElementById("explainField").removeAttribute("hidden");
+                    // Display the returned text in the resultDiv
+                    document.getElementById("resultField").innerText = text;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+}
