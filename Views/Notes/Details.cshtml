@@ -84,7 +84,7 @@
 <div>
     <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
     <a class="btn btn-primary" asp-action="Index">Back to List</a>
-    <a asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model.Id">Write a comment</a>
+    <a class="btn btn-outline-info" asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model?.Id">Write a comment</a>
 </div>
 
 @section scripts {

@@ -13,7 +13,7 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="Contents" class="control-label"></label>
-            <input asp-for="Contents" class="form-control" />
+            <textarea asp-for="Contents" class="form-control" style="height: 250px; resize: none;"></textarea>
             <span asp-validation-for="Contents" class="text-danger"></span>
         </div>
         <input type="hidden" asp-for="NoteId" value="@ViewBag.Message" />
@@ -25,7 +25,7 @@
 </div>
 
 <div>
-    <a asp-controller="Notes" asp-action="Index">Back to Index</a>
+    <a class="btn btn-secondary" asp-controller="Notes" asp-action="Index">Back to list</a>
 </div>
 
 <div asp-validation-summary="All" class="text-danger">

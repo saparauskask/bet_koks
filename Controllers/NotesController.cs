@@ -167,7 +167,6 @@ namespace OnlineNotes.Controllers
                 .FirstOrDefaultAsync(n => n.Id == id);
             if (note != null)
             { 
-                Console.WriteLine(note.Comments.Count);
                 foreach (var comment in note.Comments.ToList())
                 {
                     _context.Comment.Remove(comment);
