@@ -62,5 +62,27 @@ namespace OnlineNotes.Controllers
             ViewBag.CreationDate = comment.CreationDate;
             return View();
         }
+
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var comment = await _context.Comment.FindAsync(id);
+
+            if (comment != null)
+            {
+                _context.Comment.Remove(comment);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Notes");
+            }
+
+            return NotFound();
+
+        }
     }
 }
