@@ -44,11 +44,47 @@
 </div>
 
 <div>
+    <h4>Comments</h4>
+    <hr />
+   
+    @if (Model.Comments.Any())
+    {
+        <table class="table">
+            <tr>
+                <th></th>
+                <th>Date Created</th>
+                <th></th>
+            </tr>
+            <tbody>
+            @foreach (var comment in Model.Comments)
+            {
+                <tr>
+                    <td>
+                        @comment.Contents
+                    </td>
+                    <td>
+                        @comment.CreationDate
+                    </td>
+                    <td>
+                            <a class="btn btn-danger btn-sm" asp-controller="Comments" asp-action="Delete" asp-route-Id="@comment.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    } else
+    {
+        <p> There are no comments to display</p>
+    }
+</div>
+
+<div>
     <button class="btn btn-info" id="explainButton" style="margin-bottom:10px">Explain it like im 5</button>
 </div>
 <div>
     <a class="btn btn-secondary" asp-action="Edit" asp-route-id="@Model?.Id">Edit</a>
     <a class="btn btn-primary" asp-action="Index">Back to List</a>
+    <a class="btn btn-outline-info" asp-controller="Comments" asp-action="Create" asp-route-noteId="@Model?.Id">Write a comment</a>
 </div>
 
 @section scripts {

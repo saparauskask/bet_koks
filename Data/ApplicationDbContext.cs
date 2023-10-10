@@ -10,7 +10,8 @@ namespace OnlineNotes.Data
             : base(options)
         {
         }
-        public DbSet<OnlineNotes.Models.Note>? Note { get; set; }
+        public DbSet<OnlineNotes.Models.Note> Note { get; set; }
+        public DbSet <OnlineNotes.Models.Comment> Comment { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }

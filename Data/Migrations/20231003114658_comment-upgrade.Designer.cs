@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineNotes.Data;
 
@@ -11,9 +12,10 @@ using OnlineNotes.Data;
 namespace OnlineNotes.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231003114658_comment-upgrade")]
+    partial class commentupgrade
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -252,7 +254,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>
@@ -273,7 +275,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Note", (string)null);
+                    b.ToTable("Note");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.ApplicationUser", b =>
@@ -340,13 +342,11 @@ namespace OnlineNotes.Data.Migrations
 
             modelBuilder.Entity("OnlineNotes.Models.Comment", b =>
                 {
-                    b.HasOne("OnlineNotes.Models.Note", "Note")
+                    b.HasOne("OnlineNotes.Models.Note", null)
                         .WithMany("Comments")
                         .HasForeignKey("NoteId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Note");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>

@@ -41,12 +41,16 @@ namespace OnlineNotes.Controllers
                 return NotFound();
             }
 
+            ViewBag.NoteId = id;
             var note = await _context.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (note == null)
             {
                 return NotFound();
             }
+
+            
 
             return View(note);
         }
@@ -157,9 +161,17 @@ namespace OnlineNotes.Controllers
             {
                 return Problem("Entity set 'ApplicationDbContext.Note'  is null.");
             }
-            var note = await _context.Note.FindAsync(id);
+
+            var note = await _context.Note
+                .Include(n => n.Comments) // Include the Comments related to the Note
+                .FirstOrDefaultAsync(n => n.Id == id);
             if (note != null)
-            {
+            { 
+                foreach (var comment in note.Comments.ToList())
+                {
+                    _context.Comment.Remove(comment);
+                }
+
                 _context.Note.Remove(note);
             }
             

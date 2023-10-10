@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineNotes.Data;
 
@@ -11,9 +12,10 @@ using OnlineNotes.Data;
 namespace OnlineNotes.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231003121102_comment-upgrade-2")]
+    partial class commentupgrade2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -232,27 +234,26 @@ namespace OnlineNotes.Data.Migrations
 
             modelBuilder.Entity("OnlineNotes.Models.Comment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"), 1L, 1);
 
                     b.Property<string>("Contents")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<DateTime?>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("NoteId")
+                    b.Property<int?>("NoteId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>
@@ -273,7 +274,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Note", (string)null);
+                    b.ToTable("Note");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.ApplicationUser", b =>
@@ -340,13 +341,9 @@ namespace OnlineNotes.Data.Migrations
 
             modelBuilder.Entity("OnlineNotes.Models.Comment", b =>
                 {
-                    b.HasOne("OnlineNotes.Models.Note", "Note")
+                    b.HasOne("OnlineNotes.Models.Note", null)
                         .WithMany("Comments")
-                        .HasForeignKey("NoteId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Note");
+                        .HasForeignKey("NoteId");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>
