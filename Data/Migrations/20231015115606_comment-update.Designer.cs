@@ -12,8 +12,8 @@ using OnlineNotes.Data;
 namespace OnlineNotes.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231007161100_comment-upgrade-4")]
-    partial class commentupgrade4
+    [Migration("20231015115606_comment-update")]
+    partial class commentupdate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -344,7 +344,9 @@ namespace OnlineNotes.Data.Migrations
                 {
                     b.HasOne("OnlineNotes.Models.Note", "Note")
                         .WithMany("Comments")
-                        .HasForeignKey("NoteId");
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Note");
                 });

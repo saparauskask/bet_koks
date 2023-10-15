@@ -4,7 +4,7 @@
 
 namespace OnlineNotes.Data.Migrations
 {
-    public partial class commentupgrade : Migration
+    public partial class commentupdate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
