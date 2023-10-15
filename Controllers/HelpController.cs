@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineNotes.Models;
 using OnlineNotes.Services.OpenAIServices;
-using OpenAI_API;
 
 namespace OnlineNotes.Controllers
 {

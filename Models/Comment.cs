@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace OnlineNotes.Models
+﻿namespace OnlineNotes.Models
 {
     public class Comment
     {
