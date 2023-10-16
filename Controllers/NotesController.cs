@@ -26,7 +26,7 @@ namespace OnlineNotes.Controllers
               
             if (notes == null)
             {
-                return NotFound();
+                return Error();
             }
             return View(notes);
         }
@@ -63,7 +63,7 @@ namespace OnlineNotes.Controllers
                 {
                     return RedirectToAction(nameof(Index));
                 }
-                return NotFound();
+                return Problem();
             }
             return View(note);
         }

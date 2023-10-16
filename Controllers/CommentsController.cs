@@ -33,7 +33,7 @@ namespace OnlineNotes.Controllers
 
             if (ModelState.IsValid)
             {
-                var result = await _commentsService.CreateComment(comment);
+                var result = await _commentsService.CreateCommentAsync(comment);
 
                 if (result)
                 {
@@ -46,9 +46,9 @@ namespace OnlineNotes.Controllers
             return View(comment); // Show the form with validation errors
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            var comment = _commentsService.GetCommentById(id);
+            var comment = await _commentsService.GetCommentByIdAsync(id);
 
             if (comment  == null)
             {
@@ -70,11 +70,11 @@ namespace OnlineNotes.Controllers
                 return NotFound();
             }
 
-            var comment = _commentsService.GetCommentById(id);
+            var comment = await _commentsService.GetCommentByIdAsync(id);
 
             if (comment != null)
             {
-               var result = await _commentsService.DeleteComment(comment);
+               var result = await _commentsService.DeleteCommentAsync(comment);
 
                 if (result)
                 {

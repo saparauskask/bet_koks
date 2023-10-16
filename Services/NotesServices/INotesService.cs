@@ -9,6 +9,6 @@ namespace OnlineNotes.Services.NotesServices
         Task<Note?> GetNoteAsync(int? id);
         Task<bool> CreateNoteAsync(Note note);
         Task<bool> UpdateNoteAsync(int id, Note note);
-        Task<bool> DeleteNoteAsync(Note note); // TODO also implement the deletion of comments related to the Note
+        Task<bool> DeleteNoteAsync(Note note);
     }
 }

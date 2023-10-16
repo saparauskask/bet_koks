@@ -4,8 +4,8 @@ namespace OnlineNotes.Services.CommentsServices
 {
     public interface ICommentsService
     {
-        Task<bool> CreateComment(Comment comment);
-        Comment? GetCommentById(int? id);
-        Task<bool> DeleteComment(Comment comment);
+        Task<bool> CreateCommentAsync(Comment comment);
+        Task<Comment?> GetCommentByIdAsync(int? id);
+        Task<bool> DeleteCommentAsync(Comment comment);
     }
 }

@@ -12,7 +12,7 @@ namespace OnlineNotes.Services.CommentsServices
             _context = context;
         }
 
-        public async Task<bool> CreateComment (Comment comment)
+        public async Task<bool> CreateCommentAsync (Comment comment)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace OnlineNotes.Services.CommentsServices
 
         }
 
-        public async Task<bool> DeleteComment(Comment comment)
+        public async Task<bool> DeleteCommentAsync(Comment comment)
         {
             try
             {
@@ -41,21 +41,16 @@ namespace OnlineNotes.Services.CommentsServices
             }
         }
 
-        public Comment? GetCommentById(int? id)
+        public async Task<Comment?> GetCommentByIdAsync(int? id)
         {
             try
             {
-                var comment = _context.Comment?.Find(id);
-                if (comment != null)
-                {
+                var comment = await _context.Comment.FindAsync(id);
                     return comment;
-                }
-
-                return null;
             }
             catch (Exception)
             {
-                return null;
+                return null; // TODO do something with the exception
             }
         }
     }
