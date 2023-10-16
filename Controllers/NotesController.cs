@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using OnlineNotes.Data;
 using OnlineNotes.Models;
+using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 
 namespace OnlineNotes.Controllers
@@ -16,42 +10,37 @@ namespace OnlineNotes.Controllers
     [Authorize] // restricts access to a controller to only authenticated users
     public class NotesController : Controller
     {
-        private readonly ApplicationDbContext _context;
         private readonly IOpenAIService _openAIService;
+        private readonly INotesService _notesService;
 
-        public NotesController(ApplicationDbContext context, IOpenAIService openAIService)
+        public NotesController(IOpenAIService openAIService, INotesService notesService)
         {
-            _context = context;
             _openAIService = openAIService;
+            _notesService = notesService;
         }
 
         // GET: Notes
         public async Task<IActionResult> Index()
         {
-              return _context.Note != null ? 
-                          View(await _context.Note.ToListAsync()) :
-                          Problem("Entity set 'ApplicationDbContext.Note'  is null.");
+            var notes = await _notesService.GetNotesToListAsync();
+              
+            if (notes == null)
+            {
+                return Error();
+            }
+            return View(notes);
         }
 
         // GET: Notes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Note == null)
-            {
-                return NotFound();
-            }
+            var note = await _notesService.GetNoteAsync(id);
 
-            ViewBag.NoteId = id;
-            var note = await _context.Note
-                .Include(n => n.Comments) // Include the Comments navigation property
-                .FirstOrDefaultAsync(m => m.Id == id);
             if (note == null)
             {
                 return NotFound();
             }
-
-            
-
+            ViewBag.NoteId = id;
             return View(note);
         }
 
@@ -62,17 +51,19 @@ namespace OnlineNotes.Controllers
         }
 
         // POST: Notes/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Contents")] Note note)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(note);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var result = await _notesService.CreateNoteAsync(note);
+
+                if (result)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+                return Problem();
             }
             return View(note);
         }
@@ -80,12 +71,7 @@ namespace OnlineNotes.Controllers
         // GET: Notes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Note == null)
-            {
-                return NotFound();
-            }
-
-            var note = await _context.Note.FindAsync(id);
+            var note = await _notesService.GetNoteAsync(id);
             if (note == null)
             {
                 return NotFound();
@@ -100,36 +86,20 @@ namespace OnlineNotes.Controllers
         }
 
         // POST: Notes/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Contents")] Note note)
         {
-            if (id != note.Id)
-            {
-                return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
-                try
+                var result = await _notesService.UpdateNoteAsync(id, note);
+
+                if (result)
                 {
-                    _context.Update(note);
-                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NoteExists(note.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
             return View(note);
         }
@@ -137,18 +107,12 @@ namespace OnlineNotes.Controllers
         // GET: Notes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Note == null)
-            {
-                return NotFound();
-            }
+            var note = await _notesService.GetNoteAsync(id);
 
-            var note = await _context.Note
-                .FirstOrDefaultAsync(m => m.Id == id);
             if (note == null)
             {
                 return NotFound();
             }
-
             return View(note);
         }
 
@@ -157,31 +121,20 @@ namespace OnlineNotes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Note == null)
+            var note = await _notesService.GetNoteAsync(id);
+            if (note == null)
             {
-                return Problem("Entity set 'ApplicationDbContext.Note'  is null.");
+                return NotFound();
             }
 
-            var note = await _context.Note
-                .Include(n => n.Comments) // Include the Comments related to the Note
-                .FirstOrDefaultAsync(n => n.Id == id);
-            if (note != null)
-            { 
-                foreach (var comment in note.Comments.ToList())
-                {
-                    _context.Comment.Remove(comment);
-                }
+            var result = await _notesService.DeleteNoteAsync(note);
 
-                _context.Note.Remove(note);
+            if (result)
+            {
+                return RedirectToAction(nameof(Index));
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
 
-        private bool NoteExists(int id)
-        {
-          return (_context.Note?.Any(e => e.Id == id)).GetValueOrDefault();
+            return Error();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -252,7 +252,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>
@@ -273,7 +273,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Note", (string)null);
+                    b.ToTable("Note");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.ApplicationUser", b =>

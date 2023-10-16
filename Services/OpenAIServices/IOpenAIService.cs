@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-
-namespace OnlineNotes.Services.OpenAIServices
+﻿namespace OnlineNotes.Services.OpenAIServices
 {
     public interface IOpenAIService
     {

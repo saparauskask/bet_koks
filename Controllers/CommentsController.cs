@@ -1,19 +1,19 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineNotes.Data;
 using OnlineNotes.Models;
+using OnlineNotes.Services.CommentsServices;
 
 namespace OnlineNotes.Controllers
 {
     [Authorize]
     public class CommentsController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ICommentsService _commentsService;
         private int _noteId;
 
-        public CommentsController(ApplicationDbContext context)
+        public CommentsController(ICommentsService commentsService) // Dependency Injection principle
         {
-            _context = context;
+            _commentsService = commentsService;
         }
 
 
@@ -30,29 +30,27 @@ namespace OnlineNotes.Controllers
         public async Task<IActionResult> Create([Bind("Id,Contents,CreationDate,NoteId")] Comment comment)
         {
             ModelState.Remove("Note"); // navigation property will be set later by EF based on 'NoteId'
+
             if (ModelState.IsValid)
             {
-                // Save the comment to the database
-                _context.Add(comment);
-                await _context.SaveChangesAsync();
+                var result = await _commentsService.CreateCommentAsync(comment);
 
-                // Redirect to the appropriate page (e.g., the note's details page)
-                return RedirectToAction("Details", "Notes", new { id = comment.NoteId });
+                if (result)
+                {
+                    return RedirectToAction("Details", "Notes", new { id = comment.NoteId });
+                }
+
+                // TODO Redirect to the appropriate page (e.g., the note's details page)
+                return View(comment);
             } 
-
             return View(comment); // Show the form with validation errors
         }
 
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> DeleteAsync(int id)
         {
-            if (_context.Comment == null)
-            {
-                return NotFound();
-            }
+            var comment = await _commentsService.GetCommentByIdAsync(id);
 
-            var comment = _context.Comment.Find(id);
-
-            if (comment == null)
+            if (comment  == null)
             {
                 return NotFound();
             }
@@ -72,15 +70,18 @@ namespace OnlineNotes.Controllers
                 return NotFound();
             }
 
-            var comment = await _context.Comment.FindAsync(id);
+            var comment = await _commentsService.GetCommentByIdAsync(id);
 
             if (comment != null)
             {
-                _context.Comment.Remove(comment);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Notes");
-            }
+               var result = await _commentsService.DeleteCommentAsync(comment);
 
+                if (result)
+                {
+                    return RedirectToAction("Index", "Notes");
+                }
+                return NotFound();
+            }
             return NotFound();
 
         }

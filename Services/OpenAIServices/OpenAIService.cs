@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using OpenAI_API;
+﻿using OpenAI_API;
 using System.Globalization;
 
 namespace OnlineNotes.Services.OpenAIServices

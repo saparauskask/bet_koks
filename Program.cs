@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Services.CommentsServices;
+using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 
 namespace OnlineNotes
@@ -21,6 +23,8 @@ namespace OnlineNotes
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IOpenAIService,  OpenAIService>();
+            builder.Services.AddScoped<ICommentsService, CommentsService>();
+            builder.Services.AddScoped<INotesService, NotesService>();
 
             var app = builder.Build();
 
