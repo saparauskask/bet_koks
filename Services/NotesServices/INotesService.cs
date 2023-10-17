@@ -6,6 +6,7 @@ namespace OnlineNotes.Services.NotesServices
 {
     public interface INotesService
     {
+        public IEnumerable<Note> GetNotesAsEnumerable();
         Task<List<Note>?> GetNotesToListAsync();
         Task<Note?> GetNoteAsync(int? id);
         Task<bool> CreateNoteAsync(Note note);

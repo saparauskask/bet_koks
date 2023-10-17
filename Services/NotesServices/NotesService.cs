@@ -13,6 +13,12 @@ namespace OnlineNotes.Services.NotesServices
             _context = context;
         }
 
+        public IEnumerable<Note> GetNotesAsEnumerable()
+        {
+            List<Note> notes = _context.Note.ToList();
+            return notes.AsEnumerable();
+        }
+
         public async Task<bool> CreateNoteAsync(Note note)
         {
             try

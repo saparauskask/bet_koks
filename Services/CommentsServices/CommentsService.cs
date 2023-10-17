@@ -1,4 +1,5 @@
-﻿using OnlineNotes.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using OnlineNotes.Data;
 using OnlineNotes.Models;
 
 namespace OnlineNotes.Services.CommentsServices
@@ -10,6 +11,15 @@ namespace OnlineNotes.Services.CommentsServices
         public CommentsService(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        public IEnumerable<Comment> GetCommentsFilteredByDateAsEnumerable(DateTime date)
+        {
+            List<Comment> comments = _context.Comment.ToList();
+            comments = GenericFilterService<Comment>.FilterByCondition(comments,
+                c => c.CreationDate == date);
+
+            return comments.AsEnumerable();
         }
 
         public async Task<bool> CreateCommentAsync (Comment comment)
@@ -45,7 +55,9 @@ namespace OnlineNotes.Services.CommentsServices
         {
             try
             {
-                var comment = await _context.Comment.FindAsync(id);
+                var comment = await _context.Comment
+                    .Where(c => c.Id == id)
+                    .FirstOrDefaultAsync();
                     return comment;
             }
             catch (Exception)

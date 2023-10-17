@@ -22,7 +22,7 @@ namespace OnlineNotes.Controllers
         // GET: Notes
         public async Task<IActionResult> Index()
         {
-            var notes = await _notesService.GetNotesToListAsync();
+            var notes = _notesService.GetNotesAsEnumerable();
               
             if (notes == null)
             {
