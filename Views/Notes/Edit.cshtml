@@ -1,4 +1,6 @@
 ﻿@model OnlineNotes.Models.Note
+@using OnlineNotes.Models
+@using OnlineNotes.Models.Enums;
 
 @{
     ViewData["Title"] = "Edit";
@@ -26,6 +28,19 @@
             <div style="margin-top:10px" class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
                 <a class="btn btn-secondary" asp-action="Index">Back to List</a>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Status</label>
+                <div>
+                    @foreach (var status in Enum.GetValues(typeof(NoteStatus)))
+                    {
+                        <label class="radio-inline">
+                            <input type="radio" asp-for="Status" value="@status" />
+                            @status
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="Status" class="text-danger"></span>
             </div>
         </form>
     </div>

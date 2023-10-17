@@ -12,6 +12,10 @@
         overflow-x: auto;
         white-space: pre-wrap;
     }
+
+    .status-column {
+        width: 50px; /* Adjust the width as needed */
+    }
 </style>
 
 <p>
@@ -20,6 +24,8 @@
 <table class="table">
     <thead>
     <tr>
+            <th class="status-column">Status</th> <!-- Status column -->
+            <th>
         <th style="width: 200px">
             @Html.DisplayNameFor(model => model.Title)
         </th>
@@ -33,6 +39,9 @@
     @foreach (var item in Model)
     {
         <tr>
+                <td class="status-column">
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>

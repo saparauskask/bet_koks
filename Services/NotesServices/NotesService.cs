@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Enums;
 
 namespace OnlineNotes.Services.NotesServices
 {
@@ -12,10 +13,11 @@ namespace OnlineNotes.Services.NotesServices
             _context = context;
         }
 
-        public async Task<bool> CreateNoteAsync(Note note)
+        public async Task<bool> CreateNoteAsync(Note note, NoteStatus status = NoteStatus.Draft)
         {
             try
             {
+                note.Status = status;
                 _context.Note.Add(note);
                 await _context.SaveChangesAsync();
                 return true;
