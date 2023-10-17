@@ -13,6 +13,12 @@ namespace OnlineNotes.Services.CommentsServices
             _context = context;
         }
 
+        public IEnumerable<Comment> GetCommentsAsEnumerable()
+        {
+            List<Comment> comments = _context.Comment.ToList();
+            return comments.AsEnumerable();
+        }
+
         public async Task<bool> CreateCommentAsync (Comment comment)
         {
             try
