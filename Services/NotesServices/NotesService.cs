@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Enums;
 
 namespace OnlineNotes.Services.NotesServices
 {
