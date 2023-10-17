@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineNotes.Data.Migrations;
 using OnlineNotes.Models;
 using OnlineNotes.Services.CommentsServices;
 
@@ -23,6 +24,11 @@ namespace OnlineNotes.Controllers
             ViewBag.Message = noteId;
             ViewBag.CreationDate = DateTime.Now;
             return View();
+        }
+
+        public IActionResult Filter(int noteId)
+        {
+            return RedirectToAction("Details", "Notes", new { id = noteId });
         }
 
         [HttpPost]
@@ -59,6 +65,12 @@ namespace OnlineNotes.Controllers
             ViewBag.Contents = comment.Contents;
             ViewBag.CreationDate = comment.CreationDate;
             return View();
+        }
+
+        [HttpPost, ActionName("Filter")]
+        public async Task<IActionResult> FilterByToday(int noteId)
+        {
+            return RedirectToAction("Details", "Notes", new { id = noteId });
         }
 
         [HttpPost, ActionName("Delete")]
