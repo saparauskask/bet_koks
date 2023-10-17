@@ -13,9 +13,12 @@ namespace OnlineNotes.Services.CommentsServices
             _context = context;
         }
 
-        public IEnumerable<Comment> GetCommentsAsEnumerable()
+        public IEnumerable<Comment> GetCommentsFilteredByDateAsEnumerable(DateTime date)
         {
             List<Comment> comments = _context.Comment.ToList();
+            comments = GenericFilterService<Comment>.FilterByCondition(comments,
+                c => c.CreationDate == date);
+
             return comments.AsEnumerable();
         }
 
