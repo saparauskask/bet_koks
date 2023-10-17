@@ -1,66 +1,44 @@
-﻿using OpenAI_API;
-using System.Globalization;
+﻿using OnlineNotes.Data;
+using OpenAI_API;
 
 namespace OnlineNotes.Services.OpenAIServices
 {
     public class OpenAIService : IOpenAIService
     {
         readonly OpenAIAPI api;
-        private record OpenAIAPIKey(string Key, DateTime CreationDate);
 
         public OpenAIService()
         {
-            var apiKey = ReadApiKey();
+            var apiKey = FileRepository.ReadApiKey();
             api = new OpenAIAPI(apiKey?.Key);
         }
 
-        public async Task<string> CompleteSentence(string input)
+        public async Task<string> CompleteHelpRequest(string input = "Can you help me?")
         {
             try
             {
-                string? result = await api.Completions.GetCompletion(input);
-                return result;
+                var result = await api.Completions.CreateCompletionAsync(input, temperature: 1.0);
+                return result.ToString();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return "Something went wrong, the request could not be completed";
             }
         }
 
-       private OpenAIAPIKey? ReadApiKey()
-       {
-            string apiKeyFilePath = ".env";
+        public async Task<string> CompleteSentence(string input = "Can you help me?")
+        {
             try
             {
-                using (FileStream fileStream = new FileStream(apiKeyFilePath, FileMode.Open, FileAccess.Read))
-                using (StreamReader reader = new StreamReader(fileStream))
-                {
-                    string apiKey = reader.ReadLine()?.Trim() ?? string.Empty; //provides empty string as default value
-                    string dateStr = reader.ReadLine()?.Trim() ?? string.Empty;
-
-                    if (!string.IsNullOrEmpty(apiKey) && !string.IsNullOrEmpty(dateStr))
-                    {
-                        if (DateTime.TryParseExact(dateStr, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime creationDate))
-                        {
-                            return new OpenAIAPIKey(apiKey, creationDate);
-                        }
-                        else
-                        {
-                            Console.WriteLine("Failed to parse the date in the file.");
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("API Key or Date is empty or not found in the file.");
-                    }
-                }
+                var result = await api.Completions.CreateCompletionAsync(input, temperature: 0.5);
+                return result.ToString();
             }
-            catch (Exception ex)
+            catch (Exception ex) 
             {
                 Console.WriteLine(ex.Message);
+                return "Something went wrong, the request could not be completed";
             }
-            return null;
         }
     }
 }

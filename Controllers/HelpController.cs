@@ -21,7 +21,15 @@ namespace OnlineNotes.Controllers
 
         public async Task<IActionResult> HelpButtonAction(string input)
         {
-            string completionResult = await _openAIService.CompleteSentence(input);
+            string completionResult;
+            if (!string.IsNullOrEmpty(input))
+            {
+                completionResult = await _openAIService.CompleteHelpRequest(input);
+            }
+            else
+            {
+                completionResult = await _openAIService.CompleteHelpRequest();
+            }
             return Content(completionResult, "text/plain");
         }
     }
