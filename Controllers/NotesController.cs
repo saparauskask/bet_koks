@@ -53,7 +53,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Contents")] Note note)
+        public async Task<IActionResult> Create([Bind("Id,Title,Contents, Status")] Note note)
         {
             if (ModelState.IsValid)
             {

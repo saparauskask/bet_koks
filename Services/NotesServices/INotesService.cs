@@ -8,7 +8,7 @@ namespace OnlineNotes.Services.NotesServices
     {
         Task<List<Note>?> GetNotesToListAsync();
         Task<Note?> GetNoteAsync(int? id);
-        Task<bool> CreateNoteAsync(Note note, NoteStatus status = NoteStatus.Draft);
+        Task<bool> CreateNoteAsync(Note note);
         Task<bool> UpdateNoteAsync(int id, Note note);
         Task<bool> DeleteNoteAsync(Note note);
     }
