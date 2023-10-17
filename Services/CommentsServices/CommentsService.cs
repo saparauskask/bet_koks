@@ -1,4 +1,5 @@
-﻿using OnlineNotes.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using OnlineNotes.Data;
 using OnlineNotes.Models;
 
 namespace OnlineNotes.Services.CommentsServices
@@ -45,7 +46,9 @@ namespace OnlineNotes.Services.CommentsServices
         {
             try
             {
-                var comment = await _context.Comment.FindAsync(id);
+                var comment = await _context.Comment
+                    .Where(c => c.Id == id)
+                    .FirstOrDefaultAsync();
                     return comment;
             }
             catch (Exception)
