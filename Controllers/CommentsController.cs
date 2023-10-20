@@ -47,7 +47,6 @@ namespace OnlineNotes.Controllers
                 }
 
                 // TODO Redirect to the appropriate page (e.g., the note's details page)
-                return View(comment);
             } 
             return View(comment); // Show the form with validation errors
         }

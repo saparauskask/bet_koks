@@ -2,6 +2,7 @@
 using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
+using OnlineNotes.Models.Requests;
 
 namespace OnlineNotes.Services.NotesServices
 {
@@ -19,11 +20,14 @@ namespace OnlineNotes.Services.NotesServices
             return notes.AsEnumerable();
         }
 
-        public async Task<bool> CreateNoteAsync(Note note)
+        public async Task<bool> CreateNoteAsync(CreateNoteRequest note)
         {
+            Note note1 = new Note();
+            note1.SetTitle(note.Title);
+
             try
             {
-                _context.Note.Add(note);
+                _context.Note.Add(note1);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -35,6 +39,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> DeleteNoteAsync(Note note)
         {
+            note.SetTitle("hello");
             try
             {
                 foreach (var comment in note.Comments.ToList())

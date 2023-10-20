@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Requests;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 
@@ -53,7 +54,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Contents, Status")] Note note)
+        public async Task<IActionResult> Create([Bind("Id,Title,Contents, Status")] CreateNoteRequest note)
         {
             if (ModelState.IsValid)
             {
