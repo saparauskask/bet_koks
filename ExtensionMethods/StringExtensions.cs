@@ -5,8 +5,10 @@
 
         public static int WordCount(this string contents)
         {
-            int count = 0;
-            return count;
+            char[] delimiters = { ' ', '.', '?' };
+            string[] words = contents.Split(delimiters, StringSplitOptions.RemoveEmptyEntries); // splits string into substrings based on the delimeters
+
+            return words.Length;
         }
     }
 }
