@@ -1,23 +1,22 @@
-﻿using OnlineNotes.Models.Enums;
+﻿using Microsoft.Extensions.FileProviders.Composite;
+using OnlineNotes.Models.Enums;
 
 namespace OnlineNotes.Models
 {
     public class Note
     {
         public int Id { get; set; }
-        public string Title { get; private set; }
+        public string Title { get; set; }
         public string Contents { get; set; }
         // Collection navigation containing dependents
         public ICollection<Comment> Comments { get; } = new List<Comment>();
         public NoteStatus Status { get; set; }
 
-        public void SetTitle(string title)
+        public Note(string title, string contents, NoteStatus status)
         {
-            if (!string.IsNullOrWhiteSpace(title))
-            {
-                Title = title;
-            }
-            
+            Title = title;
+            Contents = contents;
+            Status = status;
         }
     }
 }

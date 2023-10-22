@@ -11,7 +11,7 @@ namespace OnlineNotes.Services.NotesServices
         Task<List<Note>?> GetNotesToListAsync();
         Task<Note?> GetNoteAsync(int? id);
         Task<bool> CreateNoteAsync(CreateNoteRequest note);
-        Task<bool> UpdateNoteAsync(int id, Note note);
-        Task<bool> DeleteNoteAsync(Note note);
+        Task<bool> UpdateNoteAsync(EditNoteRequest note);
+        Task<bool> DeleteNoteAsync(DeleteNoteRequest note);
     }
 }
