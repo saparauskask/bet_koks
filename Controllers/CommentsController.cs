@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Data.Migrations;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Requests.Comments;
 using OnlineNotes.Services.CommentsServices;
 
 namespace OnlineNotes.Controllers
@@ -33,7 +34,7 @@ namespace OnlineNotes.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Contents,CreationDate,NoteId")] Comment comment)
+        public async Task<IActionResult> Create([Bind("Id,Contents,CreationDate,NoteId")] CreateCommentRequest comment)
         {
             ModelState.Remove("Note"); // navigation property will be set later by EF based on 'NoteId'
 
@@ -47,7 +48,6 @@ namespace OnlineNotes.Controllers
                 }
 
                 // TODO Redirect to the appropriate page (e.g., the note's details page)
-                return View(comment);
             } 
             return View(comment); // Show the form with validation errors
         }
@@ -75,14 +75,12 @@ namespace OnlineNotes.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int? id)
+        public async Task<IActionResult> DeleteConfirmed(DeleteCommentRequest comment)
         {
-            if (id == null)
+            if (comment.Id == null)
             {
                 return NotFound();
             }
-
-            var comment = await _commentsService.GetCommentByIdAsync(id);
 
             if (comment != null)
             {
@@ -90,7 +88,8 @@ namespace OnlineNotes.Controllers
 
                 if (result)
                 {
-                    return RedirectToAction("Index", "Notes");
+                    //return RedirectToAction("Index", "Notes");
+                    return RedirectToAction("Details", "Notes", new { id = comment.Id });
                 }
                 return NotFound();
             }

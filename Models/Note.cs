@@ -1,4 +1,5 @@
-﻿using OnlineNotes.Models.Enums;
+﻿using Microsoft.Extensions.FileProviders.Composite;
+using OnlineNotes.Models.Enums;
 
 namespace OnlineNotes.Models
 {
@@ -10,5 +11,12 @@ namespace OnlineNotes.Models
         // Collection navigation containing dependents
         public ICollection<Comment> Comments { get; } = new List<Comment>();
         public NoteStatus Status { get; set; }
+
+        public Note(string title, string contents, NoteStatus status)
+        {
+            Title = title;
+            Contents = contents;
+            Status = status;
+        }
     }
 }

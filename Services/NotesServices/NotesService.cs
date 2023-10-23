@@ -2,6 +2,7 @@
 using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
+using OnlineNotes.Models.Requests.Note;
 
 namespace OnlineNotes.Services.NotesServices
 {
@@ -19,8 +20,10 @@ namespace OnlineNotes.Services.NotesServices
             return notes.AsEnumerable();
         }
 
-        public async Task<bool> CreateNoteAsync(Note note)
+        public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
+            Note note = new Note(noteRequest.Title, noteRequest.Contents, noteRequest.Status);
+
             try
             {
                 _context.Note.Add(note);
@@ -33,16 +36,18 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
-        public async Task<bool> DeleteNoteAsync(Note note)
+        public async Task<bool> DeleteNoteAsync(DeleteNoteRequest note)
         {
+            Note actualNote = await GetNoteAsync(note.Id);
+
             try
             {
-                foreach (var comment in note.Comments.ToList())
+                foreach (var comment in actualNote.Comments.ToList())
                 {
                     _context.Comment.Remove(comment);
                 }
                 
-                _context.Note.Remove(note);
+                _context.Note.Remove(actualNote);
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -80,16 +85,14 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
-        public async Task<bool> UpdateNoteAsync(int id, Note note)
+        public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
         {
-            if (id != note.Id)
-            {
-                return false;
-            }
+            Note actualNote = new Note(note.Title, note.Contents, note.Status);
+            actualNote.Id = note.Id;
 
             try
             {
-                _context.Update(note);
+                _context.Update(actualNote);
                 await _context.SaveChangesAsync();
                 return true;
             }

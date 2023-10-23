@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.ExtensionMethods;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Requests.Note;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 
@@ -56,7 +57,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Contents, Status")] Note note)
+        public async Task<IActionResult> Create([Bind("Id,Title,Contents,Status")] CreateNoteRequest note)
         {
             if (ModelState.IsValid)
             {
@@ -91,12 +92,11 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Contents,Status")] Note note)
+        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status")] EditNoteRequest note)
         {
-
             if (ModelState.IsValid)
             {
-                var result = await _notesService.UpdateNoteAsync(id, note);
+                var result = await _notesService.UpdateNoteAsync(note);
 
                 if (result)
                 {
@@ -122,9 +122,8 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(DeleteNoteRequest note)
         {
-            var note = await _notesService.GetNoteAsync(id);
             if (note == null)
             {
                 return NotFound();
@@ -137,7 +136,8 @@ namespace OnlineNotes.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return Error();
+            //return Error();
+            return RedirectToAction(nameof(Index));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
