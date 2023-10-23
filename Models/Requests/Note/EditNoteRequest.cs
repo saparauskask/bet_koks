@@ -1,6 +1,6 @@
 ﻿using OnlineNotes.Models.Enums;
 
-namespace OnlineNotes.Models.Requests
+namespace OnlineNotes.Models.Requests.Note
 {
     public class EditNoteRequest
     {

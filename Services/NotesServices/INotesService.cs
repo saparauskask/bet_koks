@@ -1,7 +1,7 @@
 ﻿using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
-using OnlineNotes.Models.Requests;
+using OnlineNotes.Models.Requests.Note;
 
 namespace OnlineNotes.Services.NotesServices
 {

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Requests.Comments;
 
 namespace OnlineNotes.Services.CommentsServices
 {
@@ -22,8 +23,14 @@ namespace OnlineNotes.Services.CommentsServices
             return comments.AsEnumerable();
         }
 
-        public async Task<bool> CreateCommentAsync (Comment comment)
+        public async Task<bool> CreateCommentAsync (CreateCommentRequest commentReqest)
         {
+            Comment comment = new Comment();
+            comment.Contents = commentReqest.Contents;
+            comment.NoteId = commentReqest.NoteId;
+            comment.Note = commentReqest.Note;
+            comment.CreationDate = DateTime.Now;
+
             try
             {
                 _context.Comment.Add(comment);
@@ -37,8 +44,9 @@ namespace OnlineNotes.Services.CommentsServices
 
         }
 
-        public async Task<bool> DeleteCommentAsync(Comment comment)
+        public async Task<bool> DeleteCommentAsync(DeleteCommentRequest commentRequest)
         {
+            Comment comment = await GetCommentByIdAsync(commentRequest.Id);
             try
             {
                 _context.Comment.Remove(comment);

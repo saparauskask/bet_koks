@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Models;
-using OnlineNotes.Models.Requests;
+using OnlineNotes.Models.Requests.Note;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 
