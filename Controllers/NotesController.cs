@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineNotes.ExtensionMethods;
 using OnlineNotes.Models;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
@@ -40,6 +41,8 @@ namespace OnlineNotes.Controllers
             {
                 return NotFound();
             }
+            var wordCount = note.Contents.WordCount();
+            ViewBag.Count = wordCount;
             ViewBag.NoteId = id;
             return View(note);
         }
