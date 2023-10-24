@@ -15,21 +15,35 @@
 <!-- Add a div to display the returned text -->
 <div id="resultDiv"></div>
 
+<div id="loading" style="display: none;">
+    <!-- Three dots to simulate a loading animation -->
+    loading...
+</div>
+
 @section scripts {
     <script>
         document.getElementById("myButton").addEventListener("click", function () {
             // Get the user input from the text input field
             var userInput = document.getElementById("textInput").value;
 
+            // Show the loading dots
+            var loading = document.getElementById("loading");
+            loading.style.display = "block";
+
             // Send a request to the action with the user input
             fetch('@Url.Action("HelpButtonAction", "Help")?input=' + encodeURIComponent(userInput))
                 .then(response => response.text())
                 .then(text => {
+                    // Hide the loading dots
+                    loading.style.display = "none";
+
                     // Display the returned text in the resultDiv
                     document.getElementById("resultDiv").innerText = text;
                 })
                 .catch(error => {
                     console.error('Error:', error);
+                    // Hide the loading dots in case of an error
+                    loading.style.display = "none";
                 });
         });
     </script>
