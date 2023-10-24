@@ -12,6 +12,7 @@ namespace OnlineNotes.Controllers
 
         public HelpController(IOpenAIService openAIService)
         {
+            //implement sessions
             _openAIService = openAIService;
             _conversation = new ChatGPTConversation(DateTime.Now);
         }

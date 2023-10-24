@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using OnlineNotes.Data;
+﻿using OnlineNotes.Data;
 using OpenAI_API;
 using OpenAI_API.Chat;
 
@@ -9,7 +8,6 @@ namespace OnlineNotes.Services.OpenAIServices
     {
         private OpenAIAPI _api;
         private Conversation chat;
-
         public DateTime StartTime { get; }
         public DateTime EndTime { get; }
         public List<ChatGPTMessage> Messages { get; }
