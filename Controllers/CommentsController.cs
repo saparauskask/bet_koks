@@ -84,12 +84,12 @@ namespace OnlineNotes.Controllers
 
             if (comment != null)
             {
-               var result = await _commentsService.DeleteCommentAsync(comment);
+                int noteId = await _commentsService.GetNoteIdFromCommentId(comment.Id);
+                var result = await _commentsService.DeleteCommentAsync(comment);
 
                 if (result)
                 {
-                    //return RedirectToAction("Index", "Notes");
-                    return RedirectToAction("Details", "Notes", new { id = comment.Id });
+                    return RedirectToAction("Details", "Notes", new { id = noteId });
                 }
                 return NotFound();
             }

@@ -9,5 +9,6 @@ namespace OnlineNotes.Services.CommentsServices
         Task<bool> CreateCommentAsync(CreateCommentRequest commentReqest);
         Task<Comment?> GetCommentByIdAsync(int? id);
         Task<bool> DeleteCommentAsync(DeleteCommentRequest commentRequest);
+        Task<int> GetNoteIdFromCommentId(int commentId);
     }
 }
