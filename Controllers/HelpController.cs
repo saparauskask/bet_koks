@@ -8,13 +8,13 @@ namespace OnlineNotes.Controllers
     public class HelpController : Controller
     {
         private readonly IOpenAIService _openAIService;
-        private ChatGPTConversation _conversation;
+        private List<object> _conversationList;
 
         public HelpController(IOpenAIService openAIService)
         {
             //implement sessions
             _openAIService = openAIService;
-            _conversation = new ChatGPTConversation(DateTime.Now);
+            _conversationList = new List<object>();
         }
 
         public IActionResult Index()
@@ -27,13 +27,28 @@ namespace OnlineNotes.Controllers
             string completionResult;
             if (!string.IsNullOrEmpty(input))
             {
-                completionResult = await _conversation.GenerateResponse(input);
+                ChatGPTConversation conversation = new ChatGPTConversation(DateTime.Now);
+                completionResult = await conversation.GenerateResponse(input);
+
+                _conversationList.Add(conversation);
             }
             else
             {
                 completionResult = await _openAIService.CompleteHelpRequest();
             }
             return Content(completionResult, "text/plain");
+        }
+        public ChatGPTConversation RetrieveConversation(int index)
+        {
+                if (index >= 0 && index < _conversationList.Count)
+                {
+                    ChatGPTConversation conversation = (ChatGPTConversation)_conversationList[index];
+                    return conversation;
+                }
+                else
+                {
+                    return new ChatGPTConversation(default(DateTime));
+                }
         }
     }
 }

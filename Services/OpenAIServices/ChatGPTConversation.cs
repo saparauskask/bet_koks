@@ -1,4 +1,5 @@
-﻿using OnlineNotes.Data;
+﻿using Microsoft.AspNetCore.SignalR;
+using OnlineNotes.Data;
 using OpenAI_API;
 using OpenAI_API.Chat;
 
@@ -10,14 +11,18 @@ namespace OnlineNotes.Services.OpenAIServices
         private Conversation chat;
         public DateTime StartTime { get; }
         public DateTime EndTime { get; }
+        public string UserId { get; }
         public List<ChatGPTMessage> Messages { get; }
 
-        public ChatGPTConversation(DateTime startTime)
+        public ChatGPTConversation(DateTime startTime, string userId = "123abc")
         {
             StartTime = startTime;
             EndTime = DateTime.MinValue;
+            UserId = userId;
+
             var apiKey = FileRepository.ReadApiKey();
             _api = new OpenAIAPI(apiKey?.Key);
+
             Messages = new List<ChatGPTMessage>();
             chat = _api.Chat.CreateConversation();
         }
