@@ -8,10 +8,12 @@ namespace OnlineNotes.Controllers
     public class HelpController : Controller
     {
         private readonly IOpenAIService _openAIService;
+        private ChatGPTConversation _conversation;
 
         public HelpController(IOpenAIService openAIService)
         {
             _openAIService = openAIService;
+            _conversation = new ChatGPTConversation(DateTime.Now);
         }
 
         public IActionResult Index()
@@ -24,7 +26,7 @@ namespace OnlineNotes.Controllers
             string completionResult;
             if (!string.IsNullOrEmpty(input))
             {
-                completionResult = await _openAIService.CompleteHelpRequest(input);
+                completionResult = await _conversation.GenerateResponse(input);
             }
             else
             {
