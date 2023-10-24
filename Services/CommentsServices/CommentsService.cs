@@ -47,6 +47,7 @@ namespace OnlineNotes.Services.CommentsServices
         public async Task<bool> DeleteCommentAsync(DeleteCommentRequest commentRequest)
         {
             Comment comment = await GetCommentByIdAsync(commentRequest.Id);
+
             try
             {
                 _context.Comment.Remove(comment);
@@ -71,6 +72,20 @@ namespace OnlineNotes.Services.CommentsServices
             catch (Exception)
             {
                 return null; // TODO do something with the exception
+            }
+        }
+
+        public async Task<int> GetNoteIdFromCommentId(int commentId)
+        {
+            Comment? comment = await GetCommentByIdAsync(commentId);
+
+            if (comment != null)
+            {
+                return comment.NoteId;
+            }
+            else
+            {
+                throw new Exception("Comment not found");
             }
         }
     }
