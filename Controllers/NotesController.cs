@@ -25,8 +25,7 @@ namespace OnlineNotes.Controllers
         // GET: Notes
         public async Task<IActionResult> Index()
         {
-            var notes = _notesService.GetNotesAsEnumerable();
-            //var notes = await _notesService.GetFilteredNotesToListAsync(Models.Enums.NoteStatus.Draft);
+            var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus());
               
             if (notes == null)
             {
@@ -140,12 +139,6 @@ namespace OnlineNotes.Controllers
 
             var result = await _notesService.DeleteNoteAsync(note);
 
-            if (result)
-            {
-                return RedirectToAction(nameof(Index));
-            }
-
-            //return Error();
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
@@ -9,9 +11,33 @@ namespace OnlineNotes.Services.NotesServices
     public class NotesService : INotesService
     {
         private readonly ApplicationDbContext _context;
-        public NotesService(ApplicationDbContext context)
+        private readonly IHttpContextAccessor _contextAccessor;
+
+        public NotesService(ApplicationDbContext context, IHttpContextAccessor contextAccessor)
         {
             _context = context;
+            _contextAccessor = contextAccessor;
+        }
+
+        public NoteStatus? GetFilterStatus()
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                string? filterStatusString = _contextAccessor.HttpContext.Session.GetString("FilterStatus");
+
+                switch (filterStatusString)
+                {
+                    case "Public":
+                        return NoteStatus.Public;
+                    case "Draft":
+                        return NoteStatus.Draft;
+                    case "Archived":
+                        return NoteStatus.Archived;
+                    default:
+                        return null;
+                }
+            }
+            return null;
         }
 
         public IEnumerable<Note> GetNotesAsEnumerable()
@@ -89,6 +115,11 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
+                if (_contextAccessor.HttpContext != null)
+                {
+                        _contextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
+                }
+
                 if (filterStatus.HasValue)
                 {
                     var notes = await _context.Note.Where(note => note.Status == filterStatus).ToListAsync();
