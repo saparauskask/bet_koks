@@ -20,6 +20,19 @@
 
 <p>
     <a class="btn btn-primary" asp-action="Create">Create New</a>
+    <div class="btn-group" role="group" aria-label="Filter radio">
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked="">
+        <a class="btn btn-outline-primary" for="btnradio1" asp-action="Filter">All</a>
+
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off" checked="">
+        <a class="btn btn-outline-primary" for="btnradio2" asp-action="Filter" asp-route-status="Public">Public</a>
+
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off" checked="">
+        <a class="btn btn-outline-primary" for="btnradio3" asp-action="Filter" asp-route-status="Draft">Draft</a>
+
+        <input type="radio" class="btn-check" name="btnradio" id="btnradio4" autocomplete="off" checked="">
+        <a class="btn btn-outline-primary" for="btnradio4" asp-action="Filter" asp-route-status="Archived">Archived</a>
+    </div>
 </p>
 <table class="table">
     <thead>

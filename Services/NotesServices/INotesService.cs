@@ -13,5 +13,6 @@ namespace OnlineNotes.Services.NotesServices
         Task<bool> CreateNoteAsync(CreateNoteRequest note);
         Task<bool> UpdateNoteAsync(EditNoteRequest note);
         Task<bool> DeleteNoteAsync(DeleteNoteRequest note);
+        Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus);
     }
 }

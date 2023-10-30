@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.ExtensionMethods;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
@@ -25,11 +26,13 @@ namespace OnlineNotes.Controllers
         public async Task<IActionResult> Index()
         {
             var notes = _notesService.GetNotesAsEnumerable();
+            //var notes = await _notesService.GetFilteredNotesToListAsync(Models.Enums.NoteStatus.Draft);
               
             if (notes == null)
             {
                 return Error();
             }
+
             return View(notes);
         }
 
@@ -52,6 +55,12 @@ namespace OnlineNotes.Controllers
         public IActionResult Create()
         {
             return View();
+        }
+
+        public async Task<IActionResult> Filter(NoteStatus? status)
+        {
+            var notes = await _notesService.GetFilteredNotesToListAsync(status);
+            return View("Index", notes);
         }
 
         // POST: Notes/Create
