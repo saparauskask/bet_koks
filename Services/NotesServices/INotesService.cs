@@ -1,4 +1,5 @@
-﻿using OnlineNotes.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
@@ -13,5 +14,7 @@ namespace OnlineNotes.Services.NotesServices
         Task<bool> CreateNoteAsync(CreateNoteRequest note);
         Task<bool> UpdateNoteAsync(EditNoteRequest note);
         Task<bool> DeleteNoteAsync(DeleteNoteRequest note);
+        Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus);
+        NoteStatus? GetFilterStatus();
     }
 }
