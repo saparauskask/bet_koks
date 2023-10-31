@@ -19,7 +19,17 @@
 </style>
 
 <p>
-    <a class="btn btn-primary" asp-action="Create">Create New</a>
+    <div class="btn-group" role="group">
+        <a class="btn btn-primary" asp-action="Create" style="margin-right:10px">Create New</a>
+
+        <button id="btnGroupDrop" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter by </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop" style="">
+            <a class="dropdown-item" asp-action="Filter">All</a>
+            <a class="dropdown-item" asp-action="Filter" asp-route-status="Public">Public</a>
+            <a class="dropdown-item" asp-action="Filter" asp-route-status="Draft">Draft</a>
+            <a class="dropdown-item" asp-action="Filter" asp-route-status="Archived">Archived</a>
+        </div>
+    </div>
 </p>
 <table class="table">
     <thead>

@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
@@ -9,9 +11,33 @@ namespace OnlineNotes.Services.NotesServices
     public class NotesService : INotesService
     {
         private readonly ApplicationDbContext _context;
-        public NotesService(ApplicationDbContext context)
+        private readonly IHttpContextAccessor _contextAccessor;
+
+        public NotesService(ApplicationDbContext context, IHttpContextAccessor contextAccessor)
         {
             _context = context;
+            _contextAccessor = contextAccessor;
+        }
+
+        public NoteStatus? GetFilterStatus()
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                string? filterStatusString = _contextAccessor.HttpContext.Session.GetString("FilterStatus");
+
+                switch (filterStatusString)
+                {
+                    case "Public":
+                        return NoteStatus.Public;
+                    case "Draft":
+                        return NoteStatus.Draft;
+                    case "Archived":
+                        return NoteStatus.Archived;
+                    default:
+                        return null;
+                }
+            }
+            return null;
         }
 
         public IEnumerable<Note> GetNotesAsEnumerable()
@@ -22,7 +48,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
-            Note note = new Note(noteRequest.Title, noteRequest.Contents, noteRequest.Status);
+            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status);
 
             try
             {
@@ -38,7 +64,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> DeleteNoteAsync(DeleteNoteRequest note)
         {
-            Note actualNote = await GetNoteAsync(note.Id);
+            Note? actualNote = await GetNoteAsync(note.Id);
 
             try
             {
@@ -85,10 +111,36 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
+        public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus)
+        {
+            try
+            {
+                if (_contextAccessor.HttpContext != null)
+                {
+                        _contextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
+                }
+
+                if (filterStatus.HasValue)
+                {
+                    var notes = await _context.Note.Where(note => note.Status == filterStatus).ToListAsync();
+                    return notes.AsEnumerable();
+                }
+                else
+                {
+                    var notes = await _context.Note.ToListAsync();
+                    return notes.AsEnumerable();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex + "An eror occured");
+                return null;
+            }
+        }
+
         public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
         {
-            Note actualNote = new Note(note.Title, note.Contents, note.Status);
-            actualNote.Id = note.Id;
+            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id };
 
             try
             {
