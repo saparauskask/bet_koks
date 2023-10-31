@@ -41,12 +41,6 @@ namespace OnlineNotes.Services.NotesServices
             return null;
         }
 
-        public IEnumerable<Note> GetNotesAsEnumerable() // This method is no longer in use
-        {
-            List<Note> notes = _context.Note.ToList();
-            return notes.AsEnumerable();
-        }
-
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
             Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status);
@@ -117,20 +111,6 @@ namespace OnlineNotes.Services.NotesServices
             }
 
             return note;
-        }
-
-        public async Task<List<Note>?> GetNotesToListAsync() //  this method is no longer in use
-        {
-            try
-            {
-                var notes = await _context.Note.ToListAsync();
-                return notes;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex + "An eror occured");
-                return null;
-            }
         }
 
         public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus)
