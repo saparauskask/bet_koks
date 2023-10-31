@@ -4,6 +4,8 @@ using OnlineNotes.Data;
 using OnlineNotes.Services.CommentsServices;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
+using Serilog;
+using Serilog.Events;
 
 namespace OnlineNotes
 {
@@ -34,6 +36,14 @@ namespace OnlineNotes
             builder.Services.AddScoped<IOpenAIService,  OpenAIService>();
             builder.Services.AddScoped<ICommentsService, CommentsService>();
             builder.Services.AddScoped<INotesService, NotesService>();
+
+            // logger configuration for writting log messages to a file
+            var logger = new LoggerConfiguration()
+                .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
+                .Enrich.FromLogContext()
+                .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
+                .CreateLogger();
+            builder.Logging.AddSerilog(logger);
 
             var app = builder.Build();
 
