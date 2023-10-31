@@ -8,19 +8,29 @@ namespace OnlineNotes.Services.CommentsServices
     public class CommentsService : ICommentsService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<CommentsService> _logger;
 
-        public CommentsService(ApplicationDbContext context)
+        public CommentsService(ApplicationDbContext context, ILogger<CommentsService> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
-        public IEnumerable<Comment> GetCommentsFilteredByDateAsEnumerable(DateTime date)
+        public IEnumerable<Comment>? GetCommentsFilteredByDateAsEnumerable(DateTime date)
         {
-            List<Comment> comments = _context.Comment.ToList();
-            comments = GenericFilterService<Comment>.FilterByCondition(comments,
-                c => c.CreationDate == date);
-
-            return comments.AsEnumerable();
+            try
+            {
+                List<Comment> comments = _context.Comment.ToList();
+                comments = GenericFilterService<Comment>.FilterByCondition(comments,
+                    c => c.CreationDate == date);
+                _logger.LogInformation("Retrieved comments filtered by date: {Date}", date);
+                return comments.AsEnumerable();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while retrieving comments filtered by date: {Date}", date);
+            }
+            return null;
         }
 
         public async Task<bool> CreateCommentAsync (CreateCommentRequest commentReqest)
@@ -28,17 +38,18 @@ namespace OnlineNotes.Services.CommentsServices
             Comment comment = new Comment();
             comment.Contents = commentReqest.Contents;
             comment.NoteId = commentReqest.NoteId;
-            comment.Note = commentReqest.Note;
             comment.CreationDate = DateTime.Now;
 
             try
             {
                 _context.Comment.Add(comment);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Comment with ID: {CommentId} was created successfully.", comment.Id);
                 return true;
             } 
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while saving the comment: {ExceptionMessage}.", ex.Message);
                 return false;
             }
 
@@ -46,32 +57,47 @@ namespace OnlineNotes.Services.CommentsServices
 
         public async Task<bool> DeleteCommentAsync(DeleteCommentRequest commentRequest)
         {
-            Comment comment = await GetCommentByIdAsync(commentRequest.Id);
+            Comment? comment = await GetCommentByIdAsync(commentRequest.Id);
+
+            if (comment == null)
+            {
+                _logger.LogWarning("Comment with ID: {commentId} was not found for deletion.", commentRequest.Id);
+                return false;
+            }
 
             try
             {
                 _context.Comment.Remove(comment);
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("Comment with ID: {commentId} was deleted successfully.", commentRequest.Id);
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "An error occurred while deleting the comment: {ExceptionMessage}", ex.Message);
                 return false;
             }
         }
 
         public async Task<Comment?> GetCommentByIdAsync(int? id)
         {
+            if (id == null)
+            {
+                _logger.LogWarning("GetCommentByIdAsync: Requested Comment with ID: null.");
+            }
+
             try
             {
                 var comment = await _context.Comment
                     .Where(c => c.Id == id)
                     .FirstOrDefaultAsync();
-                    return comment;
+                _logger.LogInformation("Retrieved Comment with ID: {CommentId}.", id);
+                return comment;
             }
             catch (Exception)
             {
-                return null; // TODO do something with the exception
+                _logger.LogWarning("Comment with ID: {CommentId} was not found.", id);
+                return null;
             }
         }
 
@@ -85,6 +111,7 @@ namespace OnlineNotes.Services.CommentsServices
             }
             else
             {
+                _logger.LogWarning("Comment not found for Comment ID: {CommentId}", commentId);
                 throw new Exception("Comment not found");
             }
         }

@@ -59,6 +59,10 @@ namespace OnlineNotes.Controllers
         public async Task<IActionResult> Filter(NoteStatus? status)
         {
             var notes = await _notesService.GetFilteredNotesToListAsync(status);
+            if (notes == null)
+            {
+                return Error();
+            }
             return View("Index", notes);
         }
 
@@ -75,7 +79,7 @@ namespace OnlineNotes.Controllers
                 {
                     return RedirectToAction(nameof(Index));
                 }
-                return Problem();
+                return Error();
             }
             return View(note);
         }

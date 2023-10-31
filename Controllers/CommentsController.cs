@@ -47,7 +47,6 @@ namespace OnlineNotes.Controllers
                     return RedirectToAction("Details", "Notes", new { id = comment.NoteId });
                 }
 
-                // TODO Redirect to the appropriate page (e.g., the note's details page)
             } 
             return View(comment); // Show the form with validation errors
         }
@@ -77,13 +76,6 @@ namespace OnlineNotes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(DeleteCommentRequest comment)
         {
-            if (comment.Id == null)
-            {
-                return NotFound();
-            }
-
-            if (comment != null)
-            {
                 int noteId = await _commentsService.GetNoteIdFromCommentId(comment.Id);
                 var result = await _commentsService.DeleteCommentAsync(comment);
 
@@ -91,10 +83,7 @@ namespace OnlineNotes.Controllers
                 {
                     return RedirectToAction("Details", "Notes", new { id = noteId });
                 }
-                return NotFound();
-            }
             return NotFound();
-
         }
     }
 }

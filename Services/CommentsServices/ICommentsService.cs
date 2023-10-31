@@ -5,7 +5,7 @@ namespace OnlineNotes.Services.CommentsServices
 {
     public interface ICommentsService
     {
-        IEnumerable<Comment> GetCommentsFilteredByDateAsEnumerable(DateTime date);
+        IEnumerable<Comment>? GetCommentsFilteredByDateAsEnumerable(DateTime date);
         Task<bool> CreateCommentAsync(CreateCommentRequest commentReqest);
         Task<Comment?> GetCommentByIdAsync(int? id);
         Task<bool> DeleteCommentAsync(DeleteCommentRequest commentRequest);
