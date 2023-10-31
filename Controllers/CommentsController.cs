@@ -77,12 +77,8 @@ namespace OnlineNotes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(DeleteCommentRequest comment)
         {
-            if (comment.Id == null)
-            {
-                return NotFound();
-            }
 
-            if (comment != null)
+          try
             {
                 int noteId = await _commentsService.GetNoteIdFromCommentId(comment.Id);
                 var result = await _commentsService.DeleteCommentAsync(comment);
@@ -91,10 +87,13 @@ namespace OnlineNotes.Controllers
                 {
                     return RedirectToAction("Details", "Notes", new { id = noteId });
                 }
-                return NotFound();
             }
-            return NotFound();
+            catch (Exception ex)
+            {
+                //return NotFound();
+            }
 
+            return NotFound();
         }
     }
 }

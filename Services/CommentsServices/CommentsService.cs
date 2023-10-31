@@ -28,7 +28,6 @@ namespace OnlineNotes.Services.CommentsServices
             Comment comment = new Comment();
             comment.Contents = commentReqest.Contents;
             comment.NoteId = commentReqest.NoteId;
-            comment.Note = commentReqest.Note;
             comment.CreationDate = DateTime.Now;
 
             try
@@ -46,7 +45,12 @@ namespace OnlineNotes.Services.CommentsServices
 
         public async Task<bool> DeleteCommentAsync(DeleteCommentRequest commentRequest)
         {
-            Comment comment = await GetCommentByIdAsync(commentRequest.Id);
+            Comment? comment = await GetCommentByIdAsync(commentRequest.Id);
+
+            if (comment == null)
+            {
+                return false;
+            }
 
             try
             {
@@ -54,7 +58,7 @@ namespace OnlineNotes.Services.CommentsServices
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
