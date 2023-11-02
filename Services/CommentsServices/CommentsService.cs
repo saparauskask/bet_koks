@@ -16,23 +16,6 @@ namespace OnlineNotes.Services.CommentsServices
             _logger = logger;
         }
 
-        public IEnumerable<Comment>? GetCommentsFilteredByDateAsEnumerable(DateTime date)
-        {
-            try
-            {
-                List<Comment> comments = _context.Comment.ToList();
-                comments = GenericFilterService<Comment>.FilterByCondition(comments,
-                    c => c.CreationDate == date);
-                _logger.LogInformation("Retrieved comments filtered by date: {Date}", date);
-                return comments.AsEnumerable();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while retrieving comments filtered by date: {Date}", date);
-            }
-            return null;
-        }
-
         public async Task<bool> CreateCommentAsync (CreateCommentRequest commentReqest)
         {
             Comment comment = new Comment();
