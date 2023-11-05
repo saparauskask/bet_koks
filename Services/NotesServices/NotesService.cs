@@ -49,7 +49,6 @@ namespace OnlineNotes.Services.NotesServices
             {
                 _context.Note.Add(note);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Note with ID: {NoteId} was created successfully.", note.Id);
                 return true;
             }
             catch (Exception ex)
@@ -79,7 +78,6 @@ namespace OnlineNotes.Services.NotesServices
                 
                 _context.Note.Remove(actualNote);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Note with ID: {noteId} was deleted successfully.", noteId);
                 return true;
             }
             catch(Exception ex)
@@ -101,11 +99,7 @@ namespace OnlineNotes.Services.NotesServices
                 .Include(n => n.Comments) // Include the Comments navigation property
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (note != null)
-            {
-                _logger.LogInformation("Retrieved Note with ID: {NoteId}.", note.Id);
-            }
-            else
+            if (note == null)
             {
                 _logger.LogWarning("Note with ID: {NoteId} was not found.", id);
             }
@@ -164,7 +158,6 @@ namespace OnlineNotes.Services.NotesServices
             {
                 _context.Update(actualNote);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Note with ID: {NoteId} updated successfully.", note.Id);
                 return true;
             }
             catch (Exception ex)

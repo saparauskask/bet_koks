@@ -68,7 +68,7 @@ namespace OnlineNotes.Controllers
                 int noteId = await _commentsService.GetNoteIdFromCommentId(comment.Id);
                 var result = await _commentsService.DeleteCommentAsync(comment);
 
-                if (result)
+                if (result && noteId != 0)
                 {
                     return RedirectToAction("Details", "Notes", new { id = noteId });
                 }

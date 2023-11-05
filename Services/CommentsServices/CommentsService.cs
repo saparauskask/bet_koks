@@ -27,7 +27,6 @@ namespace OnlineNotes.Services.CommentsServices
             {
                 _context.Comment.Add(comment);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Comment with ID: {CommentId} was created successfully.", comment.Id);
                 return true;
             } 
             catch (Exception ex)
@@ -52,7 +51,6 @@ namespace OnlineNotes.Services.CommentsServices
             {
                 _context.Comment.Remove(comment);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Comment with ID: {commentId} was deleted successfully.", commentRequest.Id);
                 return true;
             }
             catch (Exception ex)
@@ -74,7 +72,6 @@ namespace OnlineNotes.Services.CommentsServices
                 var comment = await _context.Comment
                     .Where(c => c.Id == id)
                     .FirstOrDefaultAsync();
-                _logger.LogInformation("Retrieved Comment with ID: {CommentId}.", id);
                 return comment;
             }
             catch (Exception)
@@ -95,7 +92,7 @@ namespace OnlineNotes.Services.CommentsServices
             else
             {
                 _logger.LogWarning("Comment not found for Comment ID: {CommentId}", commentId);
-                throw new Exception("Comment not found");
+                return 0;
             }
         }
     }
