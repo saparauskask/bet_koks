@@ -66,6 +66,17 @@ namespace OnlineNotes.Controllers
             return View("Index", notes);
         }
 
+        public async Task<IActionResult> Search(string term)
+        {
+            if (!String.IsNullOrWhiteSpace(term))
+            {
+                var notes = await _notesService.GetIndexedNotesToListAsync(term);
+                return View("Index", notes);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         // POST: Notes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]

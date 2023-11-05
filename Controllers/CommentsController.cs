@@ -27,11 +27,6 @@ namespace OnlineNotes.Controllers
             return View();
         }
 
-        public IActionResult Filter(int noteId)
-        {
-            return RedirectToAction("Details", "Notes", new { id = noteId });
-        }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Contents,CreationDate,NoteId")] CreateCommentRequest comment)
@@ -64,12 +59,6 @@ namespace OnlineNotes.Controllers
             ViewBag.Contents = comment.Contents;
             ViewBag.CreationDate = comment.CreationDate;
             return View();
-        }
-
-        [HttpPost, ActionName("Filter")]
-        public async Task<IActionResult> FilterByToday(int noteId)
-        {
-            return RedirectToAction("Details", "Notes", new { id = noteId });
         }
 
         [HttpPost, ActionName("Delete")]

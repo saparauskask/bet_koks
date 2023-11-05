@@ -140,6 +140,22 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
+        public async Task<IEnumerable<Note>?> GetIndexedNotesToListAsync(string term)
+        {
+            try
+            {
+                // Makes search term and Note title lowercase to make searching case insensitive
+                string lowerTerm = term.ToLower();
+                var notes = await _context.Note.Where(note => note.Title.ToLower().Contains(lowerTerm)).ToListAsync();
+                return notes;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetIndexedNotesToListAsync: {ErrorMessage}", ex.Message);
+                return null;
+            }
+        }
+
         public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
         {
             Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id };
