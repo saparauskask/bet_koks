@@ -20,15 +20,22 @@
 
 <p>
     <div class="btn-group" role="group">
-        <a class="btn btn-primary" asp-action="Create" style="margin-right:10px">Create New</a>
+        <a class="btn btn-primary" asp-action="Create" style="margin-right:100px">Create New</a>
 
         <button id="btnGroupDrop" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter by </button>
-        <div class="dropdown-menu" aria-labelledby="btnGroupDrop" style="">
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop">
             <a class="dropdown-item" asp-action="Filter">All</a>
             <a class="dropdown-item" asp-action="Filter" asp-route-status="Public">Public</a>
             <a class="dropdown-item" asp-action="Filter" asp-route-status="Draft">Draft</a>
             <a class="dropdown-item" asp-action="Filter" asp-route-status="Archived">Archived</a>
         </div>
+
+        <form class="d-flex" style="margin-left:10px" asp-action="Search">
+            <input class="form-control me-sm-2" type="search" placeholder="Search" name="term">
+            <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
+        </form>
+
+        <a class="btn btn-link" asp-action="Filter" hidden>Show All</a>
     </div>
 </p>
 <table class="table">
