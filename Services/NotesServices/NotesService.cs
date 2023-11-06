@@ -75,6 +75,11 @@ namespace OnlineNotes.Services.NotesServices
                 {
                     _context.Comment.Remove(comment);
                 }
+
+                foreach (var rating in actualNote.Ratings.ToList())
+                {
+                    _context.NoteRating.Remove(rating);
+                }
                 
                 _context.Note.Remove(actualNote);
                 await _context.SaveChangesAsync();
@@ -97,6 +102,7 @@ namespace OnlineNotes.Services.NotesServices
 
             var note = await _context.Note
                 .Include(n => n.Comments) // Include the Comments navigation property
+                .Include(n => n.Ratings)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (note == null)
@@ -153,7 +159,7 @@ namespace OnlineNotes.Services.NotesServices
         public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
         {
             Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id };
-
+            actualNote.AvgRating = note.AvgRating;
             try
             {
                 _context.Update(actualNote);
@@ -165,6 +171,39 @@ namespace OnlineNotes.Services.NotesServices
                 _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
                 return false;
             }
+        }
+
+        public async Task<bool> CalculateAvgRating(Note? note)
+        {
+            if (note == null) { return false; }
+
+            note = await _context.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
+                .Include(n => n.Ratings)
+                .FirstOrDefaultAsync(m => m.Id == note.Id);
+
+            if (note == null || note.Ratings == null) return false;
+
+            float totalRating = 0;
+            foreach (var rating in note.Ratings)
+            {
+                totalRating += rating.RatingValue;
+            }
+
+            float averageRating =(float) Math.Round(totalRating / note.Ratings.Count, 2);
+
+            try
+            {
+                note.AvgRating = averageRating;
+                _context.Update(note);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
+            }
+            return false;
         }
     }
 }

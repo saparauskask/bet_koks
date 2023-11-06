@@ -17,6 +17,15 @@
 <div>
     <h4>Note</h4>
     <hr />
+    @if (Model.Ratings.Any())
+    {
+        <!--TODO rated by x users-->
+        <p>Rating: @(Model.AvgRating.ToString())/5</p>
+       
+    } else
+    {
+        <p>There are no ratings yet for this post</p>
+    }
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
@@ -31,7 +40,7 @@
             <pre>@Html.DisplayFor(model => model.Contents)</pre>
         </dd>
 
-        <div align="right" background: blue> <b>@ViewBag.Count words</b></div>
+        <div align="right" background: blue> @ViewBag.Count words</div>
 
         <div id="explainField" hidden>
             <dt class="col-sm-2">
@@ -43,6 +52,55 @@
         </div>
 
     </dl>
+</div>
+
+<div>
+    <h4>Rate this note</h4>
+    <!-- TODO. Will implement UI later
+
+    <div class="stars">
+        <input type="radio" id="star1" name="rating" value="1" />
+        <input type="radio" id="star2" name="rating" value="2" />
+        <input type="radio" id="star3" name="rating" value="3" />
+        <input type="radio" id="star4" name="rating" value="4" />
+        <input type="radio" id="star5" name="rating" value="5" />
+
+        <label for="star1" aria-label="Banana">1 star</label>
+        <label for="star2">2 stars</label>
+        <label for="star3">3 stars</label>
+        <label for="star4">4 stars</label>
+        <label for="star5">5 stars</label>
+
+        <button id="submitRating">Submit</button>
+    </div>
+    <div id="resultDiv"></div>
+    -->
+
+    <form asp-action="SubmitRating" asp-controller="Notes" method="post">
+        <div class="stars">
+            <input type="radio" id="star1" name="rating" value="1" />
+            <label for="star1">1 star</label>
+
+            <input type="radio" id="star2" name="rating" value="2" />
+            <label for="star2">2 stars</label>
+
+            <input type="radio" id="star3" name="rating" value="3" />
+            <label for="star3">3 stars</label>
+
+            <input type="radio" id="star4" name="rating" value="4" />
+            <label for="star4">4 stars</label>
+
+            <input type="radio" id="star5" name="rating" value="5" />
+            <label for="star5">5 stars</label>
+
+            <input type="hidden" name="id" value="@Model.Id" />
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <br />
+    <hr />
 </div>
 
 <div>

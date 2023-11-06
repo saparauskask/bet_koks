@@ -7,6 +7,8 @@ using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
+using OnlineNotes.Services.RatingServices;
+using Microsoft.AspNetCore.Identity;
 
 namespace OnlineNotes.Controllers
 {
@@ -15,11 +17,15 @@ namespace OnlineNotes.Controllers
     {
         private readonly IOpenAIService _openAIService;
         private readonly INotesService _notesService;
+        private readonly INoteRatingService _ratingService;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public NotesController(IOpenAIService openAIService, INotesService notesService)
+        public NotesController(IOpenAIService openAIService, INotesService notesService, INoteRatingService ratingService, UserManager<IdentityUser> userManager)
         {
             _openAIService = openAIService;
             _notesService = notesService;
+            _ratingService = ratingService;
+            _userManager = userManager;
         }
 
         // GET: Notes
@@ -115,7 +121,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status")] EditNoteRequest note)
+        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status, AvgRating")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {
@@ -155,6 +161,36 @@ namespace OnlineNotes.Controllers
             var result = await _notesService.DeleteNoteAsync(note);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitRating(int rating, int id)
+        {// TODO check if note is not null!
+            var note = await _notesService.GetNoteAsync(id);
+
+            if (note != null)
+            {
+                var ratingRequest = new CreateNoteRatingRequest();
+                IdentityUser user = await _userManager.GetUserAsync(User);
+
+                ratingRequest.UserId = user.Id;
+                ratingRequest.RatingValue = rating;
+                ratingRequest.CreationDate = DateTime.Now;
+                ratingRequest.Note = note;
+
+                var result = await _ratingService.CreateNoteRatingAsync(ratingRequest);
+
+                if (result)
+                {
+                    var updatedNoteResult = await _notesService.CalculateAvgRating(note);
+
+                    if (updatedNoteResult)
+                    {
+                        return RedirectToAction("Details", new { id = note.Id });
+                    }
+                }
+            }
+            return Error();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Models;
 using OnlineNotes.Services.CommentsServices;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
+using OnlineNotes.Services.RatingServices;
 using Serilog;
 using Serilog.Events;
 
@@ -36,6 +38,7 @@ namespace OnlineNotes
             builder.Services.AddScoped<IOpenAIService,  OpenAIService>();
             builder.Services.AddScoped<ICommentsService, CommentsService>();
             builder.Services.AddScoped<INotesService, NotesService>();
+            builder.Services.AddScoped<INoteRatingService, NoteRatingService>();
 
             // logger configuration for writting log messages to a file
             var logger = new LoggerConfiguration()
