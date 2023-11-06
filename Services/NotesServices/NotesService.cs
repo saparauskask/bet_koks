@@ -37,6 +37,7 @@ namespace OnlineNotes.Services.NotesServices
                         return null;
                 }
             }
+
             _logger.LogError("HttpContext is null when atempting to get FilterStatus");
             return null;
         }
@@ -168,6 +169,18 @@ namespace OnlineNotes.Services.NotesServices
                 _logger.LogError(ex, "An error occurred in GetFilteredNotesToListAsync: {ErrorMessage}", ex.Message);
                 return null;
             }
+        }
+
+        public string? SetFilterStatus(NoteStatus? filterStatus)
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                _contextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
+                return filterStatus.ToString();
+            }
+
+            _logger.LogError("HttpContext is null when atempting to set FilterStatus");
+            return null;
         }
 
         public async Task<IEnumerable<Note>?> GetIndexedNotesToListAsync(string term)
