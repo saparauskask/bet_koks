@@ -25,14 +25,16 @@ namespace OnlineNotes.Controllers
         // GET: Notes
         public async Task<IActionResult> Index()
         {
+            // Filtering:
             var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus());
-              
+
             if (notes == null)
             {
                 return Error();
             }
 
-            return View(notes);
+            // Sorting: 
+            return View(_notesService.GetSortedNotes(notes));
         }
 
         // GET: Notes/Details/5
@@ -74,6 +76,12 @@ namespace OnlineNotes.Controllers
                 return View("Index", notes);
             }
 
+            return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult Sort(int sortOrder)
+        {
+            _notesService.SetSortStatus(sortOrder);
             return RedirectToAction(nameof(Index));
         }
 

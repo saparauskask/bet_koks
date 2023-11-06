@@ -15,5 +15,7 @@ namespace OnlineNotes.Services.NotesServices
         Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus);
         Task<IEnumerable<Note>?> GetIndexedNotesToListAsync(string term);
         NoteStatus? GetFilterStatus();
+        int? SetSortStatus(int sortStatus);
+        IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes);
     }
 }

@@ -37,7 +37,37 @@ namespace OnlineNotes.Services.NotesServices
                         return null;
                 }
             }
-            _logger.LogError("HttpContext is null.");
+            _logger.LogError("HttpContext is null when atempting to get FilterStatus");
+            return null;
+        }
+
+        public IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes)
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                // 1 - sort ascending, 0 - sort descending
+                int? sortStatusInt = _contextAccessor.HttpContext.Session.GetInt32("SortStatus");
+                if(sortStatusInt == 0)
+                {
+                    return notes.OrderByDescending(i => i.CreatedDate);
+                }
+
+                return notes.OrderBy(i => i.CreatedDate);
+            }
+
+            _logger.LogError("HttpContext is null when atempting to get SortedNotes");
+            return null;
+        }
+
+        public int? SetSortStatus(int sortStatus)
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                _contextAccessor.HttpContext.Session.SetInt32("SortStatus", sortStatus);
+                return sortStatus;
+            }
+
+            _logger.LogError("HttpContext is null when atempting to set SortStatus");
             return null;
         }
 
