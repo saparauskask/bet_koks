@@ -35,12 +35,13 @@
             <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
         </form>
 
-        <a class="btn btn-link" asp-action="Filter" hidden>Show All</a>
+        <a class="btn btn-link" asp-action="Filter">Show All</a>
     </div>
 </p>
 <table class="table">
     <thead>
     <tr>
+        <th class="date-column">Date Created</th> <!-- Created Date column -->
         <th class="status-column">Status</th> <!-- Status column -->
         <th style="width: 200px">
             @Html.DisplayNameFor(model => model.Title)
@@ -52,12 +53,16 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var item in Model)
+    @foreach (var item in Model.OrderByDescending(i => i.CreatedDate))
     {
         <tr>
-                <td class="status-column">
-                    @Html.DisplayFor(modelItem => item.Status)
+                <td class="date-column">
+                    @Html.DisplayFor(modelItem => item.CreatedDate)
                 </td>
+
+            <td class="status-column">
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>

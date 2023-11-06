@@ -43,7 +43,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
-            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status);
+            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) { CreatedDate = DateTime.Now };
 
             try
             {
