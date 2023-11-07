@@ -1,54 +1,42 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Services.OpenAIServices;
+using Newtonsoft.Json;
+using OnlineNotes.Data;
 
 namespace OnlineNotes.Controllers
 {
     [Authorize] // restricts access to a controller to only authenticated users
     public class HelpController : Controller
     {
-        private readonly IOpenAIService _openAIService;
-        private List<object> _conversationList;
-
-        public HelpController(IOpenAIService openAIService)
+        private ChatBotService _chatBotService;
+        public HelpController(ChatBotService chatBotService)
         {
-            //implement sessions
-            _openAIService = openAIService;
-            _conversationList = new List<object>();
+            _chatBotService = chatBotService;
+            _chatBotService.LoadChatHistory(ChatHistory.GetMessages());
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
             return View();
         }
 
-        public async Task<IActionResult> HelpButtonAction(string input)
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(string userMessage)
         {
-            string completionResult;
-            if (!string.IsNullOrEmpty(input))
+            if (string.IsNullOrEmpty(userMessage))
             {
-                ChatGPTConversation conversation = new ChatGPTConversation(DateTime.Now);
-                completionResult = await conversation.GenerateResponse(input);
+                return BadRequest("Message is empty.");
+            }
 
-                _conversationList.Add(conversation);
-            }
-            else
-            {
-                completionResult = await _openAIService.CompleteHelpRequest();
-            }
-            return Content(completionResult, "text/plain");
-        }
-        public ChatGPTConversation RetrieveConversation(int index)
-        {
-                if (index >= 0 && index < _conversationList.Count)
-                {
-                    ChatGPTConversation conversation = (ChatGPTConversation)_conversationList[index];
-                    return conversation;
-                }
-                else
-                {
-                    return new ChatGPTConversation(default(DateTime));
-                }
+            ChatHistory.AddMessage(new ChatGPTMessage(userMessage, isUser: true));
+
+            var response = await _chatBotService.GenerateResponse(userMessage);
+            ChatHistory.AddMessage(new ChatGPTMessage(response.ToString(), isUser: false));
+
+            return Content(response.ToString(), "text/plain");
         }
     }
 }

@@ -33,9 +33,10 @@ namespace OnlineNotes
             builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
-            builder.Services.AddScoped<IOpenAIService,  OpenAIService>();
+            builder.Services.AddScoped<IOpenAIService, OpenAIService>();
             builder.Services.AddScoped<ICommentsService, CommentsService>();
             builder.Services.AddScoped<INotesService, NotesService>();
+            builder.Services.AddScoped<ChatBotService>();
 
             // logger configuration for writting log messages to a file
             var logger = new LoggerConfiguration()
@@ -72,6 +73,7 @@ namespace OnlineNotes
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Notes}/{action=Index}/{id?}");
+
             app.MapRazorPages();
 
             app.Run();
