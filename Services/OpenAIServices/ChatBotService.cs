@@ -5,20 +5,20 @@ using OpenAI_API.Chat;
 
 namespace OnlineNotes.Services.OpenAIServices
 {
-    public struct ChatGPTConversation
+    public class ChatBotService : IChatBotService
     {
         private OpenAIAPI _api;
         private Conversation chat;
-        public DateTime StartTime { get; }
-        public DateTime EndTime { get; }
-        public string UserId { get; }
+        //public DateTime StartTime { get; }
+        //public DateTime EndTime { get; }
+        //public string UserId { get; }
         public List<ChatGPTMessage> Messages { get; }
 
-        public ChatGPTConversation(DateTime startTime, string userId = "123abc")
+        public ChatBotService()
         {
-            StartTime = startTime;
-            EndTime = DateTime.MinValue;
-            UserId = userId;
+            //StartTime = startTime;
+            //EndTime = DateTime.MinValue;
+            //UserId = userId;
 
             var apiKey = FileRepository.ReadApiKey();
             _api = new OpenAIAPI(apiKey?.Key);
@@ -29,10 +29,12 @@ namespace OnlineNotes.Services.OpenAIServices
 
         public void AddUserMessage(string text)
         {
+            /*
             if (EndTime != DateTime.MinValue)
             {
                 throw new InvalidOperationException("Conversation is already closed.");
             }
+            */
 
             Messages.Add(new ChatGPTMessage(text, isUser: true));
             chat.AppendUserInput(text);
@@ -40,13 +42,27 @@ namespace OnlineNotes.Services.OpenAIServices
 
         public void AddAIMessage(string text)
         {
+            /*
             if (EndTime != DateTime.MinValue)
             {
                 throw new InvalidOperationException("Conversation is already closed.");
             }
+            */
 
             Messages.Add(new ChatGPTMessage(text, isUser: false));
             chat.AppendSystemMessage(text);
+        }
+
+        public void LoadChatHistory(List<ChatGPTMessage> Messages)
+        {
+            if (Messages != null)
+            {
+                foreach (ChatGPTMessage message in Messages)
+                {
+                    if (message.IsUser) { chat.AppendUserInput(message.Text); }
+                    if (!message.IsUser) { chat.AppendExampleChatbotOutput(message.Text); }
+                }
+            }
         }
 
         public async Task<string> GenerateResponse(string text)
@@ -56,7 +72,7 @@ namespace OnlineNotes.Services.OpenAIServices
             var response = await chat.GetResponseFromChatbotAsync();
 
             AddAIMessage(response);
-            return response;
+            return response.ToString();
         }
     }
 }
