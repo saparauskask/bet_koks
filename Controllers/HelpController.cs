@@ -7,7 +7,7 @@ using OnlineNotes.Data;
 
 namespace OnlineNotes.Controllers
 {
-    //[Authorize] // restricts access to a controller to only authenticated users
+    [Authorize] // restricts access to a controller to only authenticated users
     public class HelpController : Controller
     {
         private ChatBotService _chatBotService;
