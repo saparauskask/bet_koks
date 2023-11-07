@@ -50,10 +50,10 @@ namespace OnlineNotes.Services.NotesServices
                 int? sortStatusInt = _contextAccessor.HttpContext.Session.GetInt32("SortStatus");
                 if(sortStatusInt == 0)
                 {
-                    return notes.OrderByDescending(i => i.CreatedDate);
+                    return notes.OrderByDescending(i => i.CreationDate);
                 }
 
-                return notes.OrderBy(i => i.CreatedDate);
+                return notes.OrderBy(i => i.CreationDate);
             }
 
             _logger.LogError("HttpContext is null when atempting to get SortedNotes");
@@ -74,7 +74,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
-            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) { CreatedDate = DateTime.Now };
+            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) { CreationDate = DateTime.Now };
 
             try
             {
@@ -201,7 +201,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
         {
-            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id };
+            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now };
 
             try
             {

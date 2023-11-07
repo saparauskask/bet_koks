@@ -10,7 +10,7 @@ namespace OnlineNotes.Models
         // Collection navigation containing dependents
         public ICollection<Comment> Comments { get; } = new List<Comment>();
         public NoteStatus Status { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public DateTime CreationDate { get; set; }
 
         public Note(string title, string contents, NoteStatus status)
         {

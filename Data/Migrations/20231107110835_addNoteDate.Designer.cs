@@ -12,8 +12,8 @@ using OnlineNotes.Data;
 namespace OnlineNotes.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231106135532_addNoteCreationDate")]
-    partial class addNoteCreationDate
+    [Migration("20231107110835_addNoteDate")]
+    partial class addNoteDate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -269,7 +269,7 @@ namespace OnlineNotes.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedDate")
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("Status")

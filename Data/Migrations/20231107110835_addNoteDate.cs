@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace OnlineNotes.Data.Migrations
 {
-    public partial class addNoteCreationDate : Migration
+    public partial class addNoteDate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<DateTime>(
-                name: "CreatedDate",
+                name: "CreationDate",
                 table: "Note",
                 type: "datetime2",
                 nullable: false,
@@ -20,7 +20,7 @@ namespace OnlineNotes.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "CreatedDate",
+                name: "CreationDate",
                 table: "Note");
         }
     }
