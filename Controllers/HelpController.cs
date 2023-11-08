@@ -23,6 +23,13 @@ namespace OnlineNotes.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult GetChatHistory()
+        {
+            var chatHistory = ChatHistory.GetMessages();
+            return Json(chatHistory);
+        }
+
         [HttpPost]
         public async Task<IActionResult> SendMessage(string userMessage)
         {

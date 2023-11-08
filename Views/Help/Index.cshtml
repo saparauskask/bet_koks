@@ -27,6 +27,27 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         $(document).ready(function () {
+            loadChatHistory();
+
+            function loadChatHistory() {
+                $.ajax({
+                    type: "GET",
+                    url: "/Help/GetChatHistory",
+                    success: function (history) {
+                        if (history && history.length > 0) {
+                            history.forEach(function (message) {
+                                displayMessage(message.isUser ? "You" : "Turing", message.text);
+                            });
+                        }
+                    },
+                    dataType: "json"
+                });
+            }
+
+            function displayMessage(sender, message) {
+                $("#chat-room").append("<div><span class=\"sender\">" + sender + ": </span>" + message + "</div>");
+            }
+
             $("form").submit(function (event) {
                 event.preventDefault(); // Prevent the default form submission
 
@@ -43,10 +64,6 @@
                     $("#userMessage").val("");
                 }
             });
-
-            function displayMessage(sender, message) {
-                    $("#chat-room").append("<div><span class=\"sender\" >" + sender + ": </span>" + message + "</div>");
-            }
 
             function sendMessage(userMessage) {
                 $.ajax({
