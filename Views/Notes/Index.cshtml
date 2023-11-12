@@ -16,6 +16,14 @@
     .status-column {
         width: 50px; /* Adjust the width as needed */
     }
+
+    #ellipsis {
+        display: inline-block;
+        width: 400px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 </style>
 
 <p>
@@ -73,7 +81,7 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
                 <td>
-                    <pre>@Html.DisplayFor(modelItem => item.Contents)</pre>
+                    <pre id="ellipsis">@Html.DisplayFor(modelItem => item.Contents)</pre>
             </td>
             <td>
                 <div class="d-flex gap-1">
