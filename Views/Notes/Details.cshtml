@@ -20,8 +20,16 @@
     @if (Model.Ratings.Any())
     {
         <!--TODO rated by x users-->
-        <p>Rating: @(Model.AvgRating.ToString())/5</p>
-       
+        <p>Rating: @(Model.AvgRating.ToString())/5  Rated by: @(Model.Ratings.Count) @{
+                if (Model.Ratings.Count == 1)
+                {
+                                    <text>user</text>
+                } else
+                {
+                                    <text>users</text>
+                }}
+                </p>
+
     } else
     {
         <p>There are no ratings yet for this post</p>
@@ -56,9 +64,9 @@
 
 <div>
     <h4>Rate this note</h4>
-    <!-- TODO. Will implement UI later
 
-    <div class="stars">
+    <form asp-action="SubmitRating" asp-controller="Notes" method="post" onsubmit="return validateForm();" style="display: flex; flex-direction: row; align-items: flex-end;">
+        <div class="stars" style="margin-right: 50px;">
         <input type="radio" id="star1" name="rating" value="1" />
         <input type="radio" id="star2" name="rating" value="2" />
         <input type="radio" id="star3" name="rating" value="3" />
@@ -71,33 +79,11 @@
         <label for="star4">4 stars</label>
         <label for="star5">5 stars</label>
 
-        <button id="submitRating">Submit</button>
+        <input type="hidden" name="id" value="@Model.Id" />
     </div>
-    <div id="resultDiv"></div>
-    -->
-
-    <form asp-action="SubmitRating" asp-controller="Notes" method="post">
-        <div class="stars">
-            <input type="radio" id="star1" name="rating" value="1" />
-            <label for="star1">1 star</label>
-
-            <input type="radio" id="star2" name="rating" value="2" />
-            <label for="star2">2 stars</label>
-
-            <input type="radio" id="star3" name="rating" value="3" />
-            <label for="star3">3 stars</label>
-
-            <input type="radio" id="star4" name="rating" value="4" />
-            <label for="star4">4 stars</label>
-
-            <input type="radio" id="star5" name="rating" value="5" />
-            <label for="star5">5 stars</label>
-
-            <input type="hidden" name="id" value="@Model.Id" />
-        </div>
-
-        <button type="submit">Submit</button>
+        <button type="submit" class="btn btn-dark btn-sm" style="width: 120px; height: 35px;">Submit</button>
     </form>
+    <div class="text-danger">This is a custom error message.</div>
 
     <br />
     <hr />
@@ -165,5 +151,26 @@
                     console.error('Error:', error);
                 });
         });
+    </script>
+
+    <script>
+        function validateForm() {
+            var radioButtons = document.getElementsByName('rating');
+            var radioButtonSelected = false;
+
+            for (var i = 0; i < radioButtons.length; ++i) {
+                if (radioButtons[i].checked) {
+                    radioButtonSelected = true;
+                    break;
+                }
+            }
+
+            if (radioButtonSelected) {
+                return true;
+            }
+
+            alert('Please select a rating before submitting')
+            return false;
+        }
     </script>
 }

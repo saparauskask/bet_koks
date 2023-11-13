@@ -26,7 +26,6 @@ namespace OnlineNotes.Services.RatingServices
             {
                 _context.NoteRating.Add(noteRating);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("That's great. You have created your first rating successfully");
                 return true;
             }
             catch (Exception ex)
