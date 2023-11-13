@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
@@ -58,6 +60,26 @@ namespace OnlineNotes.Services.NotesServices
 
             _logger.LogError("HttpContext is null when atempting to get SortedNotes");
             return null;
+        }
+
+        public IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller)
+        {
+            const int pageSize = 5; // Max elements per page
+
+            if (page < 1)
+            {
+                page = 1;
+            }
+
+            int recsCount = notes.Count();
+            var pager = new Pager(recsCount, page, pageSize);
+            int recSkip = (page - 1) * pageSize;
+
+            var data = notes.Skip(recSkip).Take(pager.PageSize).ToList();
+
+            controller.ViewBag.Pager = pager;
+
+            return data;
         }
 
         public int? SetSortStatus(int sortStatus)
