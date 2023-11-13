@@ -22,6 +22,12 @@
     <div class="btn-group" role="group">
         <a class="btn btn-primary" asp-action="Create" style="margin-right:100px">Create New</a>
 
+        <button id="btnGroupDrop" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin-right:10px">Sort by </button>
+        <div class="dropdown-menu" aria-labelledby="btnGroupDrop">
+            <a class="dropdown-item" asp-action="Sort" asp-route-sortOrder="0">Newest</a>
+            <a class="dropdown-item" asp-action="Sort" asp-route-sortOrder="1">Oldest</a>
+        </div>
+
         <button id="btnGroupDrop" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Filter by </button>
         <div class="dropdown-menu" aria-labelledby="btnGroupDrop">
             <a class="dropdown-item" asp-action="Filter">All</a>
@@ -35,12 +41,13 @@
             <button class="btn btn-secondary my-2 my-sm-0" type="submit">Search</button>
         </form>
 
-        <a class="btn btn-link" asp-action="Filter" hidden>Show All</a>
+        <a class="btn btn-link" asp-action="Filter">Show All</a>
     </div>
 </p>
 <table class="table">
     <thead>
     <tr>
+        <th class="date-column">Date Modified</th> <!-- Created Date column -->
         <th class="status-column">Status</th> <!-- Status column -->
         <th style="width: 200px">
             @Html.DisplayNameFor(model => model.Title)
@@ -55,9 +62,13 @@
     @foreach (var item in Model)
     {
         <tr>
-                <td class="status-column">
-                    @Html.DisplayFor(modelItem => item.Status)
+                <td class="date-column">
+                    @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
+
+            <td class="status-column">
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>

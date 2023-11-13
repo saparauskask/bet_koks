@@ -37,13 +37,44 @@ namespace OnlineNotes.Services.NotesServices
                         return null;
                 }
             }
-            _logger.LogError("HttpContext is null.");
+
+            _logger.LogError("HttpContext is null when atempting to get FilterStatus");
+            return null;
+        }
+
+        public IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes)
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                // 1 - sort ascending, 0 - sort descending
+                int? sortStatusInt = _contextAccessor.HttpContext.Session.GetInt32("SortStatus");
+                if(sortStatusInt == 0)
+                {
+                    return notes.OrderByDescending(i => i.CreationDate);
+                }
+
+                return notes.OrderBy(i => i.CreationDate);
+            }
+
+            _logger.LogError("HttpContext is null when atempting to get SortedNotes");
+            return null;
+        }
+
+        public int? SetSortStatus(int sortStatus)
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                _contextAccessor.HttpContext.Session.SetInt32("SortStatus", sortStatus);
+                return sortStatus;
+            }
+
+            _logger.LogError("HttpContext is null when atempting to set SortStatus");
             return null;
         }
 
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
-            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status);
+            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) { CreationDate = DateTime.Now };
 
             try
             {
@@ -140,6 +171,18 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
+        public string? SetFilterStatus(NoteStatus? filterStatus)
+        {
+            if (_contextAccessor.HttpContext != null)
+            {
+                _contextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
+                return filterStatus.ToString();
+            }
+
+            _logger.LogError("HttpContext is null when atempting to set FilterStatus");
+            return null;
+        }
+
         public async Task<IEnumerable<Note>?> GetIndexedNotesToListAsync(string term)
         {
             try
@@ -158,7 +201,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
         {
-            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id };
+            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now };
             actualNote.AvgRating = note.AvgRating;
             try
             {

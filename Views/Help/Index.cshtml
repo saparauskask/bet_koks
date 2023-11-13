@@ -1,50 +1,78 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Index";
 }
 
-<h1>Drink some water and relax</h1>
-<p>Stop, you are fine. I will help you.</p>
+<head>
+    <style>
+        .chat-box {
+            height: 300px;
+            overflow-y: scroll;
+            background-color: white;
+            padding: 10px;
+        }
 
-<!-- Add an input field for user input -->
-<div class="d-flex">
-    <input type="text" class="form-select" id="textInput" placeholder="what is dotnet??">
-    <button class="btn btn-primary" id="myButton">Help!</button>
-</div>
+        .message-field {
+            width: 100%;
+            margin-top: 10px;
+        }
 
-<!-- Add a div to display the returned text -->
-<div id="resultDiv"></div>
+        .message-button {
+            margin-top: 10px;
+        }
 
-<div id="loading" style="display: none;">
-    <!-- Three dots to simulate a loading animation -->
-    I am thinking...
-</div>
-
-@section scripts {
+        .sender {
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        document.getElementById("myButton").addEventListener("click", function () {
-            // Get the user input from the text input field
-            var userInput = document.getElementById("textInput").value;
+        $(document).ready(function () {
+            $("form").submit(function (event) {
+                event.preventDefault(); // Prevent the default form submission
 
-            // Show the loading dots
-            var loading = document.getElementById("loading");
-            loading.style.display = "block";
+                var userMessage = $("#userMessage").val();
+                if (userMessage) {
+                    // Display the user message in the chat room
+                    displayMessage("You", userMessage);
+                    displayMessage("Turing", "Is thinking...");
 
-            // Send a request to the action with the user input
-            fetch('@Url.Action("HelpButtonAction", "Help")?input=' + encodeURIComponent(userInput))
-                .then(response => response.text())
-                .then(text => {
-                    // Hide the loading dots
-                    loading.style.display = "none";
+                    // Send the message to the server
+                    sendMessage(userMessage);
 
-                    // Display the returned text in the resultDiv
-                    document.getElementById("resultDiv").innerText = text;
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    // Hide the loading dots in case of an error
-                    loading.style.display = "none";
+                    // Clear the input field
+                    $("#userMessage").val("");
+                }
+            });
+
+            function displayMessage(sender, message) {
+                    $("#chat-room").append("<div><span class=\"sender\" >" + sender + ": </span>" + message + "</div>");
+            }
+
+            function sendMessage(userMessage) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Help/SendMessage",
+                    data: { userMessage: userMessage },
+                    success: function (response) {
+                        $("#chat-room").find(":contains('Is thinking...')").remove();
+                        // Display the bot's response in the chat room
+                        displayMessage("Turing", response);
+                    },
+                    dataType: "text"
                 });
+            }
         });
     </script>
-}
+</head>
+
+<h2>Hello, I am not a machine, I am Alan Turing.</h2>
+
+<div class="chat-box" id="chat-box">
+    <div id="chat-room"></div>
+</div>
+
+<form asp-controller="Help" asp-action="SendMessage" method="post">
+    <input class="form-control me-sm-2 message-field" type="text" name="userMessage" id="userMessage" placeholder="Can machines think?" />
+    <input class="btn btn-primary message-button" type="submit" value="Send" />
+</form>
+
