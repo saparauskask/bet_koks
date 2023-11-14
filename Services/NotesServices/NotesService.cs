@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Data.Migrations;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
@@ -127,7 +128,6 @@ namespace OnlineNotes.Services.NotesServices
         {
             if (id == null)
             {
-                _logger.LogWarning("GetNoteAsync: Requested Note with ID: null.");
                 return null;
             }
 
@@ -135,11 +135,6 @@ namespace OnlineNotes.Services.NotesServices
                 .Include(n => n.Comments) // Include the Comments navigation property
                 .Include(n => n.Ratings)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (note == null)
-            {
-                _logger.LogWarning("Note with ID: {NoteId} was not found.", id);
-            }
 
             return note;
         }
@@ -247,6 +242,23 @@ namespace OnlineNotes.Services.NotesServices
                 _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
             }
             return false;
+        }
+
+        public int? GetNoteRatingIdByUserId(Note note, string userId)
+        {
+            try
+            {
+                var noteRatingId = note.Ratings
+                    .Where(nr => nr.UserId == userId)
+                    .Select(nr => (int?)nr.Id) // Project Id or null if not found
+                    .FirstOrDefault();
+                return noteRatingId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetNoteRatingIdByUserId: {ErrorMessage}", ex.Message);
+                return null;
+            }
         }
     }
 }

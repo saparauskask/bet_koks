@@ -19,5 +19,6 @@ namespace OnlineNotes.Services.NotesServices
         int? SetSortStatus(int sortStatus);
         IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes);
         string? SetFilterStatus(NoteStatus? filterStatus);
+        int? GetNoteRatingIdByUserId(Note note, string userId);
     }
 }

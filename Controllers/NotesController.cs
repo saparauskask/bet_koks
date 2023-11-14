@@ -9,6 +9,7 @@ using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 using OnlineNotes.Services.RatingServices;
 using Microsoft.AspNetCore.Identity;
+using OnlineNotes.Models.Requests.NoteRating;
 
 namespace OnlineNotes.Controllers
 {
@@ -168,21 +169,38 @@ namespace OnlineNotes.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitRating(int rating, int id)
-        {// TODO check if note is not null!
-            var note = await _notesService.GetNoteAsync(id);
+        public async Task<IActionResult> SubmitRating(int rating, int noteId)
+        {
+            IdentityUser user = await _userManager.GetUserAsync(User);
+            var note = await _notesService.GetNoteAsync(noteId);
 
             if (note != null)
             {
-                var ratingRequest = new CreateNoteRatingRequest();
-                IdentityUser user = await _userManager.GetUserAsync(User);
+                var noteRatingId = _notesService.GetNoteRatingIdByUserId(note, user.Id);
+                bool result;
 
-                ratingRequest.UserId = user.Id;
-                ratingRequest.RatingValue = rating;
-                ratingRequest.CreationDate = DateTime.Now;
-                ratingRequest.Note = note;
+                if(noteRatingId != null)
+                {
+                    var ratingRequest = new EditNoteRatingRequest
+                    {
+                        Id = noteRatingId ?? 0,
+                        RatingValue = rating,
+                        CreationDate = DateTime.Now
+                    };
 
-                var result = await _ratingService.CreateNoteRatingAsync(ratingRequest);
+                    result = await _ratingService.UpdateNoteRatingAsync(ratingRequest);
+                } else
+                {
+                    var ratingRequest = new CreateNoteRatingRequest
+                    {
+                        UserId = user.Id,
+                        RatingValue = rating,
+                        CreationDate = DateTime.Now,
+                        Note = note
+                    };
+
+                    result = await _ratingService.CreateNoteRatingAsync(ratingRequest);
+                }
 
                 if (result)
                 {
