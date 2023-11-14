@@ -17,6 +17,23 @@
 <div>
     <h4>Note</h4>
     <hr />
+    @if (Model.Ratings.Any())
+    {
+        <!--TODO rated by x users-->
+        <p>Rating: @(Model.AvgRating.ToString())/5  Rated by: @(Model.Ratings.Count) @{
+                if (Model.Ratings.Count == 1)
+                {
+                                    <text>user</text>
+                } else
+                {
+                                    <text>users</text>
+                }}
+                </p>
+
+    } else
+    {
+        <p>There are no ratings yet for this post</p>
+    }
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
@@ -31,7 +48,7 @@
             <pre>@Html.DisplayFor(model => model.Contents)</pre>
         </dd>
 
-        <div align="right" background: blue> <b>@ViewBag.Count words</b></div>
+        <div align="right" background: blue> @ViewBag.Count words</div>
 
         <div id="explainField" hidden>
             <dt class="col-sm-2">
@@ -43,6 +60,32 @@
         </div>
 
     </dl>
+</div>
+
+<div>
+    <h4>Rate this note</h4>
+
+    <form asp-action="SubmitRating" asp-controller="Notes" method="post" onsubmit="return validateForm();" style="display: flex; flex-direction: row; align-items: flex-end;">
+        <div class="stars" style="margin-right: 50px;">
+        <input type="radio" id="star1" name="rating" value="1" />
+        <input type="radio" id="star2" name="rating" value="2" />
+        <input type="radio" id="star3" name="rating" value="3" />
+        <input type="radio" id="star4" name="rating" value="4" />
+        <input type="radio" id="star5" name="rating" value="5" />
+
+        <label for="star1" aria-label="Banana">1 star</label>
+        <label for="star2">2 stars</label>
+        <label for="star3">3 stars</label>
+        <label for="star4">4 stars</label>
+        <label for="star5">5 stars</label>
+
+        <input type="hidden" name="noteId" value="@Model.Id" />
+    </div>
+        <button type="submit" class="btn btn-dark btn-sm" style="width: 120px; height: 35px;">Submit</button>
+    </form>
+
+    <br />
+    <hr />
 </div>
 
 <div>
@@ -107,5 +150,26 @@
                     console.error('Error:', error);
                 });
         });
+    </script>
+
+    <script>
+        function validateForm() {
+            var radioButtons = document.getElementsByName('rating');
+            var radioButtonSelected = false;
+
+            for (var i = 0; i < radioButtons.length; ++i) {
+                if (radioButtons[i].checked) {
+                    radioButtonSelected = true;
+                    break;
+                }
+            }
+
+            if (radioButtonSelected) {
+                return true;
+            }
+
+            alert('Please select a rating before submitting')
+            return false;
+        }
     </script>
 }
