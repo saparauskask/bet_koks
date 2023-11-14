@@ -3,7 +3,7 @@
     public interface IChatBotService
     {
         Task<string> GenerateResponse(string text);
-        public void AddUserMessage(string text);
-        public void AddAIMessage(string text);
+        public Task AddUserMessageAsync(string text);
+        public Task AddAIMessage(string text);
     }
 }

@@ -26,44 +26,46 @@
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $(document).ready(function () {
-            loadChatHistory();
+        $(document).ready(async function () {
+            await loadChatHistory();
+            setupFormSubmission();
 
-            function loadChatHistory() {
-                $.ajax({
-                    type: "GET",
-                    url: "/Help/GetChatHistory",
-                    success: function (history) {
-                        if (history && history.length > 0) {
-                            history.forEach(function (message) {
-                                displayMessage(message.isUser ? "You" : "Turing", message.text);
-                            });
-                        }
-                    },
-                    dataType: "json"
+            async function loadChatHistory() {
+                try {
+                    const history = await $.ajax({
+                        type: "GET",
+                        url: "/Help/GetChatHistory",
+                        dataType: "json"
+                    });
+                    console.log(history);
+                    if (history && history.length > 0) {
+                        history.forEach(function (message) {
+                            displayMessage(message.isUser ? "You" : "Turing", message.content);
+                        });
+                    }
+                } catch (error) {
+                    console.error("Error loading chat history:", error);
+                }
+            }
+
+            function setupFormSubmission() {
+                $("form").submit(function (event) {
+                    event.preventDefault(); // Prevent the default form submission
+
+                    var userMessage = $("#userMessage").val();
+                    if (userMessage) {
+                        // Display the user message in the chat room
+                        displayMessage("You", userMessage);
+                        displayMessage("Turing", "Is thinking...");
+
+                        // Send the message to the server
+                        sendMessage(userMessage);
+
+                        // Clear the input field
+                        $("#userMessage").val("");
+                    }
                 });
             }
-
-            function displayMessage(sender, message) {
-                $("#chat-room").append("<div><span class=\"sender\">" + sender + ": </span>" + message + "</div>");
-            }
-
-            $("form").submit(function (event) {
-                event.preventDefault(); // Prevent the default form submission
-
-                var userMessage = $("#userMessage").val();
-                if (userMessage) {
-                    // Display the user message in the chat room
-                    displayMessage("You", userMessage);
-                    displayMessage("Turing", "Is thinking...");
-
-                    // Send the message to the server
-                    sendMessage(userMessage);
-
-                    // Clear the input field
-                    $("#userMessage").val("");
-                }
-            });
 
             function sendMessage(userMessage) {
                 $.ajax({
@@ -77,6 +79,10 @@
                     },
                     dataType: "text"
                 });
+            }
+
+            function displayMessage(sender, message) {
+                $("#chat-room").append("<div><span class=\"sender\">" + sender + ": </span>" + message + "</div>");
             }
         });
     </script>

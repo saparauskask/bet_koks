@@ -4,6 +4,6 @@ namespace OnlineNotes.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public string StudentId { get; set; }
+        public string? StudentId { get; set; }
     }
 }

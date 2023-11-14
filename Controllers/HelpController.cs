@@ -14,7 +14,6 @@ namespace OnlineNotes.Controllers
         public HelpController(ChatBotService chatBotService)
         {
             _chatBotService = chatBotService;
-            _chatBotService.LoadChatHistory(ChatHistory.GetMessages());
         }
 
         [HttpGet]
@@ -26,8 +25,8 @@ namespace OnlineNotes.Controllers
         [HttpGet]
         public IActionResult GetChatHistory()
         {
-            var chatHistory = ChatHistory.GetMessages();
-            return Json(chatHistory);
+            var messages = _chatBotService.GetChatHistory();
+            return Json(messages);
         }
 
         [HttpPost]
@@ -38,10 +37,7 @@ namespace OnlineNotes.Controllers
                 return BadRequest("Message is empty.");
             }
 
-            ChatHistory.AddMessage(new ChatGPTMessage(userMessage, isUser: true));
-
             var response = await _chatBotService.GenerateResponse(userMessage);
-            ChatHistory.AddMessage(new ChatGPTMessage(response.ToString(), isUser: false));
 
             return Content(response.ToString(), "text/plain");
         }
