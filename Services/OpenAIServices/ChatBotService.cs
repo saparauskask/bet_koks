@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OnlineNotes.Data;
+using OnlineNotes.Models;
 using OpenAI_API;
 using OpenAI_API.Chat;
 
@@ -9,69 +10,62 @@ namespace OnlineNotes.Services.OpenAIServices
     {
         private OpenAIAPI _api;
         private Conversation chat;
-        //public DateTime StartTime { get; }
-        //public DateTime EndTime { get; }
-        //public string UserId { get; }
-        public List<ChatGPTMessage> Messages { get; }
+        private readonly ApplicationDbContext _context;
 
-        public ChatBotService()
+        public ChatBotService(ApplicationDbContext context)
         {
-            //StartTime = startTime;
-            //EndTime = DateTime.MinValue;
-            //UserId = userId;
-
+            _context = context;
             var apiKey = FileRepository.ReadApiKey();
             _api = new OpenAIAPI(apiKey?.Key);
 
-            Messages = new List<ChatGPTMessage>();
             chat = _api.Chat.CreateConversation();
+            LoadChatHistory(_context.ChatMessages.ToList());
         }
 
-        public void AddUserMessage(string text)
+        public async Task AddUserMessageAsync(string text)
         {
-            /*
-            if (EndTime != DateTime.MinValue)
-            {
-                throw new InvalidOperationException("Conversation is already closed.");
-            }
-            */
+            var userChatMessage = new ChatGptMessage { Content = text, IsUser = true, Timestamp = DateTime.Now };
+            _context.ChatMessages.Add(userChatMessage);
+            await _context.SaveChangesAsync();
 
-            Messages.Add(new ChatGPTMessage(text, isUser: true));
             chat.AppendUserInput(text);
         }
 
-        public void AddAIMessage(string text)
+        
+        public async Task AddAIMessage(string text)
         {
-            /*
-            if (EndTime != DateTime.MinValue)
-            {
-                throw new InvalidOperationException("Conversation is already closed.");
-            }
-            */
+            var botChatMessage = new ChatGptMessage { Content = text, IsUser = false, Timestamp = DateTime.Now };
+            _context.ChatMessages.Add(botChatMessage);
+            await _context.SaveChangesAsync();
 
-            Messages.Add(new ChatGPTMessage(text, isUser: false));
             chat.AppendSystemMessage(text);
         }
-
-        public void LoadChatHistory(List<ChatGPTMessage> Messages)
+        
+        
+        public void LoadChatHistory(List<ChatGptMessage> Messages)
         {
             if (Messages != null)
             {
-                foreach (ChatGPTMessage message in Messages)
+                foreach (ChatGptMessage message in Messages)
                 {
-                    if (message.IsUser) { chat.AppendUserInput(message.Text); }
-                    if (!message.IsUser) { chat.AppendExampleChatbotOutput(message.Text); }
+                    if (message.IsUser) { chat.AppendUserInput(message.Content); }
+                    if (!message.IsUser) { chat.AppendExampleChatbotOutput(message.Content); }
                 }
             }
         }
 
+        public List<ChatGptMessage> GetChatHistory()
+        {
+            return _context.ChatMessages.ToList();
+        }
+
         public async Task<string> GenerateResponse(string text)
         {
-            AddUserMessage(text);
+            await AddUserMessageAsync(text);
 
             var response = await chat.GetResponseFromChatbotAsync();
 
-            AddAIMessage(response);
+            await AddAIMessage(response.ToString());
             return response.ToString();
         }
     }

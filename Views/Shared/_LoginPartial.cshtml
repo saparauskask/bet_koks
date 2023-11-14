@@ -6,7 +6,7 @@
 @if (SignInManager.IsSignedIn(User))
 {
         ApplicationUser applicationUser = (ApplicationUser)await UserManager.GetUserAsync(User); // Write a description
-        var studentId = applicationUser.StudentId;
+        var studentId = applicationUser != null ? applicationUser.StudentId : null;
     <li class="nav-item">
             <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/ChangePassword" title="Manage">Welcome back, @studentId!</a>
     </li>
