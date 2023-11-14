@@ -12,6 +12,7 @@ namespace OnlineNotes.Data
         }
         public DbSet<OnlineNotes.Models.Note> Note { get; set; }
         public DbSet <OnlineNotes.Models.Comment> Comment { get; set; }
+        public DbSet <OnlineNotes.Models.NoteRating> NoteRating { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     }
 }
