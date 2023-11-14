@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
+using OnlineNotes.Models.Pagination;
 using OnlineNotes.Models.Requests.Note;
 
 namespace OnlineNotes.Services.NotesServices
@@ -64,16 +64,14 @@ namespace OnlineNotes.Services.NotesServices
 
         public IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller)
         {
-            const int pageSize = 5; // Max elements per page
-
             if (page < 1)
             {
                 page = 1;
             }
 
             int recsCount = notes.Count();
-            var pager = new Pager(recsCount, page, pageSize);
-            int recSkip = (page - 1) * pageSize;
+            var pager = new Pager(recsCount, page);
+            int recSkip = (page - 1) * (int)PaginationSettings.DefaultPageSize;
 
             var data = notes.Skip(recSkip).Take(pager.PageSize).ToList();
 

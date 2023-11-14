@@ -1,4 +1,4 @@
-﻿namespace OnlineNotes.Models
+﻿namespace OnlineNotes.Models.Pagination
 {
     public class Pager
     {
@@ -9,32 +9,18 @@
         public int StartPage { get; private set; }
         public int EndPage { get; private set; }
 
-        public Pager()
-        {
+        public Pager() { }
 
-        }
-        public Pager(int totalItems, int page, int pageSize = 10)
+        public Pager(int totalItems, int page)
         {
+            int pageSize = (int)PaginationSettings.DefaultPageSize;
+            int pageRangeStart = (int)Math.Floor((decimal)PaginationSettings.MaxVisiblePages / 2);
+            int pageRangeEnd = (int)Math.Ceiling((decimal)PaginationSettings.MaxVisiblePages / 2);
             int totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)pageSize);
             int currentPage = page;
 
-            int startPage = currentPage - 5;
-            int endPage = currentPage + 4;
-
-            if (startPage <= 0)
-            {
-                endPage = endPage - (startPage - 1);
-                startPage = 1;
-            }
-
-            if (endPage > totalPages)
-            {
-                endPage = totalPages;
-                if (endPage > 10)
-                {
-                    startPage = endPage - 9;
-                }    
-            }
+            int startPage = (int)Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
+            int endPage = (int)Math.Clamp(currentPage + pageRangeEnd, 1, totalPages);
 
             TotalItems = totalItems;
             CurrentPage = currentPage;
