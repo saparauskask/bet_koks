@@ -30,7 +30,7 @@ namespace OnlineNotes.Controllers
         }
 
         // GET: Notes
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1)
         {
             // Filtering:
             var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus());
@@ -40,8 +40,14 @@ namespace OnlineNotes.Controllers
                 return Error();
             }
 
-            // Sorting: 
-            return View(_notesService.GetSortedNotes(notes));
+            // Sorting:
+            notes = _notesService.GetSortedNotes(notes);
+
+            // Pagination:
+            var data = _notesService.GetPagedNotes(notes, page, this);
+
+
+            return View(data);
         }
 
         // GET: Notes/Details/5
