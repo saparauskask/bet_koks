@@ -66,8 +66,12 @@ namespace OnlineNotes.Controllers
         }
 
         // GET: Notes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            IdentityUser user = await _userManager.GetUserAsync(User);
+            var userId = user.Id;
+            ViewBag.UserId = userId;
+
             return View();
         }
 
