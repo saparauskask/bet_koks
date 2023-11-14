@@ -38,8 +38,6 @@ namespace OnlineNotes.Services.NotesServices
                         return null;
                 }
             }
-
-            _logger.LogError("HttpContext is null when atempting to get FilterStatus");
             return null;
         }
 
@@ -56,8 +54,6 @@ namespace OnlineNotes.Services.NotesServices
 
                 return notes.OrderBy(i => i.CreationDate);
             }
-
-            _logger.LogError("HttpContext is null when atempting to get SortedNotes");
             return null;
         }
 
@@ -68,8 +64,6 @@ namespace OnlineNotes.Services.NotesServices
                 _contextAccessor.HttpContext.Session.SetInt32("SortStatus", sortStatus);
                 return sortStatus;
             }
-
-            _logger.LogError("HttpContext is null when atempting to set SortStatus");
             return null;
         }
 
@@ -96,7 +90,6 @@ namespace OnlineNotes.Services.NotesServices
 
             if (actualNote == null)
             {
-                _logger.LogWarning("Note with ID: {noteId} was not found for deletion.", note.Id);
                 return false;
             }
 
@@ -173,8 +166,6 @@ namespace OnlineNotes.Services.NotesServices
                 _contextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
                 return filterStatus.ToString();
             }
-
-            _logger.LogError("HttpContext is null when atempting to set FilterStatus");
             return null;
         }
 

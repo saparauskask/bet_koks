@@ -43,7 +43,6 @@ namespace OnlineNotes.Services.CommentsServices
 
             if (comment == null)
             {
-                _logger.LogWarning("Comment with ID: {commentId} was not found for deletion.", commentRequest.Id);
                 return false;
             }
 
@@ -62,11 +61,6 @@ namespace OnlineNotes.Services.CommentsServices
 
         public async Task<Comment?> GetCommentByIdAsync(int? id)
         {
-            if (id == null)
-            {
-                _logger.LogWarning("GetCommentByIdAsync: Requested Comment with ID: null.");
-            }
-
             try
             {
                 var comment = await _context.Comment
@@ -89,11 +83,8 @@ namespace OnlineNotes.Services.CommentsServices
             {
                 return comment.NoteId;
             }
-            else
-            {
-                _logger.LogWarning("Comment not found for Comment ID: {CommentId}", commentId);
-                return 0;
-            }
+
+            return 0;
         }
     }
 }
