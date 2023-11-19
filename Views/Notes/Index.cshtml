@@ -1,4 +1,5 @@
 ﻿@model IEnumerable<OnlineNotes.Models.Note>
+@using OnlineNotes.Models.Enums;
 @using OnlineNotes.Models.Pagination;
 
 @{
@@ -83,9 +84,23 @@
                     @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
 
-            <td class="status-column">
-                @Html.DisplayFor(modelItem => item.Status)
-            </td>
+                <td class="status-column">
+                    @switch (item.Status)
+                    {
+                        case NoteStatus.Draft:
+                            <span class="badge rounded-pill bg-light">@Html.DisplayFor(modelItem => item.Status)</span>
+                            break;
+                        case NoteStatus.Public:
+                            <span class="badge rounded-pill bg-info">@Html.DisplayFor(modelItem => item.Status)</span>
+                            break;
+                        case NoteStatus.Archived:
+                            <span class="badge rounded-pill bg-warning">@Html.DisplayFor(modelItem => item.Status)</span>
+                            break;
+                        default:
+                            <span class="badge rounded-pill bg-danger">@Html.DisplayFor(modelItem => item.Status)</span>
+                            break;
+                    }
+                </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Title)
             </td>

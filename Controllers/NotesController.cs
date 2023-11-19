@@ -32,8 +32,11 @@ namespace OnlineNotes.Controllers
         // GET: Notes
         public async Task<IActionResult> Index(int page = 1)
         {
+            IdentityUser user = await _userManager.GetUserAsync(User);
+            var userId = user.Id;
+
             // Filtering:
-            var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus());
+            var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus(), userId);
 
             if (notes == null)
             {
@@ -101,7 +104,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Contents,Status")] CreateNoteRequest note)
+        public async Task<IActionResult> Create([Bind("Id,Title,Contents,Status, UserId")] CreateNoteRequest note)
         {
             if (ModelState.IsValid)
             {
@@ -136,7 +139,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status, AvgRating")] EditNoteRequest note)
+        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status, AvgRating, UserId")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {
