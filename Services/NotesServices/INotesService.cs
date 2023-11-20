@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
+using static OnlineNotes.Services.NotesServices.NotesService;
 
 namespace OnlineNotes.Services.NotesServices
 {

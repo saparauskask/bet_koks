@@ -225,8 +225,7 @@ namespace OnlineNotes.Services.NotesServices
 
             try
             {
-                _context.Update(actualNote);
-                await _context.SaveChangesAsync();
+                EditNoteDelegate(note, _context);
                 _logger.LogInformation("Note with ID: {NoteId} updated successfully.", note.Id);
                 return true;
             }
@@ -236,5 +235,17 @@ namespace OnlineNotes.Services.NotesServices
                 return false;
             }
         }
+
+        // DELEGATE
+        public delegate bool UpdateNoteDelegate(EditNoteRequest note, ApplicationDbContext context);
+
+        public UpdateNoteDelegate EditNoteDelegate = (EditNoteRequest note, ApplicationDbContext context) =>
+        {
+            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now };
+
+            context.Update(actualNote);
+            context.SaveChanges();
+            return true;
+        };
     }
 }
