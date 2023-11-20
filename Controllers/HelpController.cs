@@ -29,6 +29,13 @@ namespace OnlineNotes.Controllers
             return Json(messages);
         }
 
+        [HttpGet]
+        public IActionResult ClearChatHistory()
+        {
+            _chatBotService.ClearChatHistory();
+            return RedirectToAction("Index");
+        }
+
         [HttpPost]
         public async Task<IActionResult> SendMessage(string userMessage)
         {

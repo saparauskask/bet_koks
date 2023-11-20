@@ -58,6 +58,11 @@ namespace OnlineNotes.Services.OpenAIServices
             return _chatHistorySaver.getAllChatMessagesFromDb();
         }
 
+        public void ClearChatHistory()
+        {
+            _chatHistorySaver.ClearChatHistory();
+        }
+
         public async Task<string> GenerateResponse(string text)
         {
             AddUserMessageAsync(text);
