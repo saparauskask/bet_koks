@@ -21,6 +21,8 @@ namespace OnlineNotes.Services.NotesServices
             _logger = logger;
         }
 
+        public delegate NoteStatus GetNoteStatusFromString(EditNoteRequest note, ApplicationDbContext context);
+
         public NoteStatus? GetFilterStatus()
         {
             if (_contextAccessor.HttpContext != null)
@@ -98,8 +100,7 @@ namespace OnlineNotes.Services.NotesServices
 
             try
             {
-                _context.Note.Add(note);
-                await _context.SaveChangesAsync();
+                CreateNoteDelegate(note, _context);
                 _logger.LogInformation("Note with ID: {NoteId} was created successfully.", note.Id);
                 return true;
             }
@@ -123,13 +124,7 @@ namespace OnlineNotes.Services.NotesServices
             var noteId = note.Id;
             try
             {
-                foreach (var comment in actualNote.Comments.ToList())
-                {
-                    _context.Comment.Remove(comment);
-                }
-                
-                _context.Note.Remove(actualNote);
-                await _context.SaveChangesAsync();
+                DeleteNoteDelegate(actualNote, _context);
                 _logger.LogInformation("Note with ID: {noteId} was deleted successfully.", noteId);
                 return true;
             }
@@ -219,13 +214,13 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
-        public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
+        public bool UpdateNote(EditNoteRequest note)
         {
             Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now };
 
             try
             {
-                EditNoteDelegate(note, _context);
+                EditNoteDelegate(actualNote, _context);
                 _logger.LogInformation("Note with ID: {NoteId} updated successfully.", note.Id);
                 return true;
             }
@@ -237,15 +232,27 @@ namespace OnlineNotes.Services.NotesServices
         }
 
         // DELEGATE
-        public delegate bool UpdateNoteDelegate(EditNoteRequest note, ApplicationDbContext context);
+        private delegate void UpdateNoteDelegate(Note note, ApplicationDbContext context);
 
-        public UpdateNoteDelegate EditNoteDelegate = (EditNoteRequest note, ApplicationDbContext context) =>
+        private UpdateNoteDelegate EditNoteDelegate = (Note note, ApplicationDbContext context) =>
         {
-            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now };
-
-            context.Update(actualNote);
+            context.Update(note);
             context.SaveChanges();
-            return true;
+        };
+        private UpdateNoteDelegate DeleteNoteDelegate = (Note note, ApplicationDbContext context) =>
+        {
+            foreach (var comment in note.Comments.ToList())
+            {
+                context.Comment.Remove(comment);
+            }
+
+            context.Note.Remove(note);
+            context.SaveChanges();
+        };
+        private UpdateNoteDelegate CreateNoteDelegate = (Note note, ApplicationDbContext context) =>
+        {
+            context.Note.Add(note);
+            context.SaveChanges();
         };
     }
 }
