@@ -96,12 +96,10 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
-            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) { CreationDate = DateTime.Now };
-
             try
             {
-                CreateNoteDelegate(note, _context);
-                _logger.LogInformation("Note with ID: {NoteId} was created successfully.", note.Id);
+                CreateNoteDelegate(noteRequest, _context);
+                _logger.LogInformation("Note with ID: {NoteId} was created successfully.", noteRequest.Id);
                 return true;
             }
             catch (Exception ex)
@@ -113,19 +111,10 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> DeleteNoteAsync(DeleteNoteRequest note)
         {
-            Note? actualNote = await GetNoteAsync(note.Id);
-
-            if (actualNote == null)
-            {
-                _logger.LogWarning("Note with ID: {noteId} was not found for deletion.", note.Id);
-                return false;
-            }
-
-            var noteId = note.Id;
             try
             {
-                DeleteNoteDelegate(actualNote, _context);
-                _logger.LogInformation("Note with ID: {noteId} was deleted successfully.", noteId);
+                DeleteNoteDelegate(note, _context);
+                _logger.LogInformation("Note with ID: {noteId} was deleted successfully.", note.Id);
                 return true;
             }
             catch(Exception ex)
@@ -216,11 +205,9 @@ namespace OnlineNotes.Services.NotesServices
 
         public bool UpdateNote(EditNoteRequest note)
         {
-            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now };
-
             try
             {
-                EditNoteDelegate(actualNote, _context);
+                EditNoteDelegate(note, _context);
                 _logger.LogInformation("Note with ID: {NoteId} updated successfully.", note.Id);
                 return true;
             }
@@ -232,15 +219,30 @@ namespace OnlineNotes.Services.NotesServices
         }
 
         // DELEGATE
-        private delegate void UpdateNoteDelegate(Note note, ApplicationDbContext context);
+        private delegate TResult UpdateNoteDelegate<T, TResult>(T noteRequest, ApplicationDbContext context)
+            where T : BaseNoteRequest
+            where TResult : struct;
 
-        private UpdateNoteDelegate EditNoteDelegate = (Note note, ApplicationDbContext context) =>
+        private UpdateNoteDelegate<EditNoteRequest, int> EditNoteDelegate = (EditNoteRequest noteReq, ApplicationDbContext context) =>
         {
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { Id = noteReq.Id, CreationDate = DateTime.Now };
             context.Update(note);
             context.SaveChanges();
+
+            // returns updated note id
+            return note.Id;
         };
-        private UpdateNoteDelegate DeleteNoteDelegate = (Note note, ApplicationDbContext context) =>
+        private UpdateNoteDelegate<DeleteNoteRequest, bool> DeleteNoteDelegate = (DeleteNoteRequest noteReq, ApplicationDbContext context) =>
         {
+            Note? note = context.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
+                .FirstOrDefault(m => m.Id == noteReq.Id);
+
+            if (note == null)
+            {
+                return false;
+            }
+
             foreach (var comment in note.Comments.ToList())
             {
                 context.Comment.Remove(comment);
@@ -248,11 +250,15 @@ namespace OnlineNotes.Services.NotesServices
 
             context.Note.Remove(note);
             context.SaveChanges();
+            return true;
         };
-        private UpdateNoteDelegate CreateNoteDelegate = (Note note, ApplicationDbContext context) =>
+        private UpdateNoteDelegate<CreateNoteRequest, int> CreateNoteDelegate = (CreateNoteRequest noteReq, ApplicationDbContext context) =>
         {
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { CreationDate = DateTime.Now };
             context.Note.Add(note);
             context.SaveChanges();
+            // returns the id of the created note
+            return note.Id;
         };
     }
 }
