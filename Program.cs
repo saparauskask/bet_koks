@@ -36,10 +36,10 @@ namespace OnlineNotes
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IOpenAIService, OpenAIService>();
+            builder.Services.AddScoped<ChatBotService>();
             builder.Services.AddScoped<ICommentsService, CommentsService>();
             builder.Services.AddScoped<INotesService, NotesService>();
             builder.Services.AddScoped<INoteRatingService, NoteRatingService>();
-            builder.Services.AddScoped<ChatBotService>();
 
             // logger configuration for writting log messages to a file
             var logger = new LoggerConfiguration()
@@ -48,6 +48,9 @@ namespace OnlineNotes
                 .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
             builder.Logging.AddSerilog(logger);
+
+            var serviceProvider = builder.Services.BuildServiceProvider();
+            ChatHistorySaver.Initialize(serviceProvider.GetRequiredService<ApplicationDbContext>());
 
             var app = builder.Build();
 
