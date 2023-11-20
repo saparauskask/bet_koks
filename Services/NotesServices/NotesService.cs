@@ -162,16 +162,26 @@ namespace OnlineNotes.Services.NotesServices
 
                 if (filterStatus.HasValue)
                 {
-                    var notes = await _context.Note.ToListAsync(); // Not working yet
-                        //.Where(note => note.Status == filterStatus && note.UserId == currentUserId) // TODO Fix
-                        //.Where(note => (note.Status == NoteStatus.Draft && note.UserId == currentUserId) || note.Status != NoteStatus.Draft) // TODO Fix
-                        //.ToListAsync();
-                    return notes.AsEnumerable();
+                    if (filterStatus == NoteStatus.Draft)
+                    {
+                        var notes = await _context.Note
+                            .Where(note => note.Status == NoteStatus.Draft && note.UserId == currentUserId)
+                            .ToListAsync();
+                        return notes.AsEnumerable();
+                    }
+                    else
+                    {
+                        var notes = await _context.Note
+                            .Where(note => note.Status == filterStatus)
+                            .ToListAsync();
+                        return notes.AsEnumerable();
+                    }
+                    
                 }
                 else
                 {
                     var notes = await _context.Note
-                        .Where(note => (note.Status == NoteStatus.Draft && note.UserId == currentUserId) || note.Status != NoteStatus.Draft) // TODO Fix
+                        .Where(note => (note.Status == NoteStatus.Public) || (note.Status == NoteStatus.Archived) || (note.Status == NoteStatus.Draft && note.UserId == currentUserId))
                         .ToListAsync();
                     return notes.AsEnumerable();
                 }
