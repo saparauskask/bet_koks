@@ -29,7 +29,7 @@ namespace OnlineNotes.Controllers
             return Json(messages);
         }
 
-        [HttpGet]
+        [HttpPost]
         public IActionResult ClearChatHistory()
         {
             _chatBotService.ClearChatHistory();

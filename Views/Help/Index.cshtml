@@ -30,6 +30,21 @@
             await loadChatHistory();
             setupFormSubmission();
 
+            function clearChatHistory() {
+                $.ajax({
+                    type: "POST",
+                    url: "/Help/ClearChatHistory",
+                    success: function () {
+                        // Clear the chat room display
+                        $("#chat-room").empty();
+                        console.log("Chat history cleared.");
+                    },
+                    error: function (error) {
+                        console.error("Error clearing chat history:", error);
+                    }
+                });
+            }
+
             async function loadChatHistory() {
                 try {
                     const history = await $.ajax({
@@ -85,6 +100,21 @@
                 $("#chat-room").append("<div><span class=\"sender\">" + sender + ": </span>" + message + "</div>");
             }
         });
+
+        function clearChatHistory() {
+            $.ajax({
+                type: "POST",
+                url: "/Help/ClearChatHistory",
+                success: function () {
+                    // Clear the chat room display
+                    $("#chat-room").empty();
+                    console.log("Chat history cleared.");
+                },
+                error: function (error) {
+                    console.error("Error clearing chat history:", error);
+                }
+            });
+        }
     </script>
 </head>
 
@@ -97,5 +127,6 @@
 <form asp-controller="Help" asp-action="SendMessage" method="post">
     <input class="form-control me-sm-2 message-field" type="text" name="userMessage" id="userMessage" placeholder="Can machines think?" />
     <input class="btn btn-primary message-button" type="submit" value="Send" />
+    <button type="button" class="btn btn-danger message-button" onclick="clearChatHistory()">Save Tokens</button>
 </form>
 

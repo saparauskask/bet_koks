@@ -94,11 +94,8 @@ namespace OnlineNotes.Data
             lock (_lock)
             {
                 var chatMessages = _context.ChatMessages.ToList();
-                if (chatMessages.Count > 0)
-                {
-                    _context.ChatMessages.RemoveRange(_context.ChatMessages);
-                    _context.SaveChanges();
-                }
+                _context.ChatMessages.RemoveRange(chatMessages);
+                _context.SaveChanges();
             }
         }
     }
