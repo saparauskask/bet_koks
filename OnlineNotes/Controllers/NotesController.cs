@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Identity;
 using OnlineNotes.Models.Requests.NoteRating;
 using OnlineNotes.Exceptions;
 using OnlineNotes.Data.Migrations;
+using OnlineNotes.Exceptions.OnlineNotes.Exceptions;
+
 
 namespace OnlineNotes.Controllers
 {
