@@ -15,7 +15,33 @@ namespace OnlineNotes.Services.RatingServices
             _context = context;
             _logger = logger;
         }
-        
+
+        public async Task<bool> AddOrUpdateNoteRatingAsync(string userId, Note note, int? noteRatingId, int rating)
+        {
+            if(noteRatingId != null)
+            {
+                var ratingRequest = new EditNoteRatingRequest
+                {
+                    Id = noteRatingId ?? 0,
+                    RatingValue = rating,
+                    CreationDate = DateTime.Now
+                };
+
+                return await UpdateNoteRatingAsync(ratingRequest);
+            } else
+            {
+                var ratingRequest = new CreateNoteRatingRequest
+                {
+                    UserId = userId,
+                    RatingValue = rating,
+                    CreationDate = DateTime.Now,
+                    Note = note
+                };
+
+                return await CreateNoteRatingAsync(ratingRequest);
+            }
+        }
+
         public async Task<bool> CreateNoteRatingAsync(CreateNoteRatingRequest noteRatingRequest)
         {
             NoteRating noteRating = new()

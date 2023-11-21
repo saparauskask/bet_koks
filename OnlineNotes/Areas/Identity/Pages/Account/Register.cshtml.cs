@@ -83,7 +83,7 @@ namespace OnlineNotes.Areas.Identity.Pages.Account
             */
 
             [Required]
-            [RegularExpression(@"^\d{7}$", ErrorMessage = "Incorrect student ID number.")]
+            [RegularExpression(@"^\d{7}$", ErrorMessage = "Incorrect student ID number.")] // REGEX
             [Display(Name = "Student Id")]
             public string StudentId { get; set; }
         }

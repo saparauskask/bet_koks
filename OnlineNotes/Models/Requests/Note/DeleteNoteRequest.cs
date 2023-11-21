@@ -2,8 +2,8 @@
 
 namespace OnlineNotes.Models.Requests.Note
 {
-    public class DeleteNoteRequest
+    public class DeleteNoteRequest : BaseNoteRequest
     {
-        public int Id { get; set; }
+        // Code will be added when needed
     }
 }

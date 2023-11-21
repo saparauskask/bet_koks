@@ -18,10 +18,12 @@ namespace OnlineNotes.Services.CommentsServices
 
         public async Task<bool> CreateCommentAsync (CreateCommentRequest commentReqest)
         {
-            Comment comment = new Comment();
-            comment.Contents = commentReqest.Contents;
-            comment.NoteId = commentReqest.NoteId;
-            comment.CreationDate = DateTime.Now;
+            Comment comment = new Comment
+            {
+                Contents = commentReqest.Contents,
+                NoteId = commentReqest.NoteId,
+                CreationDate = DateTime.Now
+            };
 
             try
             {
@@ -61,6 +63,10 @@ namespace OnlineNotes.Services.CommentsServices
 
         public async Task<Comment?> GetCommentByIdAsync(int? id)
         {
+            if (id == null || id <= 0)
+            {
+                return null;
+            }
             try
             {
                 var comment = await _context.Comment
@@ -68,9 +74,9 @@ namespace OnlineNotes.Services.CommentsServices
                     .FirstOrDefaultAsync();
                 return comment;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.LogWarning("Comment with ID: {CommentId} was not found.", id);
+                _logger.LogWarning(ex, "An error occurred while retrieving comment with ID {CommentId}.", id);
                 return null;
             }
         }
