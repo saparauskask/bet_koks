@@ -88,17 +88,16 @@ namespace OnlineNotes.Services.NotesServices
             return null;
         }
 
-        public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
+        public int CreateNoteAsync(CreateNoteRequest noteRequest)
         {
             try
             {
-                CreateNoteDelegate(noteRequest, _context);
-                return true;
+                return CreateNoteDelegate(noteRequest, _context);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while saving the note: {ExceptionMessage}.", ex.Message);
-                return false;
+                return -1;
             }
         }
 
@@ -221,7 +220,12 @@ namespace OnlineNotes.Services.NotesServices
         private UpdateNoteDelegate<EditNoteRequest, int> EditNoteDelegate = (EditNoteRequest noteReq, ApplicationDbContext context) =>
         {
             Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) 
-            { Id = noteReq.Id, CreationDate = DateTime.Now, AvgRating = noteReq.AvgRating, UserId = noteReq.UserId };
+            { 
+                Id = noteReq.Id, 
+                CreationDate = DateTime.Now, 
+                AvgRating = noteReq.AvgRating, 
+                UserId = noteReq.UserId 
+            };
             context.Update(note);
             context.SaveChanges();
 
