@@ -9,7 +9,7 @@ namespace OnlineNotes.Data
     public sealed class ChatHistorySaver
     {
         private static readonly List<ChatGptMessage> PendingMessages = new List<ChatGptMessage>();
-        private static ChatHistorySaver _instance;
+        private static ChatHistorySaver? _instance;
         private readonly ApplicationDbContext _context;
         private static readonly object _lock = new object();
         Thread messageSaverToDBThread;
