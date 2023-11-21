@@ -9,13 +9,10 @@ using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
 using OnlineNotes.Services.RatingServices;
 using Microsoft.AspNetCore.Identity;
-<<<<<<< HEAD
-using OnlineNotes.Exceptions.OnlineNotes.Exceptions;
-=======
 using OnlineNotes.Models.Requests.NoteRating;
 using OnlineNotes.Exceptions;
 using OnlineNotes.Data.Migrations;
->>>>>>> aa5c7ca068aab224782c546834311ff47000975d
+using OnlineNotes.Exceptions.OnlineNotes.Exceptions;
 
 namespace OnlineNotes.Controllers
 {
