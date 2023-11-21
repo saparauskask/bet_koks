@@ -155,6 +155,11 @@ namespace OnlineNotes.Controllers
                     throw new NoteAccessDeniedException(userId, note.Id, "edit");
                 }
 
+                if (string.IsNullOrEmpty(note.UserId)) // temporary fix if UserId was not set previously (there was no UserId property on the Note model before)
+                {
+                    note.UserId = userId;
+                }
+
                 return View(note);
             }
             catch (NoteAccessDeniedException ex)
@@ -174,7 +179,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status, AvgRating, UserId")] EditNoteRequest note)
+        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status,AvgRating,UserId")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {
@@ -221,11 +226,6 @@ namespace OnlineNotes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(DeleteNoteRequest note)
         {
-            if (note == null)
-            {
-                return NotFound();
-            }
-
             var result = await _notesService.DeleteNoteAsync(note);
 
             return RedirectToAction(nameof(Index));
@@ -240,30 +240,7 @@ namespace OnlineNotes.Controllers
             if (note != null)
             {
                 var noteRatingId = _notesService.GetNoteRatingIdByUserId(note, user.Id);
-                bool result;
-
-                if(noteRatingId != null)
-                {
-                    var ratingRequest = new EditNoteRatingRequest
-                    {
-                        Id = noteRatingId ?? 0,
-                        RatingValue = rating,
-                        CreationDate = DateTime.Now
-                    };
-
-                    result = await _ratingService.UpdateNoteRatingAsync(ratingRequest);
-                } else
-                {
-                    var ratingRequest = new CreateNoteRatingRequest
-                    {
-                        UserId = user.Id,
-                        RatingValue = rating,
-                        CreationDate = DateTime.Now,
-                        Note = note
-                    };
-
-                    result = await _ratingService.CreateNoteRatingAsync(ratingRequest);
-                }
+                var result = await _ratingService.AddOrUpdateNoteRatingAsync(user.Id, note, noteRatingId, rating);
 
                 if (result)
                 {
