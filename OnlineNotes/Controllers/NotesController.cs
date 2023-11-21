@@ -126,9 +126,10 @@ namespace OnlineNotes.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _notesService.CreateNoteAsync(note);
+                // the result is the ID of the created note
+                int result = _notesService.CreateNoteAsync(note);
 
-                if (result)
+                if (result > 0)
                 {
                     return RedirectToAction(nameof(Index));
                 }
