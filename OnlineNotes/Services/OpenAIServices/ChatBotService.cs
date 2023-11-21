@@ -10,7 +10,7 @@ namespace OnlineNotes.Services.OpenAIServices
     {
         private OpenAIAPI _api;
         private Conversation chat;
-        ChatHistorySaver _chatHistorySaver;
+        private ChatHistorySaver _chatHistorySaver;
 
         public ChatBotService()
         {
