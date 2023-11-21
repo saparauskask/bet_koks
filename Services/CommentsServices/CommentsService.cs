@@ -27,7 +27,6 @@ namespace OnlineNotes.Services.CommentsServices
             {
                 _context.Comment.Add(comment);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Comment with ID: {CommentId} was created successfully.", comment.Id);
                 return true;
             } 
             catch (Exception ex)
@@ -44,7 +43,6 @@ namespace OnlineNotes.Services.CommentsServices
 
             if (comment == null)
             {
-                _logger.LogWarning("Comment with ID: {commentId} was not found for deletion.", commentRequest.Id);
                 return false;
             }
 
@@ -52,7 +50,6 @@ namespace OnlineNotes.Services.CommentsServices
             {
                 _context.Comment.Remove(comment);
                 await _context.SaveChangesAsync();
-                _logger.LogInformation("Comment with ID: {commentId} was deleted successfully.", commentRequest.Id);
                 return true;
             }
             catch (Exception ex)
@@ -64,17 +61,11 @@ namespace OnlineNotes.Services.CommentsServices
 
         public async Task<Comment?> GetCommentByIdAsync(int? id)
         {
-            if (id == null)
-            {
-                _logger.LogWarning("GetCommentByIdAsync: Requested Comment with ID: null.");
-            }
-
             try
             {
                 var comment = await _context.Comment
                     .Where(c => c.Id == id)
                     .FirstOrDefaultAsync();
-                _logger.LogInformation("Retrieved Comment with ID: {CommentId}.", id);
                 return comment;
             }
             catch (Exception)
@@ -92,11 +83,8 @@ namespace OnlineNotes.Services.CommentsServices
             {
                 return comment.NoteId;
             }
-            else
-            {
-                _logger.LogWarning("Comment not found for Comment ID: {CommentId}", commentId);
-                throw new Exception("Comment not found");
-            }
+
+            return 0;
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Data.Migrations;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Pagination;
@@ -41,8 +42,6 @@ namespace OnlineNotes.Services.NotesServices
                         return null;
                 }
             }
-
-            _logger.LogError("HttpContext is null when atempting to get FilterStatus");
             return null;
         }
 
@@ -59,8 +58,6 @@ namespace OnlineNotes.Services.NotesServices
 
                 return notes.OrderBy(i => i.CreationDate);
             }
-
-            _logger.LogError("HttpContext is null when atempting to get SortedNotes");
             return null;
         }
 
@@ -89,8 +86,6 @@ namespace OnlineNotes.Services.NotesServices
                 _contextAccessor.HttpContext.Session.SetInt32("SortStatus", sortStatus);
                 return sortStatus;
             }
-
-            _logger.LogError("HttpContext is null when atempting to set SortStatus");
             return null;
         }
 
@@ -128,22 +123,13 @@ namespace OnlineNotes.Services.NotesServices
         {
             if (id == null)
             {
-                _logger.LogWarning("GetNoteAsync: Requested Note with ID: null.");
                 return null;
             }
 
             var note = await _context.Note
                 .Include(n => n.Comments) // Include the Comments navigation property
+                .Include(n => n.Ratings)
                 .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (note != null)
-            {
-                _logger.LogInformation("Retrieved Note with ID: {NoteId}.", note.Id);
-            }
-            else
-            {
-                _logger.LogWarning("Note with ID: {NoteId} was not found.", id);
-            }
 
             return note;
         }
@@ -182,8 +168,6 @@ namespace OnlineNotes.Services.NotesServices
                 _contextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
                 return filterStatus.ToString();
             }
-
-            _logger.LogError("HttpContext is null when atempting to set FilterStatus");
             return null;
         }
 
@@ -252,6 +236,7 @@ namespace OnlineNotes.Services.NotesServices
             context.SaveChanges();
             return true;
         };
+        
         private UpdateNoteDelegate<CreateNoteRequest, int> CreateNoteDelegate = (CreateNoteRequest noteReq, ApplicationDbContext context) =>
         {
             Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { CreationDate = DateTime.Now };
@@ -260,5 +245,55 @@ namespace OnlineNotes.Services.NotesServices
             // returns the id of the created note
             return note.Id;
         };
+        
+        public async Task<bool> CalculateAvgRating(Note? note)
+        {
+            if (note == null) { return false; }
+
+            note = await _context.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
+                .Include(n => n.Ratings)
+                .FirstOrDefaultAsync(m => m.Id == note.Id);
+
+            if (note == null || note.Ratings == null) return false;
+
+            float totalRating = 0;
+            foreach (var rating in note.Ratings)
+            {
+                totalRating += rating.RatingValue;
+            }
+
+            float averageRating =(float) Math.Round(totalRating / note.Ratings.Count, 2);
+
+            try
+            {
+                note.AvgRating = averageRating;
+                _context.Update(note);
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
+            }
+            return false;
+        }
+
+        public int? GetNoteRatingIdByUserId(Note note, string userId)
+        {
+            try
+            {
+                var noteRatingId = note.Ratings
+                    .Where(nr => nr.UserId == userId)
+                    .Select(nr => (int?)nr.Id) // Project Id or null if not found
+                    .FirstOrDefault();
+                return noteRatingId;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetNoteRatingIdByUserId: {ErrorMessage}", ex.Message);
+                return null;
+            }
+        }
     }
 }

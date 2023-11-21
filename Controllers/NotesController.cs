@@ -7,6 +7,9 @@ using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
 using OnlineNotes.Services.NotesServices;
 using OnlineNotes.Services.OpenAIServices;
+using OnlineNotes.Services.RatingServices;
+using Microsoft.AspNetCore.Identity;
+using OnlineNotes.Models.Requests.NoteRating;
 
 namespace OnlineNotes.Controllers
 {
@@ -15,11 +18,15 @@ namespace OnlineNotes.Controllers
     {
         private readonly IOpenAIService _openAIService;
         private readonly INotesService _notesService;
+        private readonly INoteRatingService _ratingService;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public NotesController(IOpenAIService openAIService, INotesService notesService)
+        public NotesController(IOpenAIService openAIService, INotesService notesService, INoteRatingService ratingService, UserManager<IdentityUser> userManager)
         {
             _openAIService = openAIService;
             _notesService = notesService;
+            _ratingService = ratingService;
+            _userManager = userManager;
         }
 
         // GET: Notes
@@ -165,6 +172,53 @@ namespace OnlineNotes.Controllers
             var result = await _notesService.DeleteNoteAsync(note);
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitRating(int rating, int noteId)
+        {
+            IdentityUser user = await _userManager.GetUserAsync(User);
+            var note = await _notesService.GetNoteAsync(noteId);
+
+            if (note != null)
+            {
+                var noteRatingId = _notesService.GetNoteRatingIdByUserId(note, user.Id);
+                bool result;
+
+                if(noteRatingId != null)
+                {
+                    var ratingRequest = new EditNoteRatingRequest
+                    {
+                        Id = noteRatingId ?? 0,
+                        RatingValue = rating,
+                        CreationDate = DateTime.Now
+                    };
+
+                    result = await _ratingService.UpdateNoteRatingAsync(ratingRequest);
+                } else
+                {
+                    var ratingRequest = new CreateNoteRatingRequest
+                    {
+                        UserId = user.Id,
+                        RatingValue = rating,
+                        CreationDate = DateTime.Now,
+                        Note = note
+                    };
+
+                    result = await _ratingService.CreateNoteRatingAsync(ratingRequest);
+                }
+
+                if (result)
+                {
+                    var updatedNoteResult = await _notesService.CalculateAvgRating(note);
+
+                    if (updatedNoteResult)
+                    {
+                        return RedirectToAction("Details", new { id = note.Id });
+                    }
+                }
+            }
+            return Error();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
