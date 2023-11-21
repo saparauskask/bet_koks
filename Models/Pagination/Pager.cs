@@ -19,8 +19,15 @@
             int totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)pageSize);
             int currentPage = page;
 
-            int startPage = (int)Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
-            int endPage = (int)Math.Clamp(currentPage + pageRangeEnd, 1, totalPages);
+            int startPage = 1;
+            int endPage = 1;
+
+            if (totalItems > 0)
+            {
+                startPage = (int)Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
+                endPage = (int)Math.Clamp(currentPage + pageRangeEnd, 0, totalPages);
+            }
+            
 
             TotalItems = totalItems;
             CurrentPage = currentPage;

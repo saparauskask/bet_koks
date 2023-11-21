@@ -21,6 +21,8 @@ namespace OnlineNotes.Services.NotesServices
             _logger = logger;
         }
 
+        public delegate NoteStatus GetNoteStatusFromString(EditNoteRequest note, ApplicationDbContext context);
+
         public NoteStatus? GetFilterStatus()
         {
             if (_contextAccessor.HttpContext != null)
@@ -88,12 +90,9 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
-            Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) { CreationDate = DateTime.Now, UserId = noteRequest.UserId };
-
             try
             {
-                _context.Note.Add(note);
-                await _context.SaveChangesAsync();
+                CreateNoteDelegate(noteRequest, _context);
                 return true;
             }
             catch (Exception ex)
@@ -105,28 +104,9 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> DeleteNoteAsync(DeleteNoteRequest note)
         {
-            Note? actualNote = await GetNoteAsync(note.Id);
-
-            if (actualNote == null)
-            {
-                return false;
-            }
-
-            var noteId = note.Id;
             try
             {
-                foreach (var comment in actualNote.Comments.ToList())
-                {
-                    _context.Comment.Remove(comment);
-                }
-
-                foreach (var rating in actualNote.Ratings.ToList())
-                {
-                    _context.NoteRating.Remove(rating);
-                }
-                
-                _context.Note.Remove(actualNote);
-                await _context.SaveChangesAsync();
+                DeleteNoteDelegate(note, _context);
                 return true;
             }
             catch(Exception ex)
@@ -219,13 +199,11 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
-        public async Task<bool> UpdateNoteAsync(EditNoteRequest note)
+        public bool UpdateNote(EditNoteRequest note)
         {
-            Note actualNote = new(note.Title, note.Contents, note.Status) { Id = note.Id, CreationDate = DateTime.Now, AvgRating = note.AvgRating, UserId = note.UserId };
             try
             {
-                _context.Update(actualNote);
-                await _context.SaveChangesAsync();
+                EditNoteDelegate(note, _context);
                 return true;
             }
             catch (Exception ex)
@@ -235,6 +213,50 @@ namespace OnlineNotes.Services.NotesServices
             }
         }
 
+        // DELEGATE
+        private delegate TResult UpdateNoteDelegate<T, TResult>(T noteRequest, ApplicationDbContext context)
+            where T : BaseNoteRequest
+            where TResult : struct;
+
+        private UpdateNoteDelegate<EditNoteRequest, int> EditNoteDelegate = (EditNoteRequest noteReq, ApplicationDbContext context) =>
+        {
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { Id = noteReq.Id, CreationDate = DateTime.Now, AvgRating = noteReq.AvgRating };
+            context.Update(note);
+            context.SaveChanges();
+
+            // returns updated note id
+            return note.Id;
+        };
+        private UpdateNoteDelegate<DeleteNoteRequest, bool> DeleteNoteDelegate = (DeleteNoteRequest noteReq, ApplicationDbContext context) =>
+        {
+            Note? note = context.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
+                .FirstOrDefault(m => m.Id == noteReq.Id);
+
+            if (note == null)
+            {
+                return false;
+            }
+
+            foreach (var comment in note.Comments.ToList())
+            {
+                context.Comment.Remove(comment);
+            }
+
+            context.Note.Remove(note);
+            context.SaveChanges();
+            return true;
+        };
+        
+        private UpdateNoteDelegate<CreateNoteRequest, int> CreateNoteDelegate = (CreateNoteRequest noteReq, ApplicationDbContext context) =>
+        {
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { CreationDate = DateTime.Now };
+            context.Note.Add(note);
+            context.SaveChanges();
+            // returns the id of the created note
+            return note.Id;
+        };
+        
         public async Task<bool> CalculateAvgRating(Note? note)
         {
             if (note == null) { return false; }

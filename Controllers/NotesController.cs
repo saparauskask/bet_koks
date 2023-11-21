@@ -179,11 +179,11 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status,AvgRating,UserId")] EditNoteRequest note)
+        public IActionResult Edit([Bind("Id,Title,Contents,Status,AvgRating")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {
-                var result = await _notesService.UpdateNoteAsync(note);
+                var result = _notesService.UpdateNote(note);
 
                 if (result)
                 {

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
+using static OnlineNotes.Services.NotesServices.NotesService;
 
 namespace OnlineNotes.Services.NotesServices
 {
@@ -10,7 +10,7 @@ namespace OnlineNotes.Services.NotesServices
     {
         Task<Note?> GetNoteAsync(int? id);
         Task<bool> CreateNoteAsync(CreateNoteRequest note);
-        Task<bool> UpdateNoteAsync(EditNoteRequest note);
+        bool UpdateNote(EditNoteRequest note);
         Task<bool> DeleteNoteAsync(DeleteNoteRequest note);
         Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus, string currentUserId);
         Task<IEnumerable<Note>?> GetIndexedNotesToListAsync(string term);
