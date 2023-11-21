@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
-using OnlineNotes.Data.Migrations;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Pagination;
@@ -132,7 +131,7 @@ namespace OnlineNotes.Services.NotesServices
             return note;
         }
 
-        public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus)
+        public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus, string currentUserId)
         {
             try
             {
@@ -143,12 +142,27 @@ namespace OnlineNotes.Services.NotesServices
 
                 if (filterStatus.HasValue)
                 {
-                    var notes = await _context.Note.Where(note => note.Status == filterStatus).ToListAsync();
-                    return notes.AsEnumerable();
+                    if (filterStatus == NoteStatus.Draft)
+                    {
+                        var notes = await _context.Note
+                            .Where(note => note.Status == NoteStatus.Draft && note.UserId == currentUserId)
+                            .ToListAsync();
+                        return notes.AsEnumerable();
+                    }
+                    else
+                    {
+                        var notes = await _context.Note
+                            .Where(note => note.Status == filterStatus)
+                            .ToListAsync();
+                        return notes.AsEnumerable();
+                    }
+                    
                 }
                 else
                 {
-                    var notes = await _context.Note.ToListAsync();
+                    var notes = await _context.Note
+                        .Where(note => (note.Status == NoteStatus.Public) || (note.Status == NoteStatus.Archived) || (note.Status == NoteStatus.Draft && note.UserId == currentUserId))
+                        .ToListAsync();
                     return notes.AsEnumerable();
                 }
             }
@@ -206,7 +220,8 @@ namespace OnlineNotes.Services.NotesServices
 
         private UpdateNoteDelegate<EditNoteRequest, int> EditNoteDelegate = (EditNoteRequest noteReq, ApplicationDbContext context) =>
         {
-            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { Id = noteReq.Id, CreationDate = DateTime.Now, AvgRating = noteReq.AvgRating };
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) 
+            { Id = noteReq.Id, CreationDate = DateTime.Now, AvgRating = noteReq.AvgRating, UserId = noteReq.UserId };
             context.Update(note);
             context.SaveChanges();
 
@@ -236,7 +251,7 @@ namespace OnlineNotes.Services.NotesServices
         
         private UpdateNoteDelegate<CreateNoteRequest, int> CreateNoteDelegate = (CreateNoteRequest noteReq, ApplicationDbContext context) =>
         {
-            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { CreationDate = DateTime.Now };
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { CreationDate = DateTime.Now, UserId = noteReq.UserId };
             context.Note.Add(note);
             context.SaveChanges();
             // returns the id of the created note

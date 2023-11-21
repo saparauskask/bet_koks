@@ -8,5 +8,6 @@ namespace OnlineNotes.Models.Requests.Note
         public NoteStatus Status { get; set; }
         public string Contents { get; set; }
         public float? AvgRating { get; set; }
+        public string UserId { get; set; }
     }
 }

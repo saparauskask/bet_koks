@@ -10,6 +10,8 @@ using OnlineNotes.Services.OpenAIServices;
 using OnlineNotes.Services.RatingServices;
 using Microsoft.AspNetCore.Identity;
 using OnlineNotes.Models.Requests.NoteRating;
+using OnlineNotes.Exceptions;
+using OnlineNotes.Data.Migrations;
 
 namespace OnlineNotes.Controllers
 {
@@ -20,20 +22,25 @@ namespace OnlineNotes.Controllers
         private readonly INotesService _notesService;
         private readonly INoteRatingService _ratingService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly ILogger<NotesService> _logger;
 
-        public NotesController(IOpenAIService openAIService, INotesService notesService, INoteRatingService ratingService, UserManager<IdentityUser> userManager)
+        public NotesController(IOpenAIService openAIService, INotesService notesService, INoteRatingService ratingService, UserManager<IdentityUser> userManager, ILogger<NotesService> logger)
         {
             _openAIService = openAIService;
             _notesService = notesService;
             _ratingService = ratingService;
             _userManager = userManager;
+            _logger = logger;
         }
 
         // GET: Notes
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, string? errorMessage = null)
         {
+            IdentityUser user = await _userManager.GetUserAsync(User);
+            var userId = user.Id;
+
             // Filtering:
-            var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus());
+            var notes = await _notesService.GetFilteredNotesToListAsync(_notesService.GetFilterStatus(), userId);
 
             if (notes == null)
             {
@@ -46,28 +53,47 @@ namespace OnlineNotes.Controllers
             // Pagination:
             var data = _notesService.GetPagedNotes(notes, page, this);
 
-
+            ViewBag.ErrorMessage = errorMessage;
             return View(data);
         }
 
         // GET: Notes/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id) // TODO exception
         {
-            var note = await _notesService.GetNoteAsync(id);
-
-            if (note == null)
+            try
             {
-                return NotFound();
+                IdentityUser user = await _userManager.GetUserAsync(User);
+                var userId = user.Id;
+
+                var note = await _notesService.GetNoteAsync(id);
+
+                if (note == null)
+                {
+                    return NotFound();
+                }
+                var wordCount = note.Contents.WordCount();
+                ViewBag.Count = wordCount;
+                ViewBag.NoteId = id;
+                if (note.Status == NoteStatus.Draft && userId != note.UserId)
+                {
+                    throw new NoteAccessDeniedException(userId, note.Id, "read");
+                }
+                return View(note);
             }
-            var wordCount = note.Contents.WordCount();
-            ViewBag.Count = wordCount;
-            ViewBag.NoteId = id;
-            return View(note);
+            catch (NoteAccessDeniedException ex)
+            {
+                _logger.LogError($"Access to the note (Id: {ex.NoteId}) during {ex.Operation} operation was denied");
+                return RedirectToAction(nameof(Index), new {errorMessage = ex.GetErrorMessage()});
+            }
         }
 
         // GET: Notes/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            IdentityUser user = await _userManager.GetUserAsync(User);
+            var userId = user.Id;
+            ViewBag.UserId = userId;
+
             return View();
         }
 
@@ -97,7 +123,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Contents,Status")] CreateNoteRequest note)
+        public async Task<IActionResult> Create([Bind("Id,Title,Contents,Status, UserId")] CreateNoteRequest note)
         {
             if (ModelState.IsValid)
             {
@@ -115,12 +141,33 @@ namespace OnlineNotes.Controllers
         // GET: Notes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            var note = await _notesService.GetNoteAsync(id);
-            if (note == null)
+            try
             {
-                return NotFound();
+                IdentityUser user = await _userManager.GetUserAsync(User);
+                var userId = user.Id;
+                var note = await _notesService.GetNoteAsync(id);
+                if (note == null)
+                {
+                    return NotFound();
+                }
+                if (note.Status == NoteStatus.Draft && userId != note.UserId)
+                {
+                    throw new NoteAccessDeniedException(userId, note.Id, "edit");
+                }
+
+                if (string.IsNullOrEmpty(note.UserId)) // temporary fix if UserId was not set previously (there was no UserId property on the Note model before)
+                {
+                    note.UserId = userId;
+                }
+
+                return View(note);
             }
-            return View(note);
+            catch (NoteAccessDeniedException ex)
+            {
+                _logger.LogError($"Access to the note (Id: {ex.NoteId}) during {ex.Operation} operation was denied");
+                return RedirectToAction(nameof(Index), new { errorMessage = ex.GetErrorMessage() });
+            }
+            
         }
 
         public async Task<IActionResult> ExplainTask(string input)
@@ -132,7 +179,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Title,Contents,Status,AvgRating")] EditNoteRequest note)
+        public IActionResult Edit([Bind("Id,Title,Contents,Status,AvgRating,UserId")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {
@@ -150,13 +197,28 @@ namespace OnlineNotes.Controllers
         // GET: Notes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            var note = await _notesService.GetNoteAsync(id);
-
-            if (note == null)
+            try
             {
-                return NotFound();
+                IdentityUser user = await _userManager.GetUserAsync(User);
+                var userId = user.Id;
+                var note = await _notesService.GetNoteAsync(id);
+
+                if (note == null)
+                {
+                    return NotFound();
+                }
+
+                if (note.Status == NoteStatus.Draft && userId != note.UserId)
+                {
+                    throw new NoteAccessDeniedException(userId, note.Id, "delete");
+                }
+                return View(note);
             }
-            return View(note);
+            catch(NoteAccessDeniedException ex)
+            {
+                _logger.LogError($"Access to the note (Id: {ex.NoteId}) during {ex.Operation} operation was denied");
+                return RedirectToAction(nameof(Index), new { errorMessage = ex.GetErrorMessage() });
+            }
         }
 
         // POST: Notes/Delete/5
@@ -164,11 +226,6 @@ namespace OnlineNotes.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(DeleteNoteRequest note)
         {
-            if (note == null)
-            {
-                return NotFound();
-            }
-
             var result = await _notesService.DeleteNoteAsync(note);
 
             return RedirectToAction(nameof(Index));
@@ -183,30 +240,7 @@ namespace OnlineNotes.Controllers
             if (note != null)
             {
                 var noteRatingId = _notesService.GetNoteRatingIdByUserId(note, user.Id);
-                bool result;
-
-                if(noteRatingId != null)
-                {
-                    var ratingRequest = new EditNoteRatingRequest
-                    {
-                        Id = noteRatingId ?? 0,
-                        RatingValue = rating,
-                        CreationDate = DateTime.Now
-                    };
-
-                    result = await _ratingService.UpdateNoteRatingAsync(ratingRequest);
-                } else
-                {
-                    var ratingRequest = new CreateNoteRatingRequest
-                    {
-                        UserId = user.Id,
-                        RatingValue = rating,
-                        CreationDate = DateTime.Now,
-                        Note = note
-                    };
-
-                    result = await _ratingService.CreateNoteRatingAsync(ratingRequest);
-                }
+                var result = await _ratingService.AddOrUpdateNoteRatingAsync(user.Id, note, noteRatingId, rating);
 
                 if (result)
                 {
