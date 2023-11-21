@@ -132,7 +132,7 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Title,Contents,Status")] EditNoteRequest note)
+        public IActionResult Edit([Bind("Id,Title,Contents,Status,AvgRating")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {

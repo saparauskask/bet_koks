@@ -94,7 +94,6 @@ namespace OnlineNotes.Services.NotesServices
             try
             {
                 CreateNoteDelegate(noteRequest, _context);
-                _logger.LogInformation("Note with ID: {NoteId} was created successfully.", noteRequest.Id);
                 return true;
             }
             catch (Exception ex)
@@ -109,7 +108,6 @@ namespace OnlineNotes.Services.NotesServices
             try
             {
                 DeleteNoteDelegate(note, _context);
-                _logger.LogInformation("Note with ID: {noteId} was deleted successfully.", note.Id);
                 return true;
             }
             catch(Exception ex)
@@ -192,7 +190,6 @@ namespace OnlineNotes.Services.NotesServices
             try
             {
                 EditNoteDelegate(note, _context);
-                _logger.LogInformation("Note with ID: {NoteId} updated successfully.", note.Id);
                 return true;
             }
             catch (Exception ex)
@@ -209,7 +206,7 @@ namespace OnlineNotes.Services.NotesServices
 
         private UpdateNoteDelegate<EditNoteRequest, int> EditNoteDelegate = (EditNoteRequest noteReq, ApplicationDbContext context) =>
         {
-            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { Id = noteReq.Id, CreationDate = DateTime.Now };
+            Note note = new(noteReq.Title, noteReq.Contents, noteReq.Status) { Id = noteReq.Id, CreationDate = DateTime.Now, AvgRating = noteReq.AvgRating };
             context.Update(note);
             context.SaveChanges();
 
