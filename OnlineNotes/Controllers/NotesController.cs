@@ -14,6 +14,7 @@ using OnlineNotes.Exceptions;
 using OnlineNotes.Data.Migrations;
 using OnlineNotes.Exceptions.OnlineNotes.Exceptions;
 
+
 namespace OnlineNotes.Controllers
 {
     [Authorize] // restricts access to a controller to only authenticated users

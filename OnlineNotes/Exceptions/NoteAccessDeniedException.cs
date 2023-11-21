@@ -1,7 +1,5 @@
 ﻿namespace OnlineNotes.Exceptions
 {
-    namespace OnlineNotes.Exceptions
-    {
     public class NoteAccessDeniedException : Exception
     {
         public string UserId { get; }
@@ -22,4 +20,4 @@
         }
     }
 }
-}
+
