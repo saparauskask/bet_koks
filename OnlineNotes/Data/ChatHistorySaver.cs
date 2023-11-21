@@ -2,13 +2,14 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Models;
 using OpenAI_API.Chat;
+using System.Collections.Concurrent;
 using System.Security.AccessControl;
 
 namespace OnlineNotes.Data
 {
     public sealed class ChatHistorySaver
     {
-        private static readonly List<ChatGptMessage> PendingMessages = new List<ChatGptMessage>();
+        private static readonly ConcurrentQueue<ChatGptMessage> PendingMessages = new ConcurrentQueue<ChatGptMessage>();
         private static ChatHistorySaver? _instance;
         private readonly ApplicationDbContext _context;
         private static readonly object _lock = new object();
@@ -55,12 +56,12 @@ namespace OnlineNotes.Data
 
         public void AddMessage(ChatGptMessage message)
         {
-            PendingMessages.Add(message);
+            PendingMessages.Enqueue(message);
         }
 
         public List<ChatGptMessage> GetPendingMessages()
         {
-            return new List<ChatGptMessage>(PendingMessages);
+            return new List<ChatGptMessage>(PendingMessages.ToList());
         }
         
         public List<ChatGptMessage> getAllChatMessagesFromDb()
