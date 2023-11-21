@@ -30,13 +30,6 @@ namespace OnlineNotes.Controllers
         }
 
         [HttpPost]
-        public IActionResult ClearChatHistory()
-        {
-            _chatBotService.ClearChatHistory();
-            return RedirectToAction("Index");
-        }
-
-        [HttpPost]
         public async Task<IActionResult> SendMessage(string userMessage)
         {
             if (string.IsNullOrEmpty(userMessage))

@@ -10,33 +10,34 @@ namespace OnlineNotes.Services.OpenAIServices
     {
         private OpenAIAPI _api;
         private Conversation chat;
-        ChatHistorySaver _chatHistorySaver;
+        private readonly ApplicationDbContext _context;
 
-        public ChatBotService()
+        public ChatBotService(ApplicationDbContext context)
         {
+            _context = context;
             var apiKey = FileRepository.ReadApiKey();
             _api = new OpenAIAPI(apiKey?.Key);
 
-            _chatHistorySaver = ChatHistorySaver.Instance;
-
             chat = _api.Chat.CreateConversation();
-            LoadChatHistory(_chatHistorySaver.getAllChatMessagesFromDb());
+            LoadChatHistory(_context.ChatMessages.ToList());
         }
 
-        public void AddUserMessageAsync(string text)
+        public async Task AddUserMessageAsync(string text)
         {
             var userChatMessage = new ChatGptMessage { Content = text, IsUser = true, Timestamp = DateTime.Now };
+            _context.ChatMessages.Add(userChatMessage);
+            await _context.SaveChangesAsync();
 
-            _chatHistorySaver.AddMessage(userChatMessage);
             chat.AppendUserInput(text);
         }
 
         
-        public void AddAIMessage(string text)
+        public async Task AddAIMessage(string text)
         {
             var botChatMessage = new ChatGptMessage { Content = text, IsUser = false, Timestamp = DateTime.Now };
+            _context.ChatMessages.Add(botChatMessage);
+            await _context.SaveChangesAsync();
 
-            _chatHistorySaver.AddMessage(botChatMessage);
             chat.AppendSystemMessage(text);
         }
         
@@ -55,21 +56,16 @@ namespace OnlineNotes.Services.OpenAIServices
 
         public List<ChatGptMessage> GetChatHistory()
         {
-            return _chatHistorySaver.getAllChatMessagesFromDb();
-        }
-
-        public void ClearChatHistory()
-        {
-            _chatHistorySaver.ClearChatHistory();
+            return _context.ChatMessages.ToList();
         }
 
         public async Task<string> GenerateResponse(string text)
         {
-            AddUserMessageAsync(text);
+            await AddUserMessageAsync(text);
 
             var response = await chat.GetResponseFromChatbotAsync();
 
-            AddAIMessage(response.ToString());
+            await AddAIMessage(response.ToString());
             return response.ToString();
         }
     }
