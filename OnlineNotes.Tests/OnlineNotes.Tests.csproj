@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\bet_koks\OnlineNotes.csproj" />
+    <ProjectReference Include="..\OnlineNotes\OnlineNotes.csproj" />
   </ItemGroup>
 
 </Project>
