@@ -11,33 +11,36 @@ using System.Text;
 using System.Threading.Tasks;
 using OnlineNotes.Models;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
+using FakeItEasy;
+using OnlineNotes.Data.ChatHistorySaver;
 
 namespace OnlineNotes.Tests.ServicesTests.OpenAIServicesTests
 {
     public class ChatBotServiceTests
     {
-        //private readonly ApplicationDbContext _dbContext;
+        private readonly ChatBotService _chatBotService;
 
         public ChatBotServiceTests()
         {
-            // Set up an in-memory database
-            //var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                //.UseInMemoryDatabase(databaseName: "In)
-                //.Options;
-
-            //_dbContext = new ApplicationDbContext(options);
+            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
+                .Options;
+            var context = new ApplicationDbContext(options);
+            ChatHistorySaver.Initialize(context);
+            _chatBotService = new ChatBotService();
         }
 
-            [Fact]
-        public void ChatBotService_AddUserMessageAsync_MessageCountplusOne()
+        [Theory]
+        [InlineData("test")]
+        public void ChatBotService_AddUserMessageAsync_MessageCountplusOne(string text)
         {
             // Arrange
-            //int countBefore = ChatHistorySaver.Instance.getAllChatMessagesFromDb().Count;
+            var messagesInDbCountBefore = _chatBotService.GetChatHistory().Count;
             // Act
-            //_chatBotService.AddUserMessageAsync("test");
-
+            _chatBotService.AddUserMessage(text);
+            var messageInDbCountAfter = _chatBotService.GetChatHistory().Count;
             // Assert
-            //Assert.Equal(1, countBefore + 1);
         }
 
         [Fact]

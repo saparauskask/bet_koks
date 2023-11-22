@@ -5,9 +5,9 @@ using OpenAI_API.Chat;
 using System.Collections.Concurrent;
 using System.Security.AccessControl;
 
-namespace OnlineNotes.Data
+namespace OnlineNotes.Data.ChatHistorySaver
 {
-    public sealed class ChatHistorySaver
+    public sealed class ChatHistorySaver : IChatHistorySaver
     {
         private static readonly ConcurrentQueue<ChatGptMessage> PendingMessages = new ConcurrentQueue<ChatGptMessage>();
         private static ChatHistorySaver? _instance;
@@ -63,7 +63,7 @@ namespace OnlineNotes.Data
         {
             return new List<ChatGptMessage>(PendingMessages.ToList());
         }
-        
+
         public List<ChatGptMessage> getAllChatMessagesFromDb()
         {
             lock (_lock)

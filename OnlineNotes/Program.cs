@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Data.ChatHistorySaver;
 using OnlineNotes.Models;
 using OnlineNotes.Services.CommentsServices;
 using OnlineNotes.Services.NotesServices;
