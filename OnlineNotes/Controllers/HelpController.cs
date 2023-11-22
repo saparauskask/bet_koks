@@ -4,14 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Services.OpenAIServices;
 using Newtonsoft.Json;
 using OnlineNotes.Data;
+using OnlineNotes.Models;
 
 namespace OnlineNotes.Controllers
 {
     [Authorize] // restricts access to a controller to only authenticated users
     public class HelpController : Controller
     {
-        private ChatBotService _chatBotService;
-        public HelpController(ChatBotService chatBotService)
+        private IChatBotService _chatBotService;
+        public HelpController(IChatBotService chatBotService)
         {
             _chatBotService = chatBotService;
         }
@@ -25,7 +26,7 @@ namespace OnlineNotes.Controllers
         [HttpGet]
         public IActionResult GetChatHistory()
         {
-            var messages = _chatBotService.GetChatHistory();
+            List<ChatGptMessage> messages = _chatBotService.GetChatHistory();
             return Json(messages);
         }
 
@@ -44,7 +45,7 @@ namespace OnlineNotes.Controllers
                 return BadRequest("Message is empty.");
             }
 
-            var response = await _chatBotService.GenerateResponse(userMessage);
+            string response = await _chatBotService.GenerateResponse(userMessage);
 
             return Content(response.ToString(), "text/plain");
         }

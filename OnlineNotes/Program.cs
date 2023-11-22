@@ -37,7 +37,7 @@ namespace OnlineNotes
                 .AddEntityFrameworkStores<ApplicationDbContext>();
             builder.Services.AddControllersWithViews();
             builder.Services.AddScoped<IOpenAIService, OpenAIService>();
-            builder.Services.AddScoped<ChatBotService>();
+            builder.Services.AddScoped<IChatBotService, ChatBotService>();
             builder.Services.AddScoped<ICommentsService, CommentsService>();
             builder.Services.AddScoped<INotesService, NotesService>();
             builder.Services.AddScoped<INoteRatingService, NoteRatingService>();

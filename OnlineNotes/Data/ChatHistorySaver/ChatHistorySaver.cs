@@ -49,7 +49,7 @@ namespace OnlineNotes.Data.ChatHistorySaver
                 }
                 else
                 {
-                    throw new InvalidOperationException("Already initialized.");
+                    throw new InvalidOperationException("Already initializeeed.");
                 }
             }
         }
