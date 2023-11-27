@@ -37,9 +37,10 @@
 
     #ellipsis {
         display: inline-block;
-        width: 350px;
-        white-space: nowrap;
-        overflow: hidden;
+        width: auto;
+        height: auto;
+        max-height: 250px;
+        overflow: auto;
         text-overflow: ellipsis;
     }
 </style>
@@ -88,7 +89,7 @@
     @foreach (var item in Model)
     {
         <tr>
-                <td class="date-column">
+                <td class="date-column" style="width: 90px">
                     @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
 

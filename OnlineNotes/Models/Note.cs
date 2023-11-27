@@ -1,4 +1,5 @@
 ﻿using OnlineNotes.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace OnlineNotes.Models
 {
@@ -13,6 +14,7 @@ namespace OnlineNotes.Models
         public NoteStatus Status { get; set; }
         public ICollection<NoteRating> Ratings { get; } = new List<NoteRating>();
         public float? AvgRating { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime CreationDate { get; set; }
 
         public Note(string title, string contents, NoteStatus status)
