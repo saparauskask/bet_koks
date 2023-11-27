@@ -127,7 +127,7 @@ namespace OnlineNotes.Controllers
             if (ModelState.IsValid)
             {
                 // the result is the ID of the created note
-                int result = _notesService.CreateNoteAsync(note);
+                int result = await _notesService.CreateNoteAsync(note);
 
                 if (result > 0)
                 {
@@ -179,11 +179,11 @@ namespace OnlineNotes.Controllers
         // POST: Notes/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit([Bind("Id,Title,Contents,Status,AvgRating,UserId")] EditNoteRequest note)
+        public async Task<IActionResult> Edit([Bind("Id,Title,Contents,Status,AvgRating,UserId")] EditNoteRequest note)
         {
             if (ModelState.IsValid)
             {
-                var result = _notesService.UpdateNote(note);
+                var result = await _notesService.UpdateNoteAsync(note);
 
                 if (result)
                 {

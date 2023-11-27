@@ -7,12 +7,12 @@ namespace OnlineNotes.Services.RatingServices
 {
     public class NoteRatingService : INoteRatingService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ReferencesRepository _refRep;
         private readonly ILogger<NoteRatingService> _logger;
 
-        public NoteRatingService(ApplicationDbContext context, ILogger<NoteRatingService> logger)
+        public NoteRatingService(ReferencesRepository refRep, ILogger<NoteRatingService> logger)
         {
-            _context = context;
+            _refRep = refRep;
             _logger = logger;
         }
 
@@ -54,8 +54,8 @@ namespace OnlineNotes.Services.RatingServices
 
             try
             {
-                _context.NoteRating.Add(noteRating);
-                await _context.SaveChangesAsync();
+                _refRep.applicationDbContext.NoteRating.Add(noteRating);
+                await _refRep.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -83,8 +83,8 @@ namespace OnlineNotes.Services.RatingServices
                 noteRating.RatingValue = noteRatingRequest.RatingValue;
                 noteRating.CreationDate = noteRatingRequest.CreationDate;
 
-                _context.Update(noteRating);
-                await  _context.SaveChangesAsync();
+                _refRep.applicationDbContext.Update(noteRating);
+                await _refRep.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace OnlineNotes.Services.RatingServices
 
             try
             {
-                var noteRating = await _context.NoteRating.FirstOrDefaultAsync(x => x.Id == id);
+                var noteRating = await _refRep.applicationDbContext.NoteRating.FirstOrDefaultAsync(x => x.Id == id);
                 return noteRating;
             }
             catch (Exception ex)

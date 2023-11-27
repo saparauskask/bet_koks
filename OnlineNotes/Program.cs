@@ -40,6 +40,7 @@ namespace OnlineNotes
             builder.Services.AddScoped<ICommentsService, CommentsService>();
             builder.Services.AddScoped<INotesService, NotesService>();
             builder.Services.AddScoped<INoteRatingService, NoteRatingService>();
+            builder.Services.AddScoped<ReferencesRepository>();
 
             // logger configuration for writting log messages to a file
             var logger = new LoggerConfiguration()

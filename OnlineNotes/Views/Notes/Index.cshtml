@@ -74,9 +74,9 @@
 <table class="table">
     <thead>
     <tr>
-        <th class="date-column">Date Modified</th> <!-- Created Date column -->
+        <th class="date-column" style="width: 150px">Date Modified</th> <!-- Created Date column -->
         <th class="status-column">Status</th> <!-- Status column -->
-        <th style="width: 200px">
+        <th>
             @Html.DisplayNameFor(model => model.Title)
         </th>
         <th>
@@ -89,7 +89,7 @@
     @foreach (var item in Model)
     {
         <tr>
-                <td class="date-column" style="width: 90px">
+                <td class="date-column" style="width: 150px">
                     @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
 
