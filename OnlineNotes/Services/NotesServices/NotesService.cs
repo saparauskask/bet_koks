@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Exceptions;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Pagination;
 using OnlineNotes.Models.Requests.Note;
+using System.Security.Claims;
 
 namespace OnlineNotes.Services.NotesServices
 {
@@ -13,12 +16,14 @@ namespace OnlineNotes.Services.NotesServices
         private readonly ApplicationDbContext _context;
         private readonly IHttpContextAccessor _contextAccessor;
         private readonly ILogger<NotesService> _logger;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public NotesService(ApplicationDbContext context, IHttpContextAccessor contextAccessor, ILogger<NotesService> logger)
+        public NotesService(ApplicationDbContext context, IHttpContextAccessor contextAccessor, ILogger<NotesService> logger, UserManager<IdentityUser> userManager)
         {
             _context = context;
             _contextAccessor = contextAccessor;
             _logger = logger;
+            _userManager = userManager;
         }
 
         public delegate NoteStatus GetNoteStatusFromString(EditNoteRequest note, ApplicationDbContext context);
@@ -117,17 +122,31 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<Note?> GetNoteAsync(int? id)
         {
-            if (id == null)
-            {
-                return null;
-            }
+                ClaimsPrincipal? user = _contextAccessor.HttpContext?.User;
 
-            var note = await _context.Note
-                .Include(n => n.Comments) // Include the Comments navigation property
-                .Include(n => n.Ratings)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                if (id == null || user == null)
+                {
+                    return null;
+                }
 
-            return note;
+                IdentityUser currUser = await _userManager.GetUserAsync(user);
+                var userId = currUser.Id;
+
+                var note = await _context.Note
+                    .Include(n => n.Comments) // Include the Comments navigation property
+                    .Include(n => n.Ratings)
+                    .FirstOrDefaultAsync(m => m.Id == id);
+
+                if (note != null && string.IsNullOrEmpty(note.UserId)) // temporary fix if UserId was not set previously (there was no UserId property on the Note model before)
+                {
+                    note.UserId = userId;
+                }
+
+                if (note != null && note.Status == NoteStatus.Draft && note.UserId != userId)
+                    {
+                        throw new NoteAccessDeniedException(userId, note.Id, "\"operation\""); // will finish implementing later
+                    }
+                return note;
         }
 
         public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus, string currentUserId)
