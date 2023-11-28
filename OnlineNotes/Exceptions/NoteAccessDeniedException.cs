@@ -16,7 +16,7 @@
 
         public string GetErrorMessage()
         {
-            return $"Access to the note was denied! You do not have permission to {Operation} this note.";
+            return $"Access to the note was denied! You do not have permission to read this note.";
         }
     }
 }

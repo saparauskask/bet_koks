@@ -61,9 +61,6 @@ namespace OnlineNotes.Controllers
         {
             try
             {
-                IdentityUser user = await _userManager.GetUserAsync(User);
-                var userId = user.Id;
-
                 var note = await _notesService.GetNoteAsync(id);
 
                 if (note == null)
@@ -73,10 +70,6 @@ namespace OnlineNotes.Controllers
                 var wordCount = note.Contents.WordCount();
                 ViewBag.Count = wordCount;
                 ViewBag.NoteId = id;
-                if (note.Status == NoteStatus.Draft && userId != note.UserId)
-                {
-                    throw new NoteAccessDeniedException(userId, note.Id, "read");
-                }
                 return View(note);
             }
             catch (NoteAccessDeniedException ex)
@@ -143,21 +136,10 @@ namespace OnlineNotes.Controllers
         {
             try
             {
-                IdentityUser user = await _userManager.GetUserAsync(User);
-                var userId = user.Id;
                 var note = await _notesService.GetNoteAsync(id);
                 if (note == null)
                 {
                     return NotFound();
-                }
-                if (note.Status == NoteStatus.Draft && userId != note.UserId)
-                {
-                    throw new NoteAccessDeniedException(userId, note.Id, "edit");
-                }
-
-                if (string.IsNullOrEmpty(note.UserId)) // temporary fix if UserId was not set previously (there was no UserId property on the Note model before)
-                {
-                    note.UserId = userId;
                 }
 
                 return View(note);
@@ -199,8 +181,6 @@ namespace OnlineNotes.Controllers
         {
             try
             {
-                IdentityUser user = await _userManager.GetUserAsync(User);
-                var userId = user.Id;
                 var note = await _notesService.GetNoteAsync(id);
 
                 if (note == null)
@@ -208,10 +188,6 @@ namespace OnlineNotes.Controllers
                     return NotFound();
                 }
 
-                if (note.Status == NoteStatus.Draft && userId != note.UserId)
-                {
-                    throw new NoteAccessDeniedException(userId, note.Id, "delete");
-                }
                 return View(note);
             }
             catch(NoteAccessDeniedException ex)

@@ -1,9 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FakeItEasy;
+using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using OnlineNotes.Data;
-using OnlineNotes.Models.Requests.Comments;
 using OnlineNotes.Models;
+using OnlineNotes.Models.Requests.Comments;
 using OnlineNotes.Services.CommentsServices;
 
 namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
@@ -11,7 +13,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
     public class CommentsServiceTests
     {
         [Fact]
-        public async Task CreateCommentAsync_Success()
+        public async Task CommentsService_CreateCommentAsync_ReturnsTrue()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -20,8 +22,8 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             using var context = new ApplicationDbContext(options);
             var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(context, mockLogger.Object);
-
+            var mockRefRep = new Mock<ReferencesRepository>(context, A.Fake<IHttpContextAccessor>());
+            var service = new CommentsService(mockRefRep.Object, mockLogger.Object);
             var commentRequest = new CreateCommentRequest
             {
                 Contents = "Test Comment",
@@ -36,8 +38,10 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
             Assert.Equal(1, context.Comment.Count());
         }
 
+
+
         [Fact]
-        public async Task DeleteCommentAsync_Success()
+        public async Task CommentsService_DeleteCommentAsync_ReturnsTrue()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -46,7 +50,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             using var context = new ApplicationDbContext(options);
             var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(context, mockLogger.Object);
+            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
 
             var comment = new Comment
             {
@@ -68,11 +72,11 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             // Assert
             Assert.True(result);
-            Assert.Equal(0, context.Comment.Count());
+            Assert.Equal(0, await context.Comment.CountAsync());
         }
 
         [Fact]
-        public async Task GetCommentByIdAsync_WithValidId_ReturnsComment()
+        public async Task CommentsService_GetCommentByIdAsync_WithValidId_ReturnsComment()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -81,7 +85,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             using var context = new ApplicationDbContext(options);
             var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(context, mockLogger.Object);
+            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
 
             var comment = new Comment
             {
@@ -98,11 +102,11 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             // Assert
             Assert.NotNull(result);
-            Assert.Equal("Test Comment", result.Contents);
+            Assert.Equal("Test Comment", result!.Contents);
         }
 
         [Fact]
-        public async Task GetCommentByIdAsync_WithInvalidId_ReturnsNull()
+        public async Task CommentsServiceGetCommentByIdAsync_WithInvalidId_ReturnsNull()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -111,7 +115,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             using var context = new ApplicationDbContext(options);
             var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(context, mockLogger.Object);
+            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
 
             // Act
             var result = await service.GetCommentByIdAsync(1);
@@ -121,7 +125,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
         }
 
         [Fact]
-        public async Task GetNoteIdFromCommentId_WithValidCommentId_ReturnsNoteId()
+        public async Task CommentsServiceGetNoteIdFromCommentId_WithValidCommentId_ReturnsNoteId()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -130,7 +134,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             using var context = new ApplicationDbContext(options);
             var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(context, mockLogger.Object);
+            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
 
             var comment = new Comment
             {
@@ -150,7 +154,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
         }
 
         [Fact]
-        public async Task GetNoteIdFromCommentId_WithInvalidCommentId_ReturnsZero()
+        public async Task ComentsService_GetNoteIdFromCommentId_WithInvalidCommentId_ReturnsZero()
         {
             // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
@@ -159,7 +163,7 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 
             using var context = new ApplicationDbContext(options);
             var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(context, mockLogger.Object);
+            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
 
             // Act
             var result = await service.GetNoteIdFromCommentId(1);
