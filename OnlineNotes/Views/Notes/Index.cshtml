@@ -40,6 +40,7 @@
         width: auto;
         height: auto;
         max-height: 250px;
+        width: 410px;
         overflow: auto;
         text-overflow: ellipsis;
     }
@@ -74,7 +75,7 @@
 <table class="table">
     <thead>
     <tr>
-        <th class="date-column" style="width: 150px">Date Modified</th> <!-- Created Date column -->
+        <th class="date-column">Date Modified</th> <!-- Created Date column -->
         <th class="status-column">Status</th> <!-- Status column -->
         <th>
             @Html.DisplayNameFor(model => model.Title)
@@ -89,7 +90,7 @@
     @foreach (var item in Model)
     {
         <tr>
-                <td class="date-column" style="width: 150px">
+                <td class="date-column" style="width: 300px">
                     @Html.DisplayFor(modelItem => item.CreationDate)
                 </td>
 
@@ -111,7 +112,7 @@
                     }
                 </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Title)
+                    <pre style="max-width: 160px">@Html.DisplayFor(modelItem => item.Title)</pre>
             </td>
                 <td>
                     <pre id="ellipsis">@Html.DisplayFor(modelItem => item.Contents)</pre>
