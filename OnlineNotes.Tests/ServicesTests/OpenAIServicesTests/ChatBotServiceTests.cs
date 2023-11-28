@@ -11,44 +11,97 @@ using System.Text;
 using System.Threading.Tasks;
 using OnlineNotes.Models;
 using Microsoft.EntityFrameworkCore;
+using SQLitePCL;
+using FakeItEasy;
+using OnlineNotes.Data.ChatHistorySaver;
+using Microsoft.EntityFrameworkCore.Update;
 
 namespace OnlineNotes.Tests.ServicesTests.OpenAIServicesTests
 {
     public class ChatBotServiceTests
     {
-        //private readonly ApplicationDbContext _dbContext;
+        private readonly IChatBotService _chatBotService;
+        //private readonly ChatHistorySaver _chatHistorySaver;
 
         public ChatBotServiceTests()
         {
-            // Set up an in-memory database
-            //var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                //.UseInMemoryDatabase(databaseName: "In)
-                //.Options;
-
-            //_dbContext = new ApplicationDbContext(options);
+            //var context = A.Fake<ApplicationDbContext>();
+            
+            _chatBotService = A.Fake<IChatBotService>();
         }
 
-            [Fact]
-        public void ChatBotService_AddUserMessageAsync_MessageCountplusOne()
+        [Theory]
+        [InlineData("human test")]
+        public void ChatBotService_AddUserMessage_MessageCountplusOne(string text)
         {
             // Arrange
-            //int countBefore = ChatHistorySaver.Instance.getAllChatMessagesFromDb().Count;
+            
             // Act
-            //_chatBotService.AddUserMessageAsync("test");
-
+            _chatBotService.AddUserMessage(text);
             // Assert
-            //Assert.Equal(1, countBefore + 1);
+
+        }
+        
+        [Theory]
+        [InlineData("robot test")]
+        public void ChatBotService_AddAIMessage_MessageCountplusOne(string text)
+        {
+            // Arrange
+            //int messagesInDbCountBefore = _chatBotService.GetChatHistory().Count;
+            // Act
+            //_chatBotService.AddAIMessage(text);
+            //int messageInDbCountAfter = _chatHistorySaver.GetPendingMessages().Count;
+            //_chatHistorySaver.ClearChatHistory();
+            // Assert
+            //Assert.True(messageInDbCountAfter > messagesInDbCountBefore);
+        }
+
+        [Theory]
+        [InlineData("hello!")]
+        public void ChatBotService_GenerateResponse_returnsString(string text)
+        {
+            // Arrange
+            //int messagesInDbCountBefore = _chatBotService.GetChatHistory().Count;
+            // Act
+            //var result = _chatBotService.GenerateResponse(text);
+            //int messageInDbCountAfter = _chatHistorySaver.GetPendingMessages().Count;
+            //_chatHistorySaver.ClearChatHistory();
+            // Assert
+            //Assert.NotNull(result);
+            //Assert.True(messagesInDbCountBefore < messageInDbCountAfter);
         }
 
         [Fact]
-        public void GenerateResponseAsync_AddsUserMessageAndAIMessage()
+        public void ChatBotService_ClearChatHistory_IsZero()
         {
             // Arrange
-
+            //_chatBotService.AddUserMessage("1");
+            //_chatBotService.AddAIMessage("2");
+            //int messagesInDbCountBefore = _chatHistorySaver.GetPendingMessages().Count;
             // Act
-
+            //_chatBotService.ClearChatHistory();
+            //int messageInDbCountAfter = _chatBotService.GetChatHistory().Count;
             // Assert
+            //Assert.True(messageInDbCountAfter == 0);
+            //Assert.True(messagesInDbCountBefore > messageInDbCountAfter);
         }
+
+        [Fact]
+        public void ChatBotService_LoadChatHistory_NotNull()
+        {
+            // Arrange
+            //var messageList = new List<ChatGptMessage>();
+            //messageList.Add(new ChatGptMessage { Content = "x is equal to 2", IsUser = false });
+           // messageList.Add(new ChatGptMessage { Content = "x is equal to 2", IsUser = true });
+            // Act
+            //_chatBotService.LoadChatHistory(messageList);
+            //var result = _chatBotService.GenerateResponse("What is x + x?");
+            // Assert
+            //Assert.NotNull(result);
+            //Assert.Contains("4", result.ToString());
+        }
+
+
     }
 
 

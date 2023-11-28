@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using OnlineNotes.Data;
+using OnlineNotes.Data.ChatHistorySaver;
 using OnlineNotes.Models;
 using OpenAI_API;
 using OpenAI_API.Chat;
@@ -8,9 +9,9 @@ namespace OnlineNotes.Services.OpenAIServices
 {
     public class ChatBotService : IChatBotService
     {
-        private OpenAIAPI _api;
-        private Conversation chat;
-        private ChatHistorySaver _chatHistorySaver;
+        private readonly OpenAIAPI _api;
+        private readonly Conversation chat;
+        private readonly ChatHistorySaver _chatHistorySaver;
 
         public ChatBotService()
         {
@@ -23,7 +24,7 @@ namespace OnlineNotes.Services.OpenAIServices
             LoadChatHistory(_chatHistorySaver.getAllChatMessagesFromDb());
         }
 
-        public void AddUserMessageAsync(string text)
+        public void AddUserMessage(string text)
         {
             var userChatMessage = new ChatGptMessage { Content = text, IsUser = true, Timestamp = DateTime.Now };
 
@@ -65,7 +66,7 @@ namespace OnlineNotes.Services.OpenAIServices
 
         public async Task<string> GenerateResponse(string text)
         {
-            AddUserMessageAsync(text);
+            AddUserMessage(text);
 
             var response = await chat.GetResponseFromChatbotAsync();
 
