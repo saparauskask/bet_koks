@@ -9,9 +9,9 @@ namespace OnlineNotes.Services.NotesServices
     public interface INotesService
     {
         Task<Note?> GetNoteAsync(int? id);
-        int CreateNoteAsync(CreateNoteRequest note);
-        bool UpdateNote(EditNoteRequest note);
-        Task<bool> DeleteNoteAsync(DeleteNoteRequest note);
+        Task<int> CreateNoteAsync(CreateNoteRequest noteRequest);
+        Task<bool> UpdateNoteAsync(EditNoteRequest noteRequest);
+        Task<bool> DeleteNoteAsync(DeleteNoteRequest noteRequest);
         Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus, string currentUserId);
         Task<IEnumerable<Note>?> GetIndexedNotesToListAsync(string term);
         NoteStatus? GetFilterStatus();
