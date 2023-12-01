@@ -9,7 +9,7 @@ namespace ChessApp.ChessLogic
         public int X { get; set; }
         public int Y { get; set; }
 
-        public Square(int x, int y, Piece piece)
+        public Square(int x, int y, Piece? piece)
         {
             Piece = piece;
             X = x;
@@ -53,7 +53,7 @@ namespace ChessApp.ChessLogic
         }
         public override string ToString()
         {
-            return $"{Piece} ";
+            return Piece != null ? $"{Piece} " : "..";
         }
     }
 }

@@ -33,53 +33,53 @@ namespace ChessApp.ChessLogic
         {
             //white pieces
             Squares[0, 0] = new Square(0, 0, new Rook(isWhite: true));
-            Squares[0, 1] = new Square(0, 1, new Knight(isWhite: true));
-            Squares[0, 2] = new Square(0, 2, new Bishop(isWhite: true));
-            Squares[0, 3] = new Square(0, 3, new Queen(isWhite: true));
-            Squares[0, 4] = new Square(0, 4, new King(isWhite: true));
-            Squares[0, 5] = new Square(0, 5, new Bishop(isWhite: true));
-            Squares[0, 6] = new Square(0, 6, new Knight(isWhite: true));
-            Squares[0, 7] = new Square(0, 7, new Rook(isWhite: true));
+            Squares[1, 0] = new Square(1, 0, new Knight(isWhite: true));
+            Squares[2, 0] = new Square(2, 0, new Bishop(isWhite: true));
+            Squares[3, 0] = new Square(3, 0, new Queen(isWhite: true));
+            Squares[4, 0] = new Square(4, 0, new King(isWhite: true));
+            Squares[5, 0] = new Square(5, 0, new Bishop(isWhite: true));
+            Squares[6, 0] = new Square(6, 0, new Knight(isWhite: true));
+            Squares[7, 0] = new Square(7, 0, new Rook(isWhite: true));
 
             //black pieces
-            Squares[7, 0] = new Square(0, 0, new Rook(isWhite: false));
-            Squares[7, 1] = new Square(0, 1, new Knight(isWhite: false));
-            Squares[7, 2] = new Square(0, 2, new Bishop(isWhite: false));
-            Squares[7, 3] = new Square(0, 3, new Queen(isWhite: false));
-            Squares[7, 4] = new Square(0, 4, new King(isWhite: false));
-            Squares[7, 5] = new Square(0, 5, new Bishop(isWhite: false));
-            Squares[7, 6] = new Square(0, 6, new Knight(isWhite: false));
-            Squares[7, 7] = new Square(0, 7, new Rook(isWhite: false));
+            Squares[0, 7] = new Square(0, 7, new Rook(isWhite: false));
+            Squares[1, 7] = new Square(1, 7, new Knight(isWhite: false));
+            Squares[2, 7] = new Square(2, 7, new Bishop(isWhite: false));
+            Squares[3, 7] = new Square(3, 7, new Queen(isWhite: false));
+            Squares[4, 7] = new Square(4, 7, new King(isWhite: false));
+            Squares[5, 7] = new Square(5, 7, new Bishop(isWhite: false));
+            Squares[6, 7] = new Square(6, 7, new Knight(isWhite: false));
+            Squares[7, 7] = new Square(7, 7, new Rook(isWhite: false));
 
             //white and black pawns
             for (int i = 0; i < 8; ++i)
             {
-                Squares[1, i] = new Square(0, i, new Pawn(isWhite: true));
-                Squares[6, i] = new Square(6, i, new Pawn(isWhite: false));
+                Squares[i, 1] = new Square(i, 1, new Pawn(isWhite: true));
+                Squares[i, 6] = new Square(i, 6, new Pawn(isWhite: false));
             }
 
-            /*
+            //empty squres
             for (int i = 2; i < 6; i++)
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    Squares[i][j] = new Square(i, j, null);
+                    Squares[j, i] = new Square(j, i, null);
                 }
             }
-            */
+            
         }
 
         public override string ToString()
         {
             StringBuilder stringBuilder = new StringBuilder();
 
-            for (int i = 0; i < 8; ++i)
+            for (int i = 7; i >= 0; --i)
             {
                 for (int j = 0; j < 8; ++j)
                 {
                     if (Squares[i, j] != null)
                     {
-                        stringBuilder.Append($"{Squares[i, j]} ");
+                        stringBuilder.Append($"{Squares[j, i]} ");
                     }
                     else
                     {

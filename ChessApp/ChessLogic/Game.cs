@@ -11,21 +11,14 @@ namespace ChessApp.ChessLogic
         private GameStatus Status { get; set; }
         private List<Move> movesPlayed;
 
-        private void Initialize(Player p1, Player p2)
+        public Game(Player p1, Player p2)
         {
+            players = new Player[2];
             players[0] = p1;
             players[1] = p2;
+            CurrentTurn = p1;
 
             Board = new Board();
-
-            if (p1.IsWhiteSide)
-            {
-                CurrentTurn = p1;
-            }
-            else
-            {
-                CurrentTurn = p2;
-            }
 
             movesPlayed = new List<Move>();
         }
@@ -35,30 +28,41 @@ namespace ChessApp.ChessLogic
             return Status != GameStatus.ACTIVE;
         }
 
-        private bool makeMove(Move move, Player player)
+        public bool MakeMoveWithCoordinates(Player player, int fromX, int fromY, int toX, int toY)
         {
-            Piece sourcePiece = move.Start.Piece;
-            if (sourcePiece == null)
+            var start = Board.Squares[fromX, fromY];
+            var end = Board.Squares[toX, toY];
+            Console.WriteLine($"Starting piece: {start.ToString()}, endPiece: {end.ToString()}");
+            var move = new Move(start, end);
+            return MakeMove(player, move);
+        }
+
+        public bool MakeMove(Player player, Move move)
+        {
+            Piece movingPiece = move.Start.Piece;
+
+            if (player != players[0] && player != players[1])
             {
+                Console.WriteLine("Error! Someone else is trying to help!");
                 return false;
             }
 
-            // valid player 
-            if (player != CurrentTurn)
+            if (CurrentTurn != player)
             {
+                Console.WriteLine("Error! Not your turn!");
                 return false;
             }
 
-            if (sourcePiece.IsWhite != player.IsWhiteSide)
+            if (movingPiece == null)
             {
                 return false;
             }
 
             // check for valid move 
 
-            // kill? 
+            // if there was a piece in end square, set it as killed and assign to the move as killed piece. 
             Piece destPiece = move.End.Piece;
-            if (destPiece != null)
+            if (destPiece != null) //Never Null fix
             {
                 destPiece.SetKilled();
                 move.PieceKilled = destPiece;
@@ -68,7 +72,8 @@ namespace ChessApp.ChessLogic
             movesPlayed.Add(move);
 
             // move piece from the stat box to end box 
-            move.End.Piece = move.Start.Piece;
+            move.End.Piece = movingPiece;
+            move.PieceMoved = movingPiece;
             move.Start.Piece = null;
 
             // set the current turn to the other player 
@@ -82,6 +87,11 @@ namespace ChessApp.ChessLogic
             }
 
             return true;
+        }
+
+        public string PrintBoard()
+        {
+            return Board.ToString();
         }
     }
 }
