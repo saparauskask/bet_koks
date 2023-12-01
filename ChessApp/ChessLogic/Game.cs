@@ -6,7 +6,7 @@ namespace ChessApp.ChessLogic
     public class Game
     {
         private Player[] players;
-        private Board Board;
+        public Board Board { get; private set; }
         private Player CurrentTurn;
         private GameStatus Status { get; set; }
         private List<Move> movesPlayed;
