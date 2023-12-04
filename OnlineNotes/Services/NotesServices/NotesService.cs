@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.Data.Migrations;
 using OnlineNotes.Exceptions;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
@@ -312,6 +313,42 @@ namespace OnlineNotes.Services.NotesServices
                 _logger.LogError(ex, "An error occurred in GetNoteRatingIdByUserId: {ErrorMessage}", ex.Message);
                 return null;
             }
+        }
+
+        public async Task<string?> UploadFileAsync(UploadNoteAttachmentRequest request)
+        {
+            if (request != null && request.File.Length > 0)
+            {
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(request.File.FileName);
+                var filePath = Path.Combine("wwwroot/attachments", fileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await request.File.CopyToAsync(stream);
+                }
+
+                var attachment = new NoteAttachment { FilePath = filePath, NoteId = request.Id, File = request.File };
+                Note? note = await GetNoteAsync(request.Id);
+
+                if (note != null)
+                {
+                    try
+                    {
+                        _refRep.applicationDbContext.NoteAttachments.Add(attachment);
+                        await _refRep.applicationDbContext.SaveChangesAsync();
+                        return filePath;
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred in GetNoteRatingIdByUserId: {ErrorMessage}", ex.Message);
+                        return null;
+                    }
+                }
+
+                return filePath;
+            }
+
+            return null;
         }
     }
 }

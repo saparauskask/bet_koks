@@ -15,5 +15,6 @@ namespace OnlineNotes.Data
         public DbSet <OnlineNotes.Models.NoteRating> NoteRating { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ChatGptMessage> ChatMessages { get; set; }
+        public DbSet<NoteAttachment> NoteAttachments { get; set; }
     }
 }

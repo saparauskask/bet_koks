@@ -241,9 +241,6 @@ namespace OnlineNotes.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsUser")
                         .HasColumnType("bit");
 
@@ -314,6 +311,28 @@ namespace OnlineNotes.Data.Migrations
                     b.ToTable("Note");
                 });
 
+            modelBuilder.Entity("OnlineNotes.Models.NoteAttachment", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("FilePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NoteId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NoteId");
+
+                    b.ToTable("NoteAttachments");
+                });
+
             modelBuilder.Entity("OnlineNotes.Models.NoteRating", b =>
                 {
                     b.Property<int>("Id")
@@ -347,7 +366,6 @@ namespace OnlineNotes.Data.Migrations
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
                     b.Property<string>("StudentId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasDiscriminator().HasValue("ApplicationUser");
@@ -415,6 +433,17 @@ namespace OnlineNotes.Data.Migrations
                     b.Navigation("Note");
                 });
 
+            modelBuilder.Entity("OnlineNotes.Models.NoteAttachment", b =>
+                {
+                    b.HasOne("OnlineNotes.Models.Note", "Note")
+                        .WithMany("Attachments")
+                        .HasForeignKey("NoteId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Note");
+                });
+
             modelBuilder.Entity("OnlineNotes.Models.NoteRating", b =>
                 {
                     b.HasOne("OnlineNotes.Models.Note", "Note")
@@ -428,6 +457,8 @@ namespace OnlineNotes.Data.Migrations
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Comments");
 
                     b.Navigation("Ratings");

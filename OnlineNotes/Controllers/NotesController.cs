@@ -10,6 +10,7 @@ using OnlineNotes.Services.OpenAIServices;
 using OnlineNotes.Services.RatingServices;
 using Microsoft.AspNetCore.Identity;
 using OnlineNotes.Exceptions;
+using System.Net.Mail;
 
 
 namespace OnlineNotes.Controllers
@@ -54,6 +55,16 @@ namespace OnlineNotes.Controllers
 
             ViewBag.ErrorMessage = errorMessage;
             return View(data);
+        }
+
+        public async Task<IActionResult> Upload(int id)
+        {
+            if (id > 0)
+            {
+                NoteAttachment attachment = new() { NoteId = id };
+                return View(attachment);
+            }
+            return View();
         }
 
         // GET: Notes/Details/5
@@ -129,6 +140,13 @@ namespace OnlineNotes.Controllers
                 return Error();
             }
             return View(note);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Upload([Bind("Id,NoteId,File")] UploadNoteAttachmentRequest request)
+        {
+            await _notesService.UploadFileAsync(request);
+            return RedirectToAction("Details", new { id = request.Id });
         }
 
         // GET: Notes/Edit/5

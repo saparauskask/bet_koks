@@ -16,6 +16,7 @@ namespace OnlineNotes.Models
         public float? AvgRating { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd/MM/yyyy}", ApplyFormatInEditMode = true)]
         public DateTime CreationDate { get; set; }
+        public ICollection<NoteAttachment> Attachments { get; } = new List<NoteAttachment>();
 
         public Note(string title, string contents, NoteStatus status)
         {

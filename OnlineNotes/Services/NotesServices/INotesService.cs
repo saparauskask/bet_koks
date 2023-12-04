@@ -21,5 +21,6 @@ namespace OnlineNotes.Services.NotesServices
         IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller);
         string? SetFilterStatus(NoteStatus? filterStatus);
         int? GetNoteRatingIdByUserId(Note note, string userId);
+        Task<string?> UploadFileAsync(UploadNoteAttachmentRequest request);
     }
 }

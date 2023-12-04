@@ -243,9 +243,6 @@ namespace OnlineNotes.Data.Migrations
                     b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsUser")
                         .HasColumnType("bit");
 
