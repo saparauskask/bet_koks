@@ -7,7 +7,7 @@ namespace ChessApp.ChessLogic
     {
         private Player[] players;
         public Board Board { get; private set; }
-        private Player CurrentTurn;
+        public Player CurrentTurn { get; private set; }
         private GameStatus Status { get; set; }
         private List<Move> movesPlayed;
 
@@ -93,5 +93,6 @@ namespace ChessApp.ChessLogic
         {
             return Board.ToString();
         }
+
     }
 }

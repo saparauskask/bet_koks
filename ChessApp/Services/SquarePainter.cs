@@ -21,6 +21,10 @@
         private const string dark = "\"dark\"";
         private const string light = "\"light\"";
 
+        public string ButtStart = "<button class=\"invisible-button\" data-move=\"";
+        public string ButtMiddle = "\">";
+        public string ButtEnd = "</button>";
+
         public SquarePainter(bool startingColor)
         {
             IsWhite = startingColor;

@@ -25,25 +25,25 @@ namespace ChessApp.Services
                     switch (currentSquare.Piece)
                     {
                         case Pawn pawn:
-                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.GetPawn(pawn.IsWhite)}</td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.GetPawn(pawn.IsWhite)}{sqP.ButtEnd}</td>");
                             break;
                         case Rook rook:
-                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.GetPawn(rook.IsWhite)}</td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.GetRook(rook.IsWhite)}{sqP.ButtEnd}</td>");
                             break;
                         case Knight knight:
-                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.GetKnight(knight.IsWhite)}</td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.GetKnight(knight.IsWhite)}{sqP.ButtEnd}</td>");
                             break;
                         case Bishop bishop:
-                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.GetBishop(bishop.IsWhite)}</td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.GetBishop(bishop.IsWhite)}{sqP.ButtEnd}</td>");
                             break;
                         case Queen queen:
-                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.GetQueen(queen.IsWhite)}</td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.GetQueen(queen.IsWhite)}{sqP.ButtEnd}</td>");
                             break;
                         case King king:
-                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.GetKing(king.IsWhite)}</td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.GetKing(king.IsWhite)}{sqP.ButtEnd}</td>");
                             break;
                         default:
-                            strB.AppendLine($"<td class={sqP.currentColor}></td>");
+                            strB.AppendLine($"<td class={sqP.currentColor}>{sqP.ButtStart}{x} {y}{sqP.ButtMiddle}{sqP.ButtEnd}</td>");
                             break;
                     }
 
