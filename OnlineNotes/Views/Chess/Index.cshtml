@@ -1,6 +1,111 @@
 ﻿@{
+    string htmlBoard = ViewBag.HtmlBoard;
 }
 
-<h1>Daily puzzle</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <style>
+        .chess-board {
+            border-spacing: 0;
+            border-collapse: collapse;
+            margin-left: auto;
+            margin-right: auto;
+        }
 
-<iframe src="https://lichess.org/training/frame?theme=brown&bg=dark" style="width: 400px; height: 444px;" allowtransparency="true" frameborder="0"></iframe>
+            .chess-board td {
+                width: 1.5em;
+                height: 1.5em;
+                text-align: center;
+                font-size: 40px;
+                line-height: 0;
+            }
+
+            .chess-board .light {
+                background: #eee;
+            }
+
+            .chess-board .dark {
+                background: #aaa;
+            }
+
+        .invisible-button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            var firstClick = null;
+
+            document.querySelector('.chess-board').addEventListener('click', function (event) {
+                var button = event.target.closest('.invisible-button');
+                if (!button) return;
+
+                var move = button.getAttribute('data-move');
+                console.log('User wants to make move:', move);
+
+                var coordinates = move.split(' ');
+                var clickedX = parseInt(coordinates[0]);
+                var clickedY = parseInt(coordinates[1]);
+
+                if (!firstClick) {
+                    // First click
+                    firstClick = { x: clickedX, y: clickedY };
+                    console.log('First click:', firstClick);
+                } else {
+                    // Second click
+                    var secondClick = { x: clickedX, y: clickedY };
+                    console.log('Second click:', secondClick);
+
+                    var formData = new URLSearchParams();
+                    formData.append('fromX', firstClick.x);
+                    formData.append('fromY', firstClick.y);
+                    formData.append('toX', secondClick.x);
+                    formData.append('toY', secondClick.y);
+
+                    fetch('/Chess/RetrieveCoordinates', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: formData,
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Network response was not ok');
+                            }
+                            return response.text(); // Use response.text() for HTML content
+                        })
+                        .then(updatedHtmlBoard => {
+                            console.log('Success:', updatedHtmlBoard);
+
+                            // Update the view with the new HTML board
+                            document.querySelector('.chess-board').innerHTML = updatedHtmlBoard;
+
+                            // Reset firstClick for the next move
+                            firstClick = null;
+                        })
+                        .catch((error) => {
+                            console.error('Error:', error);
+
+                            // Reset firstClick in case of an error
+                            firstClick = null;
+                        });
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+    @Html.Raw(htmlBoard)
+</body>
+</html>
