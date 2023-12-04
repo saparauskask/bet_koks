@@ -40,6 +40,27 @@ namespace OnlineNotes.Controllers
             return View();
         }
 
+        [HttpGet]
+        public async Task<IActionResult> NewGame()
+        {
+            string htmlBoard = "";
+
+            using (HttpResponseMessage response = await _client.GetAsync(_client.BaseAddress + "/ChessApi/CreateNewGame"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    htmlBoard = await response.Content.ReadAsStringAsync();
+                    return Ok(htmlBoard);
+                }
+                else
+                {
+                    Console.WriteLine("Error! Chess board could not have been retrieved.");
+                }
+            }
+
+            return StatusCode(500);
+        }
+
 
         [HttpPost]
         public async Task<IActionResult> RetrieveCoordinates(int fromX, int fromY, int toX, int toY)
@@ -63,8 +84,6 @@ namespace OnlineNotes.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         string updatedHtmlBoard = await response.Content.ReadAsStringAsync();
-
-                        //ViewBag.HtmlBoard = updatedHtmlBoard;
                         
                         return Ok(updatedHtmlBoard);
                     }

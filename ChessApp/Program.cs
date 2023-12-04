@@ -1,5 +1,4 @@
-using ChessApp.ChessLogic;
-using ChessApp.Services;
+using ChessApp.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

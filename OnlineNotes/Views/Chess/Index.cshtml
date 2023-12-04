@@ -8,6 +8,11 @@
     <title></title>
     <meta charset="UTF-8">
     <style>
+        .new-game-button {
+            text-align: center;
+            padding: 10px;
+            color: #aaa;
+        }
         .chess-board {
             border-spacing: 0;
             border-collapse: collapse;
@@ -103,9 +108,41 @@
                 }
             });
         });
+
+        function startNewGame() {
+            fetch('/Chess/NewGame', {
+                method: 'GET',
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text(); // Use response.text() for HTML content
+                })
+                .then(updatedHtmlBoard => {
+                    console.log('Success:', updatedHtmlBoard);
+
+                    // Update the view with the new HTML board
+                    document.querySelector('.chess-board').innerHTML = updatedHtmlBoard;
+
+                    // Reset firstClick for the next move
+                    firstClick = null;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+
+                    // Reset firstClick in case of an error
+                    firstClick = null;
+                });
+        }
     </script>
 </head>
 <body>
-    @Html.Raw(htmlBoard)
+    <div>
+        @Html.Raw(htmlBoard)
+    </div>
+    <div class="new-game-button">
+        <button type="button" class="btn message-button" onclick="startNewGame()">Start New Game</button>
+    </div>
 </body>
 </html>
