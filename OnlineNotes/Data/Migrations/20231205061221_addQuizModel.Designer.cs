@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineNotes.Data;
 
@@ -11,9 +12,10 @@ using OnlineNotes.Data;
 namespace OnlineNotes.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231205061221_addQuizModel")]
+    partial class addQuizModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,7 +251,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ChatMessages", (string)null);
+                    b.ToTable("ChatMessages");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Comment", b =>
@@ -274,7 +276,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("Comment", (string)null);
+                    b.ToTable("Comment");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Note", b =>
@@ -308,7 +310,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Note", (string)null);
+                    b.ToTable("Note");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.NoteRating", b =>
@@ -336,7 +338,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasIndex("NoteId");
 
-                    b.ToTable("NoteRating", (string)null);
+                    b.ToTable("NoteRating");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Quizzes.Question", b =>
@@ -367,7 +369,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasIndex("QuizId");
 
-                    b.ToTable("Question", (string)null);
+                    b.ToTable("Question");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Quizzes.QuestionOption", b =>
@@ -389,7 +391,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasIndex("QuestionId");
 
-                    b.ToTable("QuestionOption", (string)null);
+                    b.ToTable("QuestionOption");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.Quizzes.Quiz", b =>
@@ -426,7 +428,7 @@ namespace OnlineNotes.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Quiz", (string)null);
+                    b.ToTable("Quiz");
                 });
 
             modelBuilder.Entity("OnlineNotes.Models.ApplicationUser", b =>
