@@ -2,7 +2,7 @@
 using OnlineNotes.Data;
 using OnlineNotes.Models.Quizzes;
 using OnlineNotes.Models.Requests.Quiz;
-using OnlineNotes.Services.NotesServices;
+using OnlineNotes.Services.OpenAIServices;
 
 namespace OnlineNotes.Services.QuizzesServices
 {
@@ -10,18 +10,32 @@ namespace OnlineNotes.Services.QuizzesServices
     {
         private readonly ReferencesRepository _refRep;
         private readonly ILogger<QuizzesService> _logger;
-        private readonly INotesService _noteService;
+        private readonly IQuizGeneratorService _quizGeneratorService;
 
-        public QuizzesService(ReferencesRepository refRep, ILogger<QuizzesService> logger, INotesService notesService)
+        public QuizzesService(ReferencesRepository refRep, ILogger<QuizzesService> logger, IQuizGeneratorService quizGeneratorService)
         {
             _refRep = refRep;
             _logger = logger;
-            _noteService = notesService;
+            _quizGeneratorService = quizGeneratorService;
         }
 
-        public async Task<bool> CreateQuizAsync(CreateQuizRequest quizRequest)
+        public async Task<int?> CreateQuizAsync(CreateQuizRequest quizRequest)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var quiz = new Quiz(quizRequest.UserId, quizRequest.CreationDate, quizRequest.Title, quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
+                var generatedQuiz = await _quizGeneratorService.GenerateQuiz(quiz.NoteContents, quiz.Difficulty, quiz.QuestionsCount); // IT WILL BE FIXED
+                quiz.NoteContents = generatedQuiz;
+                await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
+                await _refRep.applicationDbContext.SaveChangesAsync();
+                return quiz.Id;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in CreateQuizAsync: {ErrorMessage}", ex.Message);
+                return null;
+            }
+            // logic for generating questions, options based on the configuation
         }
 
         public async Task<IEnumerable<Quiz>?> GetAllQuizzesToListAsync()

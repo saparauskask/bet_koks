@@ -1,5 +1,70 @@
-﻿@{
+﻿@using OnlineNotes.Models.Enums
+@model OnlineNotes.Models.Quizzes.Quiz
+
+@{
     ViewData["Title"] = "Create";
 }
 
-<h1>Ko ziuri, obuoli</h1>
+<h1>Generate a new quiz</h1>
+
+<div class="row justify-content-center align-items-center" style="height: 50vh;">
+    <div class="col-md-8">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group">
+                <label asp-for="Title" class="control-label"><h5>Quiz Title:</h5></label>
+                <input asp-for="Title" class="form-control" />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label asp-for="Difficulty" class="control-label"><h5>Difficulty:</h5></label>
+                <div>
+                    @foreach (var difficulty in Enum.GetValues(typeof(QuizDifficulty)))
+                    {
+                        <label class="radio-inline">
+                            <input type="radio" asp-for="Difficulty" value="@difficulty" />
+                            @difficulty
+                        </label>
+                    }
+                </div>
+                <span asp-validation-for="Difficulty" class="text-danger"></span>
+            </div>
+            <br />
+
+            <div class="form-group">
+                <label asp-for="QuestionsCount" class="control-label"><h5>Number of Questions:</h5></label>
+                <input asp-for="QuestionsCount" type="number" class="form-control" />
+                <span asp-validation-for="QuestionsCount" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label><h5>Include Notes:</h5></label>
+                <div>
+                    @if (ViewBag.Notes != null)
+                    {
+                        @foreach (var note in ViewBag.Notes)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="NoteContents" value="@note.Contents">
+                                <label class="form-check-label">
+                                    @note.Title
+                                </label>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+
+            <input type="hidden" asp-for="UserId" value="@ViewBag.UserId" />
+
+            <div asp-validation-summary="All" class="text-danger"></div>
+
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>

@@ -2,7 +2,6 @@
 using OnlineNotes.Models;
 using OnlineNotes.Models.Enums;
 using OnlineNotes.Models.Requests.Note;
-using static OnlineNotes.Services.NotesServices.NotesService;
 
 namespace OnlineNotes.Services.NotesServices
 {
@@ -21,5 +20,6 @@ namespace OnlineNotes.Services.NotesServices
         IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller);
         string? SetFilterStatus(NoteStatus? filterStatus);
         int? GetNoteRatingIdByUserId(Note note, string userId);
+        Task<IEnumerable<Note>?> GetAllNotesToListAsync();
     }
 }

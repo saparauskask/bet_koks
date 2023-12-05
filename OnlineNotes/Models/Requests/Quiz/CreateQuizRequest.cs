@@ -1,4 +1,5 @@
 ﻿using OnlineNotes.Models.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace OnlineNotes.Models.Requests.Quiz
 {
@@ -6,9 +7,12 @@ namespace OnlineNotes.Models.Requests.Quiz
     {
         public string UserId { get; set; } = null!;
         public DateTime CreationDate { get; set; }
-        public string Title { get; set; } = null!; // should i add constraints here?
+        [StringLength(60, ErrorMessage = "Title length must not exceed 60 characters")]
+        public string Title { get; set; } = null!;
+        public string NoteContents { get; set; } = null!;
         public QuizDifficulty Difficulty { get; set; }
-        //what about the collection of strings?
+        [Range(1, 15, ErrorMessage = "Number of questions must be between 1 and 15")]
+        public int QuestionsCount { get; set; }
         public bool IsCompleted = false;
     }
 }

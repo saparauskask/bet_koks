@@ -7,6 +7,6 @@ namespace OnlineNotes.Services.QuizzesServices
     {
         Task<Quiz?> GetQuizByIdAsync(int? id);
         Task<IEnumerable<Quiz>?> GetAllQuizzesToListAsync();
-        Task<bool> CreateQuizAsync(CreateQuizRequest quizRequest);
+        Task<int?> CreateQuizAsync(CreateQuizRequest quizRequest);
     }
 }

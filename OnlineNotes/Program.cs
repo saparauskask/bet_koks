@@ -44,6 +44,7 @@ namespace OnlineNotes
             builder.Services.AddScoped<INoteRatingService, NoteRatingService>();
             builder.Services.AddScoped<ReferencesRepository>();
             builder.Services.AddScoped<IQuizzesService, QuizzesService>();
+            builder.Services.AddScoped<IQuizGeneratorService, QuizGeneratorService>();
 
             // logger configuration for writting log messages to a file
             var logger = new LoggerConfiguration()
