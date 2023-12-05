@@ -313,5 +313,31 @@ namespace OnlineNotes.Services.NotesServices
                 return null;
             }
         }
+
+        // get notesId and titles
+        public async Task<IEnumerable<Note>?> GetAllNotesToListAsync()
+        {
+            try
+            {
+                ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
+                if (user == null)
+                {
+                    return null;
+                }
+
+                IdentityUser currUser = await _userManager.GetUserAsync(user);
+                var currentUserId = currUser.Id;
+                var notes = await _refRep.applicationDbContext.Note
+                    .Where(note => note.UserId == currentUserId)
+                    .ToListAsync();
+
+                return notes;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetAllNotesTitlesToListAsync: {ErrorMessage}", ex.Message);
+                return null;
+            }
+        }
     }
 }

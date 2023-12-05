@@ -1,0 +1,22 @@
+﻿@model IEnumerable<OnlineNotes.Models.Quizzes.Quiz>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div style="text-align: center; margin-top: 20px;">
+    <h1>This feature is not available yet. Do not press any buttons</h1>
+    <br />
+    <br />
+    <a class="btn btn-primary" asp-action="Create">+ create a new quiz</a>
+    <hr />
+</div>
+<div>
+    @if (!Model.Any())
+    {
+        <h3>There are no quizzes yet. Feel free to create one</h3>
+    } else
+    {
+        <div>There are some quizzes created :)</div>
+    }
+</div>

@@ -1,0 +1,15 @@
+﻿@model OnlineNotes.Models.Quizzes.Quiz
+
+@{
+    ViewData["Title"] = "QuizAttempt";
+}
+
+<h1>This page is designed for solving a quiz</h1>
+<br />
+
+<div>
+    <p><h5>Title:</h5> @Model.Title </p>
+    <p><h5>Difficulty:</h5> @Model.Difficulty</p>
+    <br />
+    <p><h5>Quiz:</h5> @Model.NoteContents</p>
+</div>
