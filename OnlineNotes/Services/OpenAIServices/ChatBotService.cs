@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.SignalR;
-using OnlineNotes.Data;
+﻿using OnlineNotes.Data;
 using OnlineNotes.Data.ChatHistorySaver;
 using OnlineNotes.Models;
 using OpenAI_API;
@@ -17,9 +16,7 @@ namespace OnlineNotes.Services.OpenAIServices
         {
             var apiKey = FileRepository.ReadApiKey();
             _api = new OpenAIAPI(apiKey?.Key);
-
             _chatHistorySaver = ChatHistorySaver.Instance;
-
             chat = _api.Chat.CreateConversation();
             LoadChatHistory(_chatHistorySaver.getAllChatMessagesFromDb());
         }
@@ -27,21 +24,19 @@ namespace OnlineNotes.Services.OpenAIServices
         public void AddUserMessage(string text)
         {
             var userChatMessage = new ChatGptMessage { Content = text, IsUser = true, Timestamp = DateTime.Now };
-
             _chatHistorySaver.AddMessage(userChatMessage);
             chat.AppendUserInput(text);
         }
 
-        
+
         public void AddAIMessage(string text)
         {
             var botChatMessage = new ChatGptMessage { Content = text, IsUser = false, Timestamp = DateTime.Now };
-
             _chatHistorySaver.AddMessage(botChatMessage);
             chat.AppendSystemMessage(text);
         }
-        
-        
+
+
         public void LoadChatHistory(List<ChatGptMessage> Messages)
         {
             if (Messages != null)
@@ -67,9 +62,7 @@ namespace OnlineNotes.Services.OpenAIServices
         public async Task<string> GenerateResponse(string text)
         {
             AddUserMessage(text);
-
             var response = await chat.GetResponseFromChatbotAsync();
-
             AddAIMessage(response.ToString());
             return response.ToString();
         }

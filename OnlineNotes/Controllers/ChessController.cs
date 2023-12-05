@@ -1,6 +1,4 @@
-﻿using Castle.Components.DictionaryAdapter.Xml;
-using ChessApp.Requests;
-using Humanizer;
+﻿using ChessApp.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
@@ -84,7 +82,7 @@ namespace OnlineNotes.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         string updatedHtmlBoard = await response.Content.ReadAsStringAsync();
-                        
+
                         return Ok(updatedHtmlBoard);
                     }
                     else

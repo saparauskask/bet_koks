@@ -53,7 +53,7 @@ namespace OnlineNotes.Services.NotesServices
             {
                 // 1 - sort ascending, 0 - sort descending
                 int? sortStatusInt = _refRep.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
-                if(sortStatusInt == 0)
+                if (sortStatusInt == 0)
                 {
                     return notes.OrderByDescending(i => i.CreationDate);
                 }
@@ -95,10 +95,10 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
-                Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) 
-                { 
-                    CreationDate = DateTime.Now, 
-                    UserId = noteRequest.UserId 
+                Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status)
+                {
+                    CreationDate = DateTime.Now,
+                    UserId = noteRequest.UserId
                 };
 
                 await _refRep.applicationDbContext.Note.AddAsync(note);
@@ -136,7 +136,7 @@ namespace OnlineNotes.Services.NotesServices
 
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting the note: {ExceptionMessage}", ex.Message);
                 return false;
@@ -145,31 +145,31 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<Note?> GetNoteAsync(int? id)
         {
-                ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
+            ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
 
-                if (id == null || user == null)
-                {
-                    return null;
-                }
+            if (id == null || user == null)
+            {
+                return null;
+            }
 
-                IdentityUser currUser = await _userManager.GetUserAsync(user);
-                var userId = currUser.Id;
+            IdentityUser currUser = await _userManager.GetUserAsync(user);
+            var userId = currUser.Id;
 
-                var note = await _refRep.applicationDbContext.Note
-                    .Include(n => n.Comments) // Include the Comments navigation property
-                    .Include(n => n.Ratings)
-                    .FirstOrDefaultAsync(m => m.Id == id);
+            var note = await _refRep.applicationDbContext.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
+                .Include(n => n.Ratings)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (note != null && string.IsNullOrEmpty(note.UserId)) // temporary fix if UserId was not set previously (there was no UserId property on the Note model before)
-                {
-                    note.UserId = userId;
-                }
+            {
+                note.UserId = userId;
+            }
 
-                if (note != null && note.Status == NoteStatus.Draft && note.UserId != userId)
-                    {
-                        throw new NoteAccessDeniedException(userId, note.Id, "\"operation\""); // will finish implementing later
-                    }
-                return note;
+            if (note != null && note.Status == NoteStatus.Draft && note.UserId != userId)
+            {
+                throw new NoteAccessDeniedException(userId, note.Id, "\"operation\""); // will finish implementing later
+            }
+            return note;
         }
 
         public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus, string currentUserId)
@@ -197,7 +197,7 @@ namespace OnlineNotes.Services.NotesServices
                             .ToListAsync();
                         return notes.AsEnumerable();
                     }
-                    
+
                 }
                 else
                 {
@@ -263,7 +263,7 @@ namespace OnlineNotes.Services.NotesServices
                 return false;
             }
         }
-        
+
         public async Task<bool> CalculateAvgRating(Note? note)
         {
             if (note == null) { return false; }
@@ -281,7 +281,7 @@ namespace OnlineNotes.Services.NotesServices
                 totalRating += rating.RatingValue;
             }
 
-            float averageRating =(float) Math.Round(totalRating / note.Ratings.Count, 2);
+            float averageRating = (float)Math.Round(totalRating / note.Ratings.Count, 2);
 
             try
             {
@@ -290,7 +290,7 @@ namespace OnlineNotes.Services.NotesServices
                 await _refRep.applicationDbContext.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
             }

@@ -16,7 +16,7 @@ namespace OnlineNotes.Services.CommentsServices
             _logger = logger;
         }
 
-        public async Task<bool> CreateCommentAsync (CreateCommentRequest commentReqest)
+        public async Task<bool> CreateCommentAsync(CreateCommentRequest commentReqest)
         {
             Comment comment = new Comment
             {
@@ -30,7 +30,7 @@ namespace OnlineNotes.Services.CommentsServices
                 _refRep.applicationDbContext.Comment.Add(comment);
                 await _refRep.applicationDbContext.SaveChangesAsync();
                 return true;
-            } 
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while saving the comment: {ExceptionMessage}.", ex.Message);
