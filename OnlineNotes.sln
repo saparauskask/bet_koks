@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineNotes.Tests", "Online
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OnlineNotes", "OnlineNotes\OnlineNotes.csproj", "{D45D6B3E-4A2F-4B5C-9834-4F36C8F14FAB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessApp", "ChessApp\ChessApp.csproj", "{CA372D09-23EB-447A-AEAD-340964D1A71A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{D45D6B3E-4A2F-4B5C-9834-4F36C8F14FAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D45D6B3E-4A2F-4B5C-9834-4F36C8F14FAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D45D6B3E-4A2F-4B5C-9834-4F36C8F14FAB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA372D09-23EB-447A-AEAD-340964D1A71A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA372D09-23EB-447A-AEAD-340964D1A71A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA372D09-23EB-447A-AEAD-340964D1A71A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA372D09-23EB-447A-AEAD-340964D1A71A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
