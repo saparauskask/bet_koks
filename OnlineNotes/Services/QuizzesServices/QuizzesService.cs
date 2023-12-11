@@ -38,6 +38,32 @@ namespace OnlineNotes.Services.QuizzesServices
             // logic for generating questions, options based on the configuation
         }
 
+        public async Task<bool> DeleteQuizAsync(int? id)
+        {
+            try
+            {
+                if (id == null)
+                {
+                    return false;
+                }
+
+                var quiz = await GetQuizByIdAsync(id);
+                if (quiz == null)
+                {
+                    return false;
+                }
+
+                _refRep.applicationDbContext.Remove(quiz); // FIXME delete questions and question options
+                await _refRep.applicationDbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in DeleteQuizAsync: {ErrorMessage}", ex.Message);
+                return false;
+            }
+        }
+
         public async Task<IEnumerable<Quiz>?> GetAllQuizzesToListAsync()
         {
             try
