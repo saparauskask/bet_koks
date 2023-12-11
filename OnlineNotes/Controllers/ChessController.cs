@@ -1,21 +1,23 @@
 ﻿using ChessApp.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using OnlineNotes.Data;
 using System.Text;
 
 namespace OnlineNotes.Controllers
 {
     public class ChessController : Controller
     {
-        private readonly Uri baseAddress = new Uri("https://localhost:7089/api");
+        private readonly ReferencesRepository _referencesRepository;
         private readonly HttpClient _client;
 
-        public ChessController()
+        public ChessController(ReferencesRepository referencesRepository)
         {
+            _referencesRepository = referencesRepository;
             _client = new HttpClient();
-            _client.BaseAddress = baseAddress;
-
+            _client.BaseAddress = new Uri($"https://{_referencesRepository.httpContextAccessor.HttpContext.Request.Host}/api");
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {

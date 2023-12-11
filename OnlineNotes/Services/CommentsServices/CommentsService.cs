@@ -7,12 +7,12 @@ namespace OnlineNotes.Services.CommentsServices
 {
     public class CommentsService : ICommentsService
     {
-        private readonly ReferencesRepository _refRep;
+        private readonly ReferencesRepository _referencesRepository;
         private readonly ILogger<CommentsService> _logger;
 
-        public CommentsService(ReferencesRepository refRep, ILogger<CommentsService> logger)
+        public CommentsService(ReferencesRepository referencesRepository, ILogger<CommentsService> logger)
         {
-            _refRep = refRep;
+            _referencesRepository = referencesRepository;
             _logger = logger;
         }
 
@@ -27,8 +27,8 @@ namespace OnlineNotes.Services.CommentsServices
 
             try
             {
-                _refRep.applicationDbContext.Comment.Add(comment);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Comment.Add(comment);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -50,8 +50,8 @@ namespace OnlineNotes.Services.CommentsServices
 
             try
             {
-                _refRep.applicationDbContext.Comment.Remove(comment);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Comment.Remove(comment);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -69,7 +69,7 @@ namespace OnlineNotes.Services.CommentsServices
             }
             try
             {
-                var comment = await _refRep.applicationDbContext.Comment
+                var comment = await _referencesRepository.applicationDbContext.Comment
                     .Where(c => c.Id == id)
                     .FirstOrDefaultAsync();
                 return comment;
