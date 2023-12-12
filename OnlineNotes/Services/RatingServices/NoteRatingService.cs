@@ -7,12 +7,12 @@ namespace OnlineNotes.Services.RatingServices
 {
     public class NoteRatingService : INoteRatingService
     {
-        private readonly ReferencesRepository _refRep;
+        private readonly ReferencesRepository _referencesRepository;
         private readonly ILogger<NoteRatingService> _logger;
 
-        public NoteRatingService(ReferencesRepository refRep, ILogger<NoteRatingService> logger)
+        public NoteRatingService(ReferencesRepository referencesRepository, ILogger<NoteRatingService> logger)
         {
-            _refRep = refRep;
+            _referencesRepository = referencesRepository;
             _logger = logger;
         }
 
@@ -54,8 +54,8 @@ namespace OnlineNotes.Services.RatingServices
 
             try
             {
-                _refRep.applicationDbContext.NoteRating.Add(noteRating);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.NoteRating.Add(noteRating);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -83,8 +83,8 @@ namespace OnlineNotes.Services.RatingServices
                 noteRating.RatingValue = noteRatingRequest.RatingValue;
                 noteRating.CreationDate = noteRatingRequest.CreationDate;
 
-                _refRep.applicationDbContext.Update(noteRating);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Update(noteRating);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -103,7 +103,7 @@ namespace OnlineNotes.Services.RatingServices
 
             try
             {
-                var noteRating = await _refRep.applicationDbContext.NoteRating.FirstOrDefaultAsync(x => x.Id == id);
+                var noteRating = await _referencesRepository.applicationDbContext.NoteRating.FirstOrDefaultAsync(x => x.Id == id);
                 return noteRating;
             }
             catch (Exception ex)

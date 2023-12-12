@@ -16,8 +16,8 @@ namespace OnlineNotes.Controllers
             _referencesRepository = referencesRepository;
             _client = new HttpClient();
             _client.BaseAddress = new Uri($"https://{_referencesRepository.httpContextAccessor.HttpContext.Request.Host}/api");
-
         }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
@@ -80,7 +80,7 @@ namespace OnlineNotes.Controllers
                     if (response.IsSuccessStatusCode)
                     {
                         string updatedHtmlBoard = await response.Content.ReadAsStringAsync();
-                        
+
                         return Ok(updatedHtmlBoard);
                     }
                     else

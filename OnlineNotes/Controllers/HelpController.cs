@@ -1,9 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Services.OpenAIServices;
-using Newtonsoft.Json;
-using OnlineNotes.Data;
 using OnlineNotes.Models;
 
 namespace OnlineNotes.Controllers
