@@ -46,19 +46,16 @@ namespace OnlineNotes.Tests.ServicesTests.NotesServicesTests
             {
                 Id = 1,
                 UserId = "1234567",
-                CreationDate = DateTime.Now
             };
             var note2 = new Note("Test title 2", "Test content 2", NoteStatus.Public)
             {
                 Id = 2,
                 UserId = "1234567",
-                CreationDate = DateTime.Now.AddDays(1)
             };
             var note3 = new Note("Test title 3", "Test content 3", NoteStatus.Public)
             {
                 Id = 3,
                 UserId = "1234567",
-                CreationDate = DateTime.Now.AddDays(2)
             };
 
             var notes = new List<Note> { note1, note2, note3 };

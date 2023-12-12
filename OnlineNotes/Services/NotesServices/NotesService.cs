@@ -292,10 +292,10 @@ namespace OnlineNotes.Services.NotesServices
             {
                 if (note == null) { return false; }
 
-            note = await _referencesRepository.applicationDbContext.Note
-                .Include(n => n.Comments) // Include the Comments navigation property
-                .Include(n => n.Ratings)
-                .FirstOrDefaultAsync(m => m.Id == note.Id);
+                note = await _referencesRepository.applicationDbContext.Note
+                    .Include(n => n.Comments) // Include the Comments navigation property
+                    .Include(n => n.Ratings)
+                    .FirstOrDefaultAsync(m => m.Id == note.Id);
 
                 if (note == null || note.Ratings == null) return false;
 
@@ -305,7 +305,7 @@ namespace OnlineNotes.Services.NotesServices
                     totalRating += rating.RatingValue;
                 }
 
-            float averageRating = (float)Math.Round(totalRating / note.Ratings.Count, 2);
+                float averageRating = (float)Math.Round(totalRating / note.Ratings.Count, 2);
 
                 note.AvgRating = averageRating;
                 _referencesRepository.applicationDbContext.Update(note);
