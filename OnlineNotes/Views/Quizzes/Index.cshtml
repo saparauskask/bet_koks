@@ -5,8 +5,9 @@
 }
 
 <div style="text-align: center; margin-top: 20px;">
-    <h1>This feature is not available yet. Do not press any buttons</h1>
+    <h1>Patience. Work in progress</h1>
     <br />
+    <h3>Currently it is possible to generate a complete quiz, however it is not possible to solve it yet.</h3>
     <br />
     <a class="btn btn-primary" asp-action="Create">+ create a new quiz</a>
     <hr />
@@ -24,7 +25,7 @@
                     <th>Title</th>
                     <th>Difficulty</th>
                     <th>Score</th>
-                    <th>Options</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -44,8 +45,11 @@
                                 @("-")
                             }
                         </td>
-                        <td>
-                            <button class="btn btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="@quiz.Id">Delete</button>
+                        <td class="text-end">
+                            <div class="d-flex gap-1 justify-content-end">
+                                <a class="btn btn-info" asp-action="QuizAttempt" asp-route-id="@quiz.Id">View generated quiz</a>
+                                <button class="btn btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="@quiz.Id">Delete</button>
+                            </div>
                         </td>
                     </tr>
                 }
@@ -64,7 +68,6 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" id="quizId" />
-                <!-- Add any other content here -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-info" data-bs-dismiss="modal">Close</button>

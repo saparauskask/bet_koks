@@ -25,17 +25,24 @@ namespace OnlineNotes.Services.QuizzesServices
             {
                 var quiz = new Quiz(quizRequest.UserId, quizRequest.CreationDate, quizRequest.Title, quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
                 var generatedQuiz = await _quizGeneratorService.GenerateQuiz(quiz.NoteContents, quiz.Difficulty, quiz.QuestionsCount); // IT WILL BE FIXED
-                quiz.NoteContents = generatedQuiz;
-                await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
-                await _refRep.applicationDbContext.SaveChangesAsync();
-                return quiz.Id;
+                // new code from this point
+                if (!string.IsNullOrEmpty(generatedQuiz))
+                {
+                    quiz.NoteContents = generatedQuiz;
+                    await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
+                    await _refRep.applicationDbContext.SaveChangesAsync();
+                    return quiz.Id;
+                } else
+                {
+                    return null;
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred in CreateQuizAsync: {ErrorMessage}", ex.Message);
                 return null;
             }
-            // logic for generating questions, options based on the configuation
+            
         }
 
         public async Task<bool> DeleteQuizAsync(int? id)
@@ -99,6 +106,6 @@ namespace OnlineNotes.Services.QuizzesServices
                 _logger.LogError(ex, "An error occurred in GetQuizByIdAsync: {ErrorMessage}", ex.Message);
                 return null;
             }
-        } // TODO delete quiz + delete quiz request
+        }
     }
 }
