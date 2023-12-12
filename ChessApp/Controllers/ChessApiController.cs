@@ -19,7 +19,6 @@ namespace ChessApp.Controllers
             _game = _repository.GetLastGame();
             if (_game == null)
             {
-                Console.WriteLine("-----------new game");
                 var p1 = new Player(true, true);
                 var p2 = new Player(false, true);
                 _game = _repository.StartNewGame(p1, p2);

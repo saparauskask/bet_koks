@@ -32,7 +32,6 @@ namespace ChessApp.ChessLogic
         {
             var start = Board.Squares[fromX, fromY];
             var end = Board.Squares[toX, toY];
-            Console.WriteLine($"Starting piece: {start.ToString()}, endPiece: {end.ToString()}");
             var move = new Move(start, end);
             return MakeMove(player, move);
         }
