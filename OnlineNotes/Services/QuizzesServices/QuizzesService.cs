@@ -9,13 +9,13 @@ namespace OnlineNotes.Services.QuizzesServices
 {
     public class QuizzesService : IQuizzesService
     {
-        private readonly ReferencesRepository _refRep;
+        private readonly ReferencesRepository _referencesRepository;
         private readonly ILogger<QuizzesService> _logger;
         private readonly IQuizGeneratorService _quizGeneratorService;
 
-        public QuizzesService(ReferencesRepository refRep, ILogger<QuizzesService> logger, IQuizGeneratorService quizGeneratorService)
+        public QuizzesService(ReferencesRepository referencesRepository, ILogger<QuizzesService> logger, IQuizGeneratorService quizGeneratorService)
         {
-            _refRep = refRep;
+            _referencesRepository = referencesRepository;
             _logger = logger;
             _quizGeneratorService = quizGeneratorService;
         }
@@ -31,8 +31,8 @@ namespace OnlineNotes.Services.QuizzesServices
                 {
                     quiz.NoteContents = generatedQuiz;
                     // FIXME add validation
-                    await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
-                    await _refRep.applicationDbContext.SaveChangesAsync();
+                    await _referencesRepository.applicationDbContext.Quiz.AddAsync(quiz);
+                    await _referencesRepository.applicationDbContext.SaveChangesAsync();
                     var result = await CreateQuestionsAsync(generatedQuiz, quiz.Id);
                     return quiz.Id;
                 } else
@@ -63,8 +63,8 @@ namespace OnlineNotes.Services.QuizzesServices
                     return false;
                 }
 
-                _refRep.applicationDbContext.Remove(quiz); // FIXME delete questions and question options
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Remove(quiz);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -78,7 +78,7 @@ namespace OnlineNotes.Services.QuizzesServices
         {
             try
             {
-                var quizzes = await _refRep.applicationDbContext.Quiz
+                var quizzes = await _referencesRepository.applicationDbContext.Quiz
                     .ToListAsync();
                 return quizzes;
             }
@@ -98,7 +98,7 @@ namespace OnlineNotes.Services.QuizzesServices
                     return null;
                 }
 
-                var quiz = await _refRep.applicationDbContext.Quiz
+                var quiz = await _referencesRepository.applicationDbContext.Quiz
                     .Include(q => q.Questions)
                         .ThenInclude(question => question.QuestionOptions)
                     .FirstOrDefaultAsync(quiz => quiz.Id == id);
@@ -142,14 +142,14 @@ namespace OnlineNotes.Services.QuizzesServices
                     AnsweredCorrectly = null,
                     Explanation = null
                 };
-                _refRep.applicationDbContext.Add(question);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Add(question);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 foreach (var option in question.QuestionOptions)
                 {
                     option.QuestionId = question.Id;
                 }
 
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)

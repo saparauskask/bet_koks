@@ -1,6 +1,4 @@
-﻿using OnlineNotes.Models.Enums;
-
-namespace OnlineNotes.Models.Requests.Note
+﻿namespace OnlineNotes.Models.Requests.Note
 {
     public class DeleteNoteRequest : BaseNoteRequest
     {

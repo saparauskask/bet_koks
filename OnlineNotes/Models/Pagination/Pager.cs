@@ -18,17 +18,15 @@
             int pageRangeEnd = (int)Math.Ceiling((decimal)PaginationSettings.MaxVisiblePages / 2);
             int totalPages = (int)Math.Ceiling((decimal)totalItems / (decimal)pageSize);
             int currentPage = page;
-
             int startPage = 1;
             int endPage = 1;
 
             if (totalItems > 0)
             {
-                startPage = (int)Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
-                endPage = (int)Math.Clamp(currentPage + pageRangeEnd, 0, totalPages);
+                startPage = Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
+                endPage = Math.Clamp(currentPage + pageRangeEnd, 0, totalPages);
             }
             
-
             TotalItems = totalItems;
             CurrentPage = currentPage;
             PageSize = pageSize;

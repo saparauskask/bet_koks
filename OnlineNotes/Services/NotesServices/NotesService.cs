@@ -47,20 +47,24 @@ namespace OnlineNotes.Services.NotesServices
             return null;
         }
 
-        public IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes)
+        public IEnumerable<Note>? GetSortedNotes(int sortInt, IEnumerable<Note> notes)
         {
-            if (_refRep.httpContextAccessor.HttpContext != null)
+            try
             {
                 // 1 - sort ascending, 0 - sort descending
                 int? sortStatusInt = _refRep.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
-                if(sortStatusInt == 0)
+                if (sortInt == 0)
                 {
                     return notes.OrderByDescending(i => i.CreationDate);
                 }
 
                 return notes.OrderBy(i => i.CreationDate);
             }
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetSortedNotes: {ErrorMessage}", ex.Message);
+                return null;
+            }
         }
 
         public IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller)
@@ -90,15 +94,27 @@ namespace OnlineNotes.Services.NotesServices
             }
             return null;
         }
+        public int GetSortStatus()
+        {
+            if (_refRep.httpContextAccessor.HttpContext != null)
+            {
+                int? sortStatus = _refRep.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
+                if (sortStatus.HasValue)
+                {
+                    return sortStatus.Value;
+                }
+            }
+            return 1;
+        }
 
         public async Task<int> CreateNoteAsync(CreateNoteRequest noteRequest)
         {
             try
             {
-                Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status) 
-                { 
-                    CreationDate = DateTime.Now, 
-                    UserId = noteRequest.UserId 
+                Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status)
+                {
+                    CreationDate = DateTime.Now,
+                    UserId = noteRequest.UserId
                 };
 
                 await _refRep.applicationDbContext.Note.AddAsync(note);
@@ -136,7 +152,7 @@ namespace OnlineNotes.Services.NotesServices
 
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while deleting the note: {ExceptionMessage}", ex.Message);
                 return false;
@@ -145,31 +161,31 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<Note?> GetNoteAsync(int? id)
         {
-                ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
+            ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
 
-                if (id == null || user == null)
-                {
-                    return null;
-                }
+            if (id == null || user == null)
+            {
+                return null;
+            }
 
-                IdentityUser currUser = await _userManager.GetUserAsync(user);
-                var userId = currUser.Id;
+            IdentityUser currUser = await _userManager.GetUserAsync(user);
+            var userId = currUser.Id;
 
-                var note = await _refRep.applicationDbContext.Note
-                    .Include(n => n.Comments) // Include the Comments navigation property
-                    .Include(n => n.Ratings)
-                    .FirstOrDefaultAsync(m => m.Id == id);
+            var note = await _refRep.applicationDbContext.Note
+                .Include(n => n.Comments) // Include the Comments navigation property
+                .Include(n => n.Ratings)
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (note != null && string.IsNullOrEmpty(note.UserId)) // temporary fix if UserId was not set previously (there was no UserId property on the Note model before)
-                {
-                    note.UserId = userId;
-                }
+            {
+                note.UserId = userId;
+            }
 
-                if (note != null && note.Status == NoteStatus.Draft && note.UserId != userId)
-                    {
-                        throw new NoteAccessDeniedException(userId, note.Id, "\"operation\""); // will finish implementing later
-                    }
-                return note;
+            if (note != null && note.Status == NoteStatus.Draft && note.UserId != userId)
+            {
+                throw new NoteAccessDeniedException(userId, note.Id, "\"operation\""); // will finish implementing later
+            }
+            return note;
         }
 
         public async Task<IEnumerable<Note>?> GetFilteredNotesToListAsync(NoteStatus? filterStatus, string currentUserId)
@@ -197,7 +213,7 @@ namespace OnlineNotes.Services.NotesServices
                             .ToListAsync();
                         return notes.AsEnumerable();
                     }
-                    
+
                 }
                 else
                 {
@@ -244,13 +260,20 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
-                Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status)
+                // Retrieve the existing note
+                Note note = await _refRep.applicationDbContext.Note.FindAsync(noteRequest.Id);
+
+                if (note == null)
                 {
-                    Id = noteRequest.Id,
-                    CreationDate = DateTime.Now,
-                    AvgRating = noteRequest.AvgRating,
-                    UserId = noteRequest.UserId
-                };
+                    return false;
+                }
+
+                // Update the note properties
+                note.Title = noteRequest.Title;
+                note.Contents = noteRequest.Contents;
+                note.Status = noteRequest.Status;
+                note.AvgRating = noteRequest.AvgRating;
+                note.UserId = noteRequest.UserId;
 
                 _refRep.applicationDbContext.Update(note);
                 await _refRep.applicationDbContext.SaveChangesAsync();
@@ -263,38 +286,38 @@ namespace OnlineNotes.Services.NotesServices
                 return false;
             }
         }
-        
+
         public async Task<bool> CalculateAvgRating(Note? note)
         {
-            if (note == null) { return false; }
-
-            note = await _refRep.applicationDbContext.Note
-                .Include(n => n.Comments) // Include the Comments navigation property
-                .Include(n => n.Ratings)
-                .FirstOrDefaultAsync(m => m.Id == note.Id);
-
-            if (note == null || note.Ratings == null) return false;
-
-            float totalRating = 0;
-            foreach (var rating in note.Ratings)
-            {
-                totalRating += rating.RatingValue;
-            }
-
-            float averageRating =(float) Math.Round(totalRating / note.Ratings.Count, 2);
-
             try
             {
+                if (note == null) { return false; }
+
+                note = await _refRep.applicationDbContext.Note
+                    .Include(n => n.Comments) // Include the Comments navigation property
+                    .Include(n => n.Ratings)
+                    .FirstOrDefaultAsync(m => m.Id == note.Id);
+
+                if (note == null || note.Ratings == null) return false;
+
+                float totalRating = 0;
+                foreach (var rating in note.Ratings)
+                {
+                    totalRating += rating.RatingValue;
+                }
+
+                float averageRating = (float)Math.Round(totalRating / note.Ratings.Count, 2);
+
                 note.AvgRating = averageRating;
                 _refRep.applicationDbContext.Update(note);
                 await _refRep.applicationDbContext.SaveChangesAsync();
                 return true;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
+                return false;
             }
-            return false;
         }
 
         public int? GetNoteRatingIdByUserId(Note note, string userId)
