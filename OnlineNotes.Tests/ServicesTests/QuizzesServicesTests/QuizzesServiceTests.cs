@@ -9,7 +9,6 @@ using OnlineNotes.Models.Quizzes;
 using OnlineNotes.Models.Requests.Quiz;
 using OnlineNotes.Services.OpenAIServices;
 using OnlineNotes.Services.QuizzesServices;
-
 namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
 {
     public class QuizzesServiceTests
@@ -19,21 +18,17 @@ namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
         private readonly Mock<ReferencesRepository> _mockRefRep;
         private readonly Mock<IQuizGeneratorService> _mockQuizGeneratorService;
         private readonly QuizzesService _service;
-
         public QuizzesServiceTests()
         {
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
-
             _context = new ApplicationDbContext(options);
             _mockLogger = new Mock<ILogger<QuizzesService>>();
             _mockRefRep = new Mock<ReferencesRepository>(_context, A.Fake<IHttpContextAccessor>());
             _mockQuizGeneratorService = new Mock<IQuizGeneratorService>();
-
             _service = new QuizzesService(_mockRefRep.Object, _mockLogger.Object, _mockQuizGeneratorService.Object);
         }
-
         [Fact]
         public async Task QuizzesService_CreateQuizAsync_WithValidQuizRequest_ReturnsQuizId()
         {
@@ -50,19 +45,39 @@ namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
             string fakeReturn = "Q1. What is it\n";
             fakeReturn += " a. This is the option. b. This is the option. c. This is the option.\n";
             fakeReturn += "Correct Answer for question Q4 is: a.";
-
             _mockQuizGeneratorService.Setup(x => x.FakeGenerateQuiz(It.IsAny<string>())).Returns(fakeReturn);
-
             // Act
             var result = await _service.CreateQuizAsync(quizRequest);
-
             // Assert
             Assert.NotNull(result);
             Assert.True(result.HasValue && result.Value > 0, "The CreateQuizAsync method did not return a valid QuizId.");
             Assert.Single(_context.Quiz);
             Assert.Single(_context.Question);
         }
-
+        [Fact]
+        public async Task QuizzesService_CreateQuizAsync_WithInvalidRefRep_null()
+        {
+            // Arrange
+            var mockInvalidRefRep = new Mock<ReferencesRepository>(null, null);
+            var invalidService = new QuizzesService(mockInvalidRefRep.Object, _mockLogger.Object, _mockQuizGeneratorService.Object);
+            var quizRequest = new CreateQuizRequest
+            {
+                UserId = "1234567",
+                CreationDate = DateTime.Now,
+                Title = "Test Quiz",
+                NoteContents = "Test Quiz Contents",
+                Difficulty = QuizDifficulty.Easy,
+                QuestionsCount = 3
+            };
+            string fakeReturn = "Q1. What is it\n";
+            fakeReturn += " a. This is the option. b. This is the option. c. This is the option.\n";
+            fakeReturn += "Correct Answer for question Q4 is: a.";
+            _mockQuizGeneratorService.Setup(x => x.FakeGenerateQuiz(It.IsAny<string>())).Returns(fakeReturn);
+            // Act
+            var result = await invalidService.CreateQuizAsync(quizRequest);
+            // Assert
+            Assert.Null(result);
+        }
         [Fact]
         public async Task QuizzesService_CreateQuizAsync_WithInvalidQuizRequest_ReturnsNull()
         {
@@ -77,50 +92,57 @@ namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
                 Difficulty = QuizDifficulty.Easy,
                 QuestionsCount = 3
             };
-
             // Act
             var result = await _service.CreateQuizAsync(quizRequest);
-
             // Assert
             Assert.Null(result);
             Assert.Empty(_context.Quiz);
             Assert.Empty(_context.Question);
         }
-
         [Fact]
         public async Task QuizzesService_DeleteQuizAsync_WithValidId_ReturnsTrue()
         {
             // Arrange
             var quiz = new Quiz("1234567", DateTime.Now, "Test Quiz", "Test Quiz Contents", QuizDifficulty.Easy, 3);
             quiz.Id = 1;
-
             _context.Quiz.Add(quiz);
             _context.SaveChanges();
-
             var Id = 1;
-
             // Act
             var result = await _service.DeleteQuizAsync(Id);
-
             // Assert
             Assert.True(result);
             Assert.Empty(_context.Quiz);
             Assert.Empty(_context.Question);
         }
-
         [Fact]
         public async Task QuizzesService_DeleteQuizAsync_WithInvalidId_ReturnsFalse()
         {
             // Arrange
             var Id = 0;
-
             // Act
-            var result = await _service.DeleteQuizAsync(Id);
-
+            var resultZero = await _service.DeleteQuizAsync(Id);
+            var resultNull = await _service.DeleteQuizAsync(null);
+            // Assert
+            Assert.False(resultZero);
+            Assert.False(resultNull);
+        }
+        [Fact]
+        public async Task QuizzesService_DeleteQuizAsync_WithInvalidRefRep_ReturnsFalse()
+        {
+            // Arrange
+            var mockInvalidRefRep = new Mock<ReferencesRepository>(null, null);
+            var invalidService = new QuizzesService(mockInvalidRefRep.Object, _mockLogger.Object, _mockQuizGeneratorService.Object);
+            var quiz = new Quiz("1234567", DateTime.Now, "Test Quiz", "Test Quiz Contents", QuizDifficulty.Easy, 3);
+            quiz.Id = 1;
+            _context.Quiz.Add(quiz);
+            _context.SaveChanges();
+            var Id = 1;
+            // Act
+            var result = await invalidService.DeleteQuizAsync(Id);
             // Assert
             Assert.False(result);
         }
-
         [Fact]
         public async Task QuizzesService_GetAllQuizzesToListAsync_ReturnsListOfQuizzes()
         {
@@ -130,48 +152,49 @@ namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
             new Quiz("1234567", DateTime.Now, "Quiz 1", "Contents 1", QuizDifficulty.Easy, 3),
             new Quiz("1234567", DateTime.Now, "Quiz 2", "Contents 2", QuizDifficulty.Moderate, 5)
         };
-
             _context.Quiz.AddRange(quizzes);
             _context.SaveChanges();
-
             // Act
             var result = await _service.GetAllQuizzesToListAsync();
-
             // Assert
             Assert.NotNull(result);
             Assert.Equal(2, result.Count());
         }
-
+        [Fact]
+        public async Task QuizzesService_GetAllQuizzesToListAsync_WithInvalidRefRep_ReturnsNull()
+        {
+            // Arrange
+            var mockInvalidRefRep = new Mock<ReferencesRepository>(null, null);
+            var invalidService = new QuizzesService(mockInvalidRefRep.Object, _mockLogger.Object, _mockQuizGeneratorService.Object);
+            // Act
+            var result = await invalidService.GetAllQuizzesToListAsync();
+            // Assert
+            Assert.Null(result);
+        }
         [Fact]
         public async Task QuizzesService_GetQuizByIdAsync_WithValidId_ReturnsQuiz()
         {
             // Arrange
             var quiz = new Quiz("1234567", DateTime.Now, "Test Quiz", "Test Quiz Contents", QuizDifficulty.Easy, 3);
             quiz.Id = 1;
-
             _context.Quiz.Add(quiz);
             _context.SaveChanges();
-
             // Act
             var result = await _service.GetQuizByIdAsync(1);
-
             // Assert
             Assert.NotNull(result);
             Assert.Equal(quiz.Id, result.Id);
             Assert.Equal(quiz.Title, result.Title);
         }
-
         [Fact]
         public async Task QuizzesService_GetQuizByIdAsync_WithInvalidId_ReturnsNull()
         {
             // Arrange
             // Act
             var result = await _service.GetQuizByIdAsync(0);
-
             // Assert
             Assert.Null(result);
         }
-
         [Fact]
         public async Task QuizzesService_CreateQuestionsAsync_WithValidGeneratedQuiz_ReturnsTrue()
         {
@@ -180,15 +203,27 @@ namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
             generatedQuiz += " a. This is the option. b. This is the option. c. This is the option.\n";
             generatedQuiz += "Correct Answer for question Q4 is: a.";
             var quizId = 1;
-
             // Act
             var result = await _service.CreateQuestionsAsync(generatedQuiz, quizId);
-
             // Assert
             Assert.True(result);
             Assert.Single(_context.Question);
         }
-
+        [Fact]
+        public async Task QuizzesService_CreateQuestionsAsync_WithInvalidRefRep_ReturnsFalse()
+        {
+            // Arrange
+            var mockInvalidRefRep = new Mock<ReferencesRepository>(null, null);
+            var invalidService = new QuizzesService(mockInvalidRefRep.Object, _mockLogger.Object, _mockQuizGeneratorService.Object);
+            string generatedQuiz = "Q1. What is it\n";
+            generatedQuiz += " a. This is the option. b. This is the option. c. This is the option.\n";
+            generatedQuiz += "Correct Answer for question Q4 is: a.";
+            var quizId = 1;
+            // Act
+            var result = await invalidService.CreateQuestionsAsync(generatedQuiz, quizId);
+            // Assert
+            Assert.False(result);
+        }
         [Fact]
         public async Task QuizzesService_CreateQuestionAsync_WithValidQuestionData_ReturnsTrue()
         {
@@ -201,10 +236,8 @@ namespace OnlineNotes.Tests.ServicesTests.QuizzesServiceTests
             ("This is the option.", true)
         };
             var quizId = 1;
-
             // Act
             var result = await _service.CreateQuestionAsync(extractedQuestion, parsedAnswers, quizId);
-
             // Assert
             Assert.True(result);
             Assert.Single(_context.Question);
