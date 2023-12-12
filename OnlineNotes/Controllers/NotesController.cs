@@ -75,7 +75,7 @@ namespace OnlineNotes.Controllers
             catch (NoteAccessDeniedException ex)
             {
                 _logger.LogError($"Access to the note (Id: {ex.NoteId}) during {ex.Operation} operation was denied");
-                return RedirectToAction(nameof(Index), new {errorMessage = ex.GetErrorMessage()});
+                return RedirectToAction(nameof(Index), new { errorMessage = ex.GetErrorMessage() });
             }
         }
 
@@ -195,7 +195,7 @@ namespace OnlineNotes.Controllers
 
                 return View(note);
             }
-            catch(NoteAccessDeniedException ex)
+            catch (NoteAccessDeniedException ex)
             {
                 _logger.LogError($"Access to the note (Id: {ex.NoteId}) during {ex.Operation} operation was denied");
                 return RedirectToAction(nameof(Index), new { errorMessage = ex.GetErrorMessage() });

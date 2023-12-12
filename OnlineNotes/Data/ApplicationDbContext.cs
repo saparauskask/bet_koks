@@ -12,8 +12,8 @@ namespace OnlineNotes.Data
         {
         }
         public DbSet<Note> Note { get; set; }
-        public DbSet <Comment> Comment { get; set; }
-        public DbSet <NoteRating> NoteRating { get; set; }
+        public DbSet<Comment> Comment { get; set; }
+        public DbSet<NoteRating> NoteRating { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<ChatGptMessage> ChatMessages { get; set; }
         public DbSet<Quiz> Quiz { get; set; }

@@ -8,13 +8,13 @@ namespace OnlineNotes.Services.QuizzesServices
 {
     public class QuizzesService : IQuizzesService
     {
-        private readonly ReferencesRepository _refRep;
+        private readonly ReferencesRepository _referencesRepository;
         private readonly ILogger<QuizzesService> _logger;
         private readonly IQuizGeneratorService _quizGeneratorService;
 
-        public QuizzesService(ReferencesRepository refRep, ILogger<QuizzesService> logger, IQuizGeneratorService quizGeneratorService)
+        public QuizzesService(ReferencesRepository referencesRepository, ILogger<QuizzesService> logger, IQuizGeneratorService quizGeneratorService)
         {
-            _refRep = refRep;
+            _referencesRepository = referencesRepository;
             _logger = logger;
             _quizGeneratorService = quizGeneratorService;
         }
@@ -26,8 +26,8 @@ namespace OnlineNotes.Services.QuizzesServices
                 var quiz = new Quiz(quizRequest.UserId, quizRequest.CreationDate, quizRequest.Title, quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
                 var generatedQuiz = await _quizGeneratorService.GenerateQuiz(quiz.NoteContents, quiz.Difficulty, quiz.QuestionsCount); // IT WILL BE FIXED
                 quiz.NoteContents = generatedQuiz;
-                await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                await _referencesRepository.applicationDbContext.Quiz.AddAsync(quiz);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return quiz.Id;
             }
             catch (Exception ex)
@@ -42,7 +42,7 @@ namespace OnlineNotes.Services.QuizzesServices
         {
             try
             {
-                var quizzes = await _refRep.applicationDbContext.Quiz
+                var quizzes = await _referencesRepository.applicationDbContext.Quiz
                     .ToListAsync();
                 return quizzes;
             }
@@ -62,7 +62,7 @@ namespace OnlineNotes.Services.QuizzesServices
                     return null;
                 }
 
-                var quiz = await _refRep.applicationDbContext.Quiz
+                var quiz = await _referencesRepository.applicationDbContext.Quiz
                     .Include(q => q.Questions)
                         .ThenInclude(question => question.QuestionOptions)
                     .FirstOrDefaultAsync(quiz => quiz.Id == id);

@@ -29,12 +29,9 @@ namespace OnlineNotes.Services.OpenAIServices
                     prompt += $"Q{i}. What is ";
                     prompt += $"\n a. [Option 1]. b. [Option 2] c. [Option 3]\n";
                 }
-
                 prompt += "###";
-
                 var result = await _api.Completions.CreateCompletionAsync(prompt, temperature: 0.9);
 
-               
                 return result.ToString();
             }
             catch (Exception ex)
