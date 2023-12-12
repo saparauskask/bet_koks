@@ -16,7 +16,8 @@ namespace OnlineNotes.Services.NotesServices
         NoteStatus? GetFilterStatus();
         Task<bool> CalculateAvgRating(Note note);
         int? SetSortStatus(int sortStatus);
-        IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes);
+        int GetSortStatus();
+        IEnumerable<Note>? GetSortedNotes(int sortInt, IEnumerable<Note> notes);
         IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller);
         string? SetFilterStatus(NoteStatus? filterStatus);
         int? GetNoteRatingIdByUserId(Note note, string userId);
