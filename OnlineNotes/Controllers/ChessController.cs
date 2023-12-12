@@ -15,7 +15,11 @@ namespace OnlineNotes.Controllers
         {
             _referencesRepository = referencesRepository;
             _client = client ?? new HttpClient();
-            _client.BaseAddress = new Uri($"https://{_referencesRepository.httpContextAccessor.HttpContext.Request.Host}/api");
+
+            if (_client.BaseAddress == null)
+            {
+                _client.BaseAddress = new Uri($"https://{_referencesRepository.httpContextAccessor.HttpContext.Request.Host}/api");
+            }
         }
 
         [HttpGet]
@@ -40,16 +44,14 @@ namespace OnlineNotes.Controllers
             return View();
         }
 
-        [HttpGet]
+        [HttpPut]
         public async Task<IActionResult> NewGame()
         {
-            string htmlBoard = "";
-
-            using (HttpResponseMessage response = await _client.GetAsync(_client.BaseAddress + "/ChessApi/CreateNewGame"))
+            using (HttpResponseMessage response = await _client.PutAsync(_client.BaseAddress + "/ChessApi/CreateNewGame", null))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    htmlBoard = await response.Content.ReadAsStringAsync();
+                    var htmlBoard = await response.Content.ReadAsStringAsync();
                     return Ok(htmlBoard);
                 }
                 else
@@ -65,8 +67,6 @@ namespace OnlineNotes.Controllers
         [HttpPost]
         public async Task<IActionResult> RetrieveCoordinates(int fromX, int fromY, int toX, int toY)
         {
-            Console.WriteLine($"-------Coordinates: ({fromX},{fromY}) to ({toX},{toY})");
-
             try
             {
                 var moveData = new MoveRequest
@@ -100,6 +100,24 @@ namespace OnlineNotes.Controllers
                 Console.Error.WriteLine($"An error occurred: {ex.Message}");
                 // Handle the exception appropriately
                 return StatusCode(500); // Or return an appropriate status code
+            }
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> ClearBoardPieces()
+        {
+            using (HttpResponseMessage response = await _client.DeleteAsync(_client.BaseAddress + "/ChessApi/DeletePieces"))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var htmlBoard = await response.Content.ReadAsStringAsync();
+                    return Ok(htmlBoard);
+                }
+                else
+                {
+                    Console.WriteLine("Error! Chess board could not have been retrieved.");
+                    return StatusCode(500);
+                }
             }
         }
     }

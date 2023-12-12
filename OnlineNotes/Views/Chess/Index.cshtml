@@ -111,7 +111,34 @@
 
         function startNewGame() {
             fetch('/Chess/NewGame', {
-                method: 'GET',
+                method: 'PUT',
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text(); // Use response.text() for HTML content
+                })
+                .then(updatedHtmlBoard => {
+                    console.log('Success:', updatedHtmlBoard);
+
+                    // Update the view with the new HTML board
+                    document.querySelector('.chess-board').innerHTML = updatedHtmlBoard;
+
+                    // Reset firstClick for the next move
+                    firstClick = null;
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+
+                    // Reset firstClick in case of an error
+                    firstClick = null;
+                });
+        }
+
+        function DeletePieces() {
+            fetch('/Chess/ClearBoardPieces', {
+                method: 'DELETE',
             })
                 .then(response => {
                     if (!response.ok) {
@@ -143,6 +170,7 @@
     </div>
     <div class="new-game-button">
         <button type="button" class="btn message-button" onclick="startNewGame()">Start New Game</button>
+        <button type="button" class="btn message-button" onclick="DeletePieces()">Delete Pieces</button>
     </div>
 </body>
 </html>
