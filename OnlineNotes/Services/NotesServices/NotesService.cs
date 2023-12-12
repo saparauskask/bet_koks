@@ -13,13 +13,13 @@ namespace OnlineNotes.Services.NotesServices
 {
     public class NotesService : INotesService
     {
-        private readonly ReferencesRepository _refRep;
+        private readonly ReferencesRepository _referencesRepository;
         private readonly ILogger<NotesService> _logger;
         private readonly UserManager<IdentityUser> _userManager;
 
-        public NotesService(ReferencesRepository refRep, ILogger<NotesService> logger, UserManager<IdentityUser> userManager)
+        public NotesService(ReferencesRepository referencesRepository, ILogger<NotesService> logger, UserManager<IdentityUser> userManager)
         {
-            _refRep = refRep;
+            _referencesRepository = referencesRepository;
             _logger = logger;
             _userManager = userManager;
         }
@@ -28,9 +28,9 @@ namespace OnlineNotes.Services.NotesServices
 
         public NoteStatus? GetFilterStatus()
         {
-            if (_refRep.httpContextAccessor.HttpContext != null)
+            if (_referencesRepository.httpContextAccessor.HttpContext != null)
             {
-                string? filterStatusString = _refRep.httpContextAccessor.HttpContext.Session.GetString("FilterStatus");
+                string? filterStatusString = _referencesRepository.httpContextAccessor.HttpContext.Session.GetString("FilterStatus");
 
                 switch (filterStatusString)
                 {
@@ -52,8 +52,8 @@ namespace OnlineNotes.Services.NotesServices
             try
             {
                 // 1 - sort ascending, 0 - sort descending
-                int? sortStatusInt = _refRep.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
-                if (sortInt == 0)
+                int? sortStatusInt = _referencesRepository.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
+                if (sortStatusInt == 0)
                 {
                     return notes.OrderByDescending(i => i.CreationDate);
                 }
@@ -87,9 +87,9 @@ namespace OnlineNotes.Services.NotesServices
 
         public int? SetSortStatus(int sortStatus)
         {
-            if (_refRep.httpContextAccessor.HttpContext != null)
+            if (_referencesRepository.httpContextAccessor.HttpContext != null)
             {
-                _refRep.httpContextAccessor.HttpContext.Session.SetInt32("SortStatus", sortStatus);
+                _referencesRepository.httpContextAccessor.HttpContext.Session.SetInt32("SortStatus", sortStatus);
                 return sortStatus;
             }
             return null;
@@ -116,8 +116,8 @@ namespace OnlineNotes.Services.NotesServices
                     UserId = noteRequest.UserId
                 };
 
-                await _refRep.applicationDbContext.Note.AddAsync(note);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                await _referencesRepository.applicationDbContext.Note.AddAsync(note);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
 
                 return note.Id;
             }
@@ -132,7 +132,7 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
-                Task<Note?> note = _refRep.applicationDbContext.Note
+                Task<Note?> note = _referencesRepository.applicationDbContext.Note
                 .Include(n => n.Comments) // Include the Comments navigation property
                 .FirstOrDefaultAsync(m => m.Id == noteRequest.Id);
 
@@ -143,11 +143,11 @@ namespace OnlineNotes.Services.NotesServices
 
                 foreach (var comment in note.Result.Comments.ToList())
                 {
-                    _refRep.applicationDbContext.Comment.Remove(comment);
+                    _referencesRepository.applicationDbContext.Comment.Remove(comment);
                 }
 
-                _refRep.applicationDbContext.Note.Remove(note.Result);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Note.Remove(note.Result);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
 
                 return true;
             }
@@ -160,7 +160,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<Note?> GetNoteAsync(int? id)
         {
-            ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
+            ClaimsPrincipal? user = _referencesRepository.httpContextAccessor.HttpContext?.User;
 
             if (id == null || user == null)
             {
@@ -170,7 +170,7 @@ namespace OnlineNotes.Services.NotesServices
             IdentityUser currUser = await _userManager.GetUserAsync(user);
             var userId = currUser.Id;
 
-            var note = await _refRep.applicationDbContext.Note
+            var note = await _referencesRepository.applicationDbContext.Note
                 .Include(n => n.Comments) // Include the Comments navigation property
                 .Include(n => n.Ratings)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -191,23 +191,23 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
-                if (_refRep.httpContextAccessor.HttpContext != null)
+                if (_referencesRepository.httpContextAccessor.HttpContext != null)
                 {
-                    _refRep.httpContextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
+                    _referencesRepository.httpContextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
                 }
 
                 if (filterStatus.HasValue)
                 {
                     if (filterStatus == NoteStatus.Draft)
                     {
-                        var notes = await _refRep.applicationDbContext.Note
+                        var notes = await _referencesRepository.applicationDbContext.Note
                             .Where(note => note.Status == NoteStatus.Draft && note.UserId == currentUserId)
                             .ToListAsync();
                         return notes.AsEnumerable();
                     }
                     else
                     {
-                        var notes = await _refRep.applicationDbContext.Note
+                        var notes = await _referencesRepository.applicationDbContext.Note
                             .Where(note => note.Status == filterStatus)
                             .ToListAsync();
                         return notes.AsEnumerable();
@@ -216,7 +216,7 @@ namespace OnlineNotes.Services.NotesServices
                 }
                 else
                 {
-                    var notes = await _refRep.applicationDbContext.Note
+                    var notes = await _referencesRepository.applicationDbContext.Note
                         .Where(note => (note.Status == NoteStatus.Public) || (note.Status == NoteStatus.Archived) || (note.Status == NoteStatus.Draft && note.UserId == currentUserId))
                         .ToListAsync();
                     return notes.AsEnumerable();
@@ -231,9 +231,9 @@ namespace OnlineNotes.Services.NotesServices
 
         public string? SetFilterStatus(NoteStatus? filterStatus)
         {
-            if (_refRep.httpContextAccessor.HttpContext != null)
+            if (_referencesRepository.httpContextAccessor.HttpContext != null)
             {
-                _refRep.httpContextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
+                _referencesRepository.httpContextAccessor.HttpContext.Session.SetString("FilterStatus", filterStatus.ToString());
                 return filterStatus.ToString();
             }
             return null;
@@ -245,7 +245,7 @@ namespace OnlineNotes.Services.NotesServices
             {
                 // Makes search term and Note title lowercase to make searching case insensitive
                 string lowerTerm = term.ToLower();
-                var notes = await _refRep.applicationDbContext.Note.Where(note => note.Title.ToLower().Contains(lowerTerm)).ToListAsync();
+                var notes = await _referencesRepository.applicationDbContext.Note.Where(note => note.Title.ToLower().Contains(lowerTerm)).ToListAsync();
                 return notes;
             }
             catch (Exception ex)
@@ -274,8 +274,8 @@ namespace OnlineNotes.Services.NotesServices
                 note.AvgRating = noteRequest.AvgRating;
                 note.UserId = noteRequest.UserId;
 
-                _refRep.applicationDbContext.Update(note);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Update(note);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
 
                 return true;
             }
@@ -292,7 +292,7 @@ namespace OnlineNotes.Services.NotesServices
             {
                 if (note == null) { return false; }
 
-                note = await _refRep.applicationDbContext.Note
+                note = await _referencesRepository.applicationDbContext.Note
                     .Include(n => n.Comments) // Include the Comments navigation property
                     .Include(n => n.Ratings)
                     .FirstOrDefaultAsync(m => m.Id == note.Id);
@@ -308,8 +308,8 @@ namespace OnlineNotes.Services.NotesServices
                 float averageRating = (float)Math.Round(totalRating / note.Ratings.Count, 2);
 
                 note.AvgRating = averageRating;
-                _refRep.applicationDbContext.Update(note);
-                await _refRep.applicationDbContext.SaveChangesAsync();
+                _referencesRepository.applicationDbContext.Update(note);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 return true;
             }
             catch (Exception ex)
@@ -341,7 +341,7 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
-                ClaimsPrincipal? user = _refRep.httpContextAccessor.HttpContext?.User;
+                ClaimsPrincipal? user = _referencesRepository.httpContextAccessor.HttpContext?.User;
                 if (user == null)
                 {
                     return null;
@@ -349,7 +349,7 @@ namespace OnlineNotes.Services.NotesServices
 
                 IdentityUser currUser = await _userManager.GetUserAsync(user);
                 var currentUserId = currUser.Id;
-                var notes = await _refRep.applicationDbContext.Note
+                var notes = await _referencesRepository.applicationDbContext.Note
                     .Where(note => note.UserId == currentUserId)
                     .ToListAsync();
 
