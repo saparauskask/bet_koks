@@ -11,10 +11,10 @@ namespace OnlineNotes.Controllers
         private readonly ReferencesRepository _referencesRepository;
         private readonly HttpClient _client;
 
-        public ChessController(ReferencesRepository referencesRepository)
+        public ChessController(ReferencesRepository referencesRepository, HttpClient client)
         {
             _referencesRepository = referencesRepository;
-            _client = new HttpClient();
+            _client = client ?? new HttpClient();
             _client.BaseAddress = new Uri($"https://{_referencesRepository.httpContextAccessor.HttpContext.Request.Host}/api");
         }
 
