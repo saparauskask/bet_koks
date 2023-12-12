@@ -34,7 +34,7 @@ namespace ChessApp.Data
             }
         }
 
-        public async Game StartNewGame(Player player1, Player player2)
+        public Game StartNewGame(Player player1, Player player2)
         {
             Game newGame = new Game(player1, player2);
             games.Add(newGame);
@@ -42,7 +42,7 @@ namespace ChessApp.Data
             return newGame;
         }
 
-        public async Game GetLastGame()
+        public Game GetLastGame()
         {
             if (games.Count > 0)
             {
