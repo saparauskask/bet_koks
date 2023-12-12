@@ -30,9 +30,10 @@ namespace OnlineNotes.Services.QuizzesServices
                 if (!string.IsNullOrEmpty(generatedQuiz))
                 {
                     quiz.NoteContents = generatedQuiz;
+                    // FIXME add validation
                     await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
                     await _refRep.applicationDbContext.SaveChangesAsync();
-                    var result = await CreateQuestionsAsync(generatedQuiz, quiz.Id); // add checkers, check the placement of the line
+                    var result = await CreateQuestionsAsync(generatedQuiz, quiz.Id);
                     return quiz.Id;
                 } else
                 {
@@ -117,8 +118,45 @@ namespace OnlineNotes.Services.QuizzesServices
             {
                 var extractedQuestion = question.ExtractQuestions(); // check if not empty
                 var parsedAnswers = question.ParseAnswers();
+                var result = await CreateQuestionAsync(extractedQuestion, parsedAnswers, quizId);
+                if (result == true)
+                {
+                    continue;
+                }
+                return false;
             }
             return false;
+        }
+
+        private async Task<bool> CreateQuestionAsync(string extractedQuestion, List<(string AnswerText, bool IsCorrect)> parsedAnswers, int quizId)
+        {
+            try
+            {
+                int correctAnswer = parsedAnswers.FindIndex(answer => answer.IsCorrect);
+                var question = new Question
+                {
+                    QuizId = quizId,
+                    QuestionText = extractedQuestion,
+                    QuestionOptions = parsedAnswers.Select(answer => new QuestionOption { OptionText = answer.AnswerText }).ToList(),
+                    CorrectAnswer = correctAnswer,
+                    AnsweredCorrectly = null,
+                    Explanation = null
+                };
+                _refRep.applicationDbContext.Add(question);
+                await _refRep.applicationDbContext.SaveChangesAsync();
+                foreach (var option in question.QuestionOptions)
+                {
+                    option.QuestionId = question.Id;
+                }
+
+                await _refRep.applicationDbContext.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in CreateQuestionAsync: {ErrorMessage}", ex.Message);
+                return false;
+            }
         }
     }
 }

@@ -39,33 +39,30 @@ namespace OnlineNotes.Services.OpenAIServices
                     return "Q1. What is the main advantage of using a helper?\n" +
                            "a. Easier to maintain code. b. Easier to read code. c. Easier to create code.\n" +
                            "Correct Answer for question Q1 is: a.\n\n" +
-                           "Q2. What is the recommended way to create a note item in an ASP.NET Web Page?\n" +
+                           "Q2. What is the recommended way to create a note item in an ASP NET Web Page?\n" +
                            "a. Using an existing helper. b. Creating a new helper. c. Using a <div> element.\n" +
                            "Correct Answer for question Q2 is: b.\n\n" +
-                           "Q3. Where can you find a list of the built-in helpers in ASP.NET Web Pages?\n" +
-                           "a. ASP.NET API Quick Reference. b. ASP.NET Web Pages documentation. c. Online tutorial websites.\n" +
+                           "Q3. Where can you find a list of the built-in helpers in ASP NET Web Pages?\n" +
+                           "a. ASP NET API Quick Reference. b. ASP NET Web Pages documentation. c. Online tutorial websites.\n" +
                            "Correct Answer for question Q3 is: a.\n\n" +
                            "Q4. How can you make your codes simpler and easier to read when using a helper?\n" +
                            "a. Write shorter and concise codes. b. Insert a single line of code anywhere you need it. c. Put the codes in different pages.\n" +
                            "Correct Answer for question Q4 is: b.";
                 case "What is Neuroscience?":
-                    return "Question 1: What is the study of neuroscience also known as?\n" +
-                           " a. Neural Science b. Biology c. Mathematics\n" +
+                    return "Q1: What is the study of neuroscience also known as?\n" +
+                           " a. Neural Science. b. Biology. c. Mathematics.\n" +
                            "Correct Answer for question Q1 is: a.\n\n" +
-                           "Question 2: What does neuroscience focus on?\n" +
-                           " a. Cognitive functions b. Neurological disorders c. Computer science\n" +
+                           "Q2: What does neuroscience focus on?\n" +
+                           " a. Cognitive functions. b. Neurological disorders. c. Computer science.\n" +
                            "Correct Answer for question Q2 is: a.\n\n" +
-                           "Question 3: What is the difference between neuroscience and neurobiology?\n" +
-                           " a. Neuroscience is wider in scope b. Neurobiology looks at the biology of the nervous system c. Neuroscience is more interdisciplinary\n" +
+                           "Q3: What is the difference between neuroscience and neurobiology?\n" +
+                           " a. Neuroscience is wider in scope. b. Neurobiology looks at the biology of the nervous system. c. Neuroscience is more interdisciplinary.\n" +
                            "Correct Answer for question Q3 is: b.\n\n" +
-                           "Question 4: What aspects of the nervous system do neuroscientists study?\n" +
-                           " a. Molecular b. Computational c. All of the above\n" +
+                           "Q4: What aspects of the nervous system do neuroscientists study?\n" +
+                           " a. Molecular. b. Computational. c. All of the above.\n" +
                            "Correct Answer for question Q4 is: c.\n\n" +
-                           "Question 5: What fields are neuroscientists involved in today?\n" +
-                           " a. Mathematics b. Medicine c. Psychology\n" +
-                           "Correct Answer for question Q5 is: c.\n\n" +
-                           "Q5. How can you change the look of a note item quickly and easily?\n" +
-                           "a. Change the markup in multiple pages. b. Redesign the <div> element. c. Change the markup in one place.\n" +
+                           "Q5: What fields are neuroscientists involved in today?\n" +
+                           " a. Mathematics. b. Medicine. c. Psychology.\n" +
                            "Correct Answer for question Q5 is: c.";
                 default:
                     return "not implemented";
@@ -132,7 +129,7 @@ namespace OnlineNotes.Services.OpenAIServices
             //    _logger.LogError(ex, "An error occurred in GenerateQuiz: {ErrorMessage}", ex.Message);
             //    return "Something went wrong, the quiz could not be generated. Either your submitted note was to long or ChatGPT was unable to generate the quiz";
             //}
-            return "This method does not work";
+            return "";
         }
     }
 }
