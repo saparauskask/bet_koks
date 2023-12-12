@@ -1,5 +1,6 @@
 ﻿using FakeItEasy;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -7,23 +8,37 @@ using OnlineNotes.Data;
 using OnlineNotes.Models;
 using OnlineNotes.Models.Requests.Comments;
 using OnlineNotes.Services.CommentsServices;
+using OnlineNotes.Services.RatingServices;
+using OpenAI_API.Moderation;
 
 namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
 {
     public class CommentsServiceTests
     {
-        [Fact]
-        public async Task CommentsService_CreateCommentAsync_ReturnsTrue()
+        private readonly ApplicationDbContext _context;
+        private readonly Mock<ILogger<CommentsService>> _mockLogger;
+        private readonly Mock<ReferencesRepository> _mockRefRep;
+        private readonly Mock<UserManager<IdentityUser>> _mockUserManager;
+        private readonly CommentsService _service;
+
+        public CommentsServiceTests()
         {
-            // Arrange
             var options = new DbContextOptionsBuilder<ApplicationDbContext>()
                 .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
 
-            using var context = new ApplicationDbContext(options);
-            var mockLogger = new Mock<ILogger<CommentsService>>();
-            var mockRefRep = new Mock<ReferencesRepository>(context, A.Fake<IHttpContextAccessor>());
-            var service = new CommentsService(mockRefRep.Object, mockLogger.Object);
+            _context = new ApplicationDbContext(options);
+            _mockLogger = new Mock<ILogger<CommentsService>>();
+            _mockUserManager = new Mock<UserManager<IdentityUser>>(new Mock<IUserStore<IdentityUser>>().Object, null, null, null, null, null, null, null, null);
+
+            _mockRefRep = new Mock<ReferencesRepository>(_context, A.Fake<IHttpContextAccessor>());
+            _service = new CommentsService(_mockRefRep.Object, _mockLogger.Object);
+        }
+
+        [Fact]
+        public async Task CommentsService_CreateCommentAsync_ReturnsTrue()
+        {
+            // Arrange
             var commentRequest = new CreateCommentRequest
             {
                 Contents = "Test Comment",
@@ -31,27 +46,37 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
             };
 
             // Act
-            var result = await service.CreateCommentAsync(commentRequest);
+            var result = await _service.CreateCommentAsync(commentRequest);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(1, context.Comment.Count());
+            Assert.Equal(1, _context.Comment.Count());
         }
 
+        [Fact]
+        public async Task CommentsService_CreateCommentAsync_InvalidRefRep_ReturnsFalse()
+        {
+            // Arrange
+            var mockInvalidRefRep = new Mock<ReferencesRepository>(null, null);
+            var invalidService = new CommentsService(mockInvalidRefRep.Object, _mockLogger.Object);
 
+            var commentRequest = new CreateCommentRequest
+            {
+                Contents = "Test Comment",
+                NoteId = 1
+            };
+
+            // Act
+            var result = await invalidService.CreateCommentAsync(commentRequest);
+
+            // Assert
+            Assert.False(result);
+        }
 
         [Fact]
         public async Task CommentsService_DeleteCommentAsync_ReturnsTrue()
         {
             // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            using var context = new ApplicationDbContext(options);
-            var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
-
             var comment = new Comment
             {
                 Contents = "Test Comment",
@@ -59,8 +84,8 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
                 CreationDate = DateTime.Now
             };
 
-            context.Comment.Add(comment);
-            context.SaveChanges();
+            _context.Comment.Add(comment);
+            _context.SaveChanges();
 
             var deleteCommentRequest = new DeleteCommentRequest
             {
@@ -68,25 +93,17 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
             };
 
             // Act
-            var result = await service.DeleteCommentAsync(deleteCommentRequest);
+            var result = await _service.DeleteCommentAsync(deleteCommentRequest);
 
             // Assert
             Assert.True(result);
-            Assert.Equal(0, await context.Comment.CountAsync());
+            Assert.Equal(0, await _context.Comment.CountAsync());
         }
 
         [Fact]
-        public async Task CommentsService_GetCommentByIdAsync_WithValidId_ReturnsComment()
+        public async Task CommentsService_DeleteCommentAsync_CommentDoesNotExist_ReturnsFalse()
         {
             // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            using var context = new ApplicationDbContext(options);
-            var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
-
             var comment = new Comment
             {
                 Contents = "Test Comment",
@@ -94,11 +111,37 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
                 CreationDate = DateTime.Now
             };
 
-            context.Comment.Add(comment);
-            context.SaveChanges();
+            _context.Comment.Add(comment);
+            _context.SaveChanges();
+
+            var deleteCommentRequest = new DeleteCommentRequest
+            {
+                Id = 2
+            };
 
             // Act
-            var result = await service.GetCommentByIdAsync(comment.Id);
+            var result = await _service.DeleteCommentAsync(deleteCommentRequest);
+
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public async Task CommentsService_GetCommentByIdAsync_WithValidId_ReturnsComment()
+        {
+            // Arrange
+            var comment = new Comment
+            {
+                Contents = "Test Comment",
+                NoteId = 1,
+                CreationDate = DateTime.Now
+            };
+
+            _context.Comment.Add(comment);
+            _context.SaveChanges();
+
+            // Act
+            var result = await _service.GetCommentByIdAsync(comment.Id);
 
             // Assert
             Assert.NotNull(result);
@@ -106,35 +149,46 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
         }
 
         [Fact]
-        public async Task CommentsServiceGetCommentByIdAsync_WithInvalidId_ReturnsNull()
+        public async Task CommentsService_GetCommentByIdAsync_WithInvalidId_ReturnsNull()
         {
-            // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            using var context = new ApplicationDbContext(options);
-            var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
-
             // Act
-            var result = await service.GetCommentByIdAsync(1);
+            var resultEmpty = await _service.GetCommentByIdAsync(1);
+            var resultInvalid = await _service.GetCommentByIdAsync(-1);
+            var resultNull = await _service.GetCommentByIdAsync(null);
 
             // Assert
-            Assert.Null(result);
+            Assert.Null(resultEmpty);
+            Assert.Null(resultInvalid);
+            Assert.Null(resultNull);
         }
 
         [Fact]
-        public async Task CommentsServiceGetNoteIdFromCommentId_WithValidCommentId_ReturnsNoteId()
+        public async Task CommentsService_GetNoteIdFromCommentId_WithValidCommentId_ReturnsNoteId()
         {
             // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
+            var comment = new Comment
+            {
+                Contents = "Test Comment",
+                NoteId = 1,
+                CreationDate = DateTime.Now
+            };
 
-            using var context = new ApplicationDbContext(options);
-            var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
+            _context.Comment.Add(comment);
+            _context.SaveChanges();
+
+            // Act
+            var result = await _service.GetNoteIdFromCommentId(comment.Id);
+
+            // Assert
+            Assert.Equal(1, result);
+        }
+
+        [Fact]
+        public async Task CommentsService_GetCommentByIdAsync_WithInvalidRefRep_ReturnsNull()
+        {
+            // Arrange
+            var mockInvalidRefRep = new Mock<ReferencesRepository>(null, null);
+            var invalidService = new CommentsService(mockInvalidRefRep.Object, _mockLogger.Object);
 
             var comment = new Comment
             {
@@ -143,30 +197,21 @@ namespace OnlineNotes.Tests.ServicesTests.CommentsServiceTests
                 CreationDate = DateTime.Now
             };
 
-            context.Comment.Add(comment);
-            context.SaveChanges();
+            _context.Comment.Add(comment);
+            _context.SaveChanges();
 
             // Act
-            var result = await service.GetNoteIdFromCommentId(comment.Id);
+            var result = await invalidService.GetCommentByIdAsync(comment.Id);
 
             // Assert
-            Assert.Equal(1, result);
+            Assert.Null(result);
         }
 
         [Fact]
         public async Task ComentsService_GetNoteIdFromCommentId_WithInvalidCommentId_ReturnsZero()
         {
-            // Arrange
-            var options = new DbContextOptionsBuilder<ApplicationDbContext>()
-                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
-                .Options;
-
-            using var context = new ApplicationDbContext(options);
-            var mockLogger = new Mock<ILogger<CommentsService>>();
-            var service = new CommentsService(new ReferencesRepository(context, A.Fake<IHttpContextAccessor>()), mockLogger.Object);
-
             // Act
-            var result = await service.GetNoteIdFromCommentId(1);
+            var result = await _service.GetNoteIdFromCommentId(1);
 
             // Assert
             Assert.Equal(0, result);
