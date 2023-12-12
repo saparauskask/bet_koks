@@ -23,8 +23,8 @@
 
             if (totalItems > 0)
             {
-                startPage = (int)Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
-                endPage = (int)Math.Clamp(currentPage + pageRangeEnd, 0, totalPages);
+                startPage = Math.Clamp(currentPage - pageRangeStart, 1, totalPages);
+                endPage = Math.Clamp(currentPage + pageRangeEnd, 0, totalPages);
             }
             
             TotalItems = totalItems;

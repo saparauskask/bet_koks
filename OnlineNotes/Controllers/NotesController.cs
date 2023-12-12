@@ -47,7 +47,7 @@ namespace OnlineNotes.Controllers
             }
 
             // Sorting:
-            notes = _notesService.GetSortedNotes(notes);
+            notes = _notesService.GetSortedNotes(_notesService.GetSortStatus(), notes);
 
             // Pagination:
             var data = _notesService.GetPagedNotes(notes, page, this);
@@ -83,6 +83,12 @@ namespace OnlineNotes.Controllers
         public async Task<IActionResult> Create()
         {
             IdentityUser user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return NotFound();
+            }  
+
             var userId = user.Id;
             ViewBag.UserId = userId;
 
@@ -149,7 +155,6 @@ namespace OnlineNotes.Controllers
                 _logger.LogError($"Access to the note (Id: {ex.NoteId}) during {ex.Operation} operation was denied");
                 return RedirectToAction(nameof(Index), new { errorMessage = ex.GetErrorMessage() });
             }
-
         }
 
         public async Task<IActionResult> ExplainTask(string input)

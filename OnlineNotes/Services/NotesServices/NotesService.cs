@@ -47,7 +47,7 @@ namespace OnlineNotes.Services.NotesServices
             return null;
         }
 
-        public IEnumerable<Note>? GetSortedNotes(IEnumerable<Note> notes)
+        public IEnumerable<Note>? GetSortedNotes(int sortInt, IEnumerable<Note> notes)
         {
             if (_referencesRepository.httpContextAccessor.HttpContext != null)
             {
@@ -60,7 +60,11 @@ namespace OnlineNotes.Services.NotesServices
 
                 return notes.OrderBy(i => i.CreationDate);
             }
-            return null;
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in GetSortedNotes: {ErrorMessage}", ex.Message);
+                return null;
+            }
         }
 
         public IEnumerable<Note>? GetPagedNotes(IEnumerable<Note> notes, int page, Controller controller)
@@ -89,6 +93,18 @@ namespace OnlineNotes.Services.NotesServices
                 return sortStatus;
             }
             return null;
+        }
+        public int GetSortStatus()
+        {
+            if (_refRep.httpContextAccessor.HttpContext != null)
+            {
+                int? sortStatus = _refRep.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
+                if (sortStatus.HasValue)
+                {
+                    return sortStatus.Value;
+                }
+            }
+            return 1;
         }
 
         public async Task<int> CreateNoteAsync(CreateNoteRequest noteRequest)
@@ -244,13 +260,20 @@ namespace OnlineNotes.Services.NotesServices
         {
             try
             {
-                Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status)
+                // Retrieve the existing note
+                Note note = await _refRep.applicationDbContext.Note.FindAsync(noteRequest.Id);
+
+                if (note == null)
                 {
-                    Id = noteRequest.Id,
-                    CreationDate = DateTime.Now,
-                    AvgRating = noteRequest.AvgRating,
-                    UserId = noteRequest.UserId
-                };
+                    return false;
+                }
+
+                // Update the note properties
+                note.Title = noteRequest.Title;
+                note.Contents = noteRequest.Contents;
+                note.Status = noteRequest.Status;
+                note.AvgRating = noteRequest.AvgRating;
+                note.UserId = noteRequest.UserId;
 
                 _referencesRepository.applicationDbContext.Update(note);
                 await _referencesRepository.applicationDbContext.SaveChangesAsync();
@@ -266,25 +289,25 @@ namespace OnlineNotes.Services.NotesServices
 
         public async Task<bool> CalculateAvgRating(Note? note)
         {
-            if (note == null) { return false; }
+            try
+            {
+                if (note == null) { return false; }
 
             note = await _referencesRepository.applicationDbContext.Note
                 .Include(n => n.Comments) // Include the Comments navigation property
                 .Include(n => n.Ratings)
                 .FirstOrDefaultAsync(m => m.Id == note.Id);
 
-            if (note == null || note.Ratings == null) return false;
+                if (note == null || note.Ratings == null) return false;
 
-            float totalRating = 0;
-            foreach (var rating in note.Ratings)
-            {
-                totalRating += rating.RatingValue;
-            }
+                float totalRating = 0;
+                foreach (var rating in note.Ratings)
+                {
+                    totalRating += rating.RatingValue;
+                }
 
             float averageRating = (float)Math.Round(totalRating / note.Ratings.Count, 2);
 
-            try
-            {
                 note.AvgRating = averageRating;
                 _referencesRepository.applicationDbContext.Update(note);
                 await _referencesRepository.applicationDbContext.SaveChangesAsync();
@@ -293,8 +316,8 @@ namespace OnlineNotes.Services.NotesServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while updating Note with ID: {NoteId}", note.Id);
+                return false;
             }
-            return false;
         }
 
         public int? GetNoteRatingIdByUserId(Note note, string userId)
