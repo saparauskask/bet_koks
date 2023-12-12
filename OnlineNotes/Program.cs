@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Data.ChatHistorySaver;
+using OnlineNotes.Interceptors;
 using OnlineNotes.Models;
 using OnlineNotes.Services.CommentsServices;
 using OnlineNotes.Services.NotesServices;
@@ -21,8 +22,14 @@ namespace OnlineNotes
 
             // Add services to the container.
             var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(connectionString));
+            builder.Services.AddSingleton<UpdateAudiatbleEntities>();
+
+            builder.Services.AddDbContext<ApplicationDbContext>((sp, options) =>
+                {
+                    var auditInterceptor = sp.GetService<UpdateAudiatbleEntities>()!;
+
+                    options.UseSqlServer(connectionString).AddInterceptors(auditInterceptor);
+                });
             builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
             // Enable session
@@ -46,6 +53,9 @@ namespace OnlineNotes
             builder.Services.AddScoped<IQuizzesService, QuizzesService>();
             builder.Services.AddScoped<IQuizGeneratorService, QuizGeneratorService>();
 
+            var serviceProvider = builder.Services.BuildServiceProvider();
+            ChatHistorySaver.Initialize(serviceProvider.GetRequiredService<ApplicationDbContext>());
+
             // logger configuration for writting log messages to a file
             var logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
@@ -53,9 +63,6 @@ namespace OnlineNotes
                 .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
             builder.Logging.AddSerilog(logger);
-
-            var serviceProvider = builder.Services.BuildServiceProvider();
-            ChatHistorySaver.Initialize(serviceProvider.GetRequiredService<ApplicationDbContext>());
 
             var app = builder.Build();
 

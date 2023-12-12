@@ -49,7 +49,7 @@ namespace OnlineNotes.Services.NotesServices
 
         public IEnumerable<Note>? GetSortedNotes(int sortInt, IEnumerable<Note> notes)
         {
-            if (_referencesRepository.httpContextAccessor.HttpContext != null)
+            try
             {
                 // 1 - sort ascending, 0 - sort descending
                 int? sortStatusInt = _referencesRepository.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
@@ -96,9 +96,9 @@ namespace OnlineNotes.Services.NotesServices
         }
         public int GetSortStatus()
         {
-            if (_refRep.httpContextAccessor.HttpContext != null)
+            if (_referencesRepository.httpContextAccessor.HttpContext != null)
             {
-                int? sortStatus = _refRep.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
+                int? sortStatus = _referencesRepository.httpContextAccessor.HttpContext.Session.GetInt32("SortStatus");
                 if (sortStatus.HasValue)
                 {
                     return sortStatus.Value;
@@ -113,7 +113,6 @@ namespace OnlineNotes.Services.NotesServices
             {
                 Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status)
                 {
-                    CreationDate = DateTime.Now,
                     UserId = noteRequest.UserId
                 };
 
@@ -261,7 +260,7 @@ namespace OnlineNotes.Services.NotesServices
             try
             {
                 // Retrieve the existing note
-                Note note = await _refRep.applicationDbContext.Note.FindAsync(noteRequest.Id);
+                Note note = await _referencesRepository.applicationDbContext.Note.FindAsync(noteRequest.Id);
 
                 if (note == null)
                 {
