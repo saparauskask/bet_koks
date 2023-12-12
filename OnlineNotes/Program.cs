@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
 using OnlineNotes.Data.ChatHistorySaver;
+using OnlineNotes.Middleware;
 using OnlineNotes.Models;
 using OnlineNotes.Services.CommentsServices;
 using OnlineNotes.Services.NotesServices;
@@ -70,6 +71,8 @@ namespace OnlineNotes
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseMiddleware<RequestMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
