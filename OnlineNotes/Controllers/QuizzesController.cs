@@ -85,5 +85,19 @@ namespace OnlineNotes.Controllers
 
             return NotFound();
         }
+
+        [HttpDelete]
+        [Route("Quizzes/Delete/{id}")]
+        public async Task<IActionResult> Delete(int? id)
+        {
+            var result = await _quizzesService.DeleteQuizAsync(id);
+            if (result == true)
+            {
+                return RedirectToAction("Index");
+            } else
+            {
+                return NotFound();
+            }
+        }
     }
 }
