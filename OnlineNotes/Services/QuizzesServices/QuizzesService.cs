@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OnlineNotes.Data;
+using OnlineNotes.ExtensionMethods;
 using OnlineNotes.Models.Quizzes;
 using OnlineNotes.Models.Requests.Quiz;
 using OnlineNotes.Services.OpenAIServices;
@@ -24,13 +25,14 @@ namespace OnlineNotes.Services.QuizzesServices
             try
             {
                 var quiz = new Quiz(quizRequest.UserId, quizRequest.CreationDate, quizRequest.Title, quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
-                var generatedQuiz = await _quizGeneratorService.GenerateQuiz(quiz.NoteContents, quiz.Difficulty, quiz.QuestionsCount); // IT WILL BE FIXED
+                var generatedQuiz = _quizGeneratorService.FakeGenerateQuiz(quizRequest.Title);
                 // new code from this point
                 if (!string.IsNullOrEmpty(generatedQuiz))
                 {
                     quiz.NoteContents = generatedQuiz;
                     await _refRep.applicationDbContext.Quiz.AddAsync(quiz);
                     await _refRep.applicationDbContext.SaveChangesAsync();
+                    var result = await CreateQuestionsAsync(generatedQuiz, quiz.Id); // add checkers, check the placement of the line
                     return quiz.Id;
                 } else
                 {
@@ -106,6 +108,17 @@ namespace OnlineNotes.Services.QuizzesServices
                 _logger.LogError(ex, "An error occurred in GetQuizByIdAsync: {ErrorMessage}", ex.Message);
                 return null;
             }
+        }
+
+        private async Task<bool> CreateQuestionsAsync(string generatedQuiz, int quizId)
+        {
+            List<string> parsedQuestions = generatedQuiz.ParseQuestions();
+            foreach (var question in parsedQuestions)
+            {
+                var extractedQuestion = question.ExtractQuestions(); // check if not empty
+                var parsedAnswers = question.ParseAnswers();
+            }
+            return false;
         }
     }
 }
