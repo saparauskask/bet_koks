@@ -113,7 +113,6 @@ namespace OnlineNotes.Services.NotesServices
             {
                 Note note = new(noteRequest.Title, noteRequest.Contents, noteRequest.Status)
                 {
-                    CreationDate = DateTime.Now,
                     UserId = noteRequest.UserId
                 };
 
