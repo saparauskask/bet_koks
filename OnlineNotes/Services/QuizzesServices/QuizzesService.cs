@@ -111,7 +111,7 @@ namespace OnlineNotes.Services.QuizzesServices
             }
         }
 
-        private async Task<bool> CreateQuestionsAsync(string generatedQuiz, int quizId)
+        public async Task<bool> CreateQuestionsAsync(string generatedQuiz, int quizId)
         {
             List<string> parsedQuestions = generatedQuiz.ParseQuestions();
             foreach (var question in parsedQuestions)
@@ -119,16 +119,15 @@ namespace OnlineNotes.Services.QuizzesServices
                 var extractedQuestion = question.ExtractQuestions(); // check if not empty
                 var parsedAnswers = question.ParseAnswers();
                 var result = await CreateQuestionAsync(extractedQuestion, parsedAnswers, quizId);
-                if (result == true)
+                if (!result)
                 {
-                    continue;
+                    return false;
                 }
-                return false;
             }
-            return false;
+            return true;
         }
 
-        private async Task<bool> CreateQuestionAsync(string extractedQuestion, List<(string AnswerText, bool IsCorrect)> parsedAnswers, int quizId)
+        public async Task<bool> CreateQuestionAsync(string extractedQuestion, List<(string AnswerText, bool IsCorrect)> parsedAnswers, int quizId)
         {
             try
             {
