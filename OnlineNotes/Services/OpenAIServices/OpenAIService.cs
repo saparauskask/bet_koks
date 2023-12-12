@@ -34,7 +34,7 @@ namespace OnlineNotes.Services.OpenAIServices
                 var result = await Api.Completions.CreateCompletionAsync(input, temperature: 0.5);
                 return result.ToString();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
                 return "Something went wrong, the request could not be completed";
