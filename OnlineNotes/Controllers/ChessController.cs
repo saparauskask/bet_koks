@@ -22,6 +22,12 @@ namespace OnlineNotes.Controllers
             }
         }
 
+        public ChessController(HttpClient client)
+        {
+            _referencesRepository = null;
+            _client = client ?? new HttpClient();
+        }
+
         [HttpGet]
         public async Task<IActionResult> Index()
         {
