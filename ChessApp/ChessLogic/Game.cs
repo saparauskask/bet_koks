@@ -1,5 +1,6 @@
 ﻿using ChessApp.ChessLogic.Enums;
 using System;
+using System.Text;
 
 namespace ChessApp.ChessLogic
 {
@@ -32,7 +33,6 @@ namespace ChessApp.ChessLogic
         {
             var start = Board.Squares[fromX, fromY];
             var end = Board.Squares[toX, toY];
-            Console.WriteLine($"Starting piece: {start.ToString()}, endPiece: {end.ToString()}");
             var move = new Move(start, end);
             return MakeMove(player, move);
         }
@@ -94,5 +94,21 @@ namespace ChessApp.ChessLogic
             return Board.ToString();
         }
 
+        public void BoardClear()
+        {
+            var squares = Board.Squares;
+
+            for (int i = 7; i >= 0; --i)
+            {
+                for (int j = 0; j < 8; ++j)
+                {
+                    if (squares[i, j] != null)
+                    {
+                        squares[i, j] = new Square(i, j, null);
+                    }
+                }
+            }
+
+        }
     }
 }
