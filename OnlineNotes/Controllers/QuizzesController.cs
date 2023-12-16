@@ -50,7 +50,7 @@ namespace OnlineNotes.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Quiz quiz) // lacking async method to be called
+        public async Task<IActionResult> Create(Quiz quiz)
         {
             quiz.CreationDate = DateTime.Now;
             if (ModelState.IsValid)
@@ -86,6 +86,40 @@ namespace OnlineNotes.Controllers
             return NotFound();
         }
 
+        [HttpPost]
+        [Route("Quizzes/SubmitAnswers")]
+        public async Task<IActionResult> SubmitAnswers(IFormCollection formCollection)
+        {
+            List<int> answers = new();
+            int quizId = 0;
+            foreach (var key in formCollection.Keys)
+            {
+                if (key.StartsWith("question_"))
+                {
+                    var questionId = key.Substring("question_".Length);
+                    var selectedOptionId = formCollection[key];
+                    if (!string.IsNullOrEmpty(selectedOptionId))
+                    {
+                        answers.Add(int.Parse(selectedOptionId));
+                    }
+                    
+                }
+                if(key.Equals("QuizId"))
+                {
+                    quizId = int.Parse(formCollection[key]);
+                }
+            }
+            if (answers.Any() && quizId > 0)
+            {
+                var result = await _quizzesService.EvaluateQuiz(answers, quizId);
+                if (result == true)
+                {
+                    return RedirectToAction("Details", new { id = quizId });
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
         [HttpDelete]
         [Route("Quizzes/Delete/{id}")]
         public async Task<IActionResult> Delete(int? id)
@@ -98,6 +132,17 @@ namespace OnlineNotes.Controllers
             {
                 return NotFound();
             }
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var quiz = await _quizzesService.GetQuizByIdAsync(id);
+            if (quiz != null && id >= 0)
+            {
+                return View(quiz);
+            }
+
+            return NotFound();
         }
     }
 }

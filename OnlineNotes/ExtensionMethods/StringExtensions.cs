@@ -75,7 +75,7 @@ namespace OnlineNotes.ExtensionMethods
                     string answerText = matchedGroup.Substring(2).Trim();
 
                     // Add each answer option to the list with IsCorrect set to false
-                    parsedAnswers.Add(($"{letter}. {answerText}", isCorrect));
+                    parsedAnswers.Add(($"{letter} {answerText}", isCorrect));
                 }
             }
 

@@ -157,5 +157,87 @@ namespace OnlineNotes.Services.QuizzesServices
                 return false;
             }
         }
+
+        public async Task<bool> EvaluateQuiz (List<int> answers, int quizId)
+        {
+            try
+            {
+                var quiz = await GetQuizByIdAsync(quizId);
+
+                if (quiz != null && answers.Count == quiz.Questions.Count)
+                {
+                    var questionList = quiz.Questions.ToList();
+                    int correctAnswers = 0;
+                    for (int i = 0; i < answers.Count; ++i)
+                    {
+                        var answer = answers[i]; // user-selected answer
+                        var question = questionList[i]; // question object (question.CorrectAnswer)
+
+                        if (answer == question.CorrectAnswer)
+                        {
+                            question.AnsweredCorrectly = true;
+                            ++correctAnswers;
+                        }
+                        else
+                        {
+                            question.AnsweredCorrectly = false;
+                        }
+                        var questionResult = await UpdateQuestionAsync(question); // check if it needs to be updated
+
+                        if (questionResult == false)
+                        {
+                            return false;
+                        }
+                    }
+                    quiz.Score = correctAnswers;
+                    quiz.IsCompleted = true;
+                    var quizResult = await UpdateQuizAsync(quiz); // check if it needs to be updated
+                    if (quizResult == false)
+                    {
+                        return false;
+                    }
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in EvaluateQuiz: {ErrorMessage}", ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateQuizAsync(Quiz quiz) // Simplified version of this method
+        {
+            try
+            {
+                _referencesRepository.applicationDbContext.Quiz.Update(quiz);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
+                _logger.LogInformation($"Quiz {quiz.Id} updated successfully");
+                return true;
+                
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in UpdateQuizAsync: {ErrorMessage}", ex.Message);
+                return false;
+            }
+        }
+
+        public async Task<bool> UpdateQuestionAsync(Question question) // Simplified version of this method
+        {
+            try
+            {
+                _referencesRepository.applicationDbContext.Question.Update(question);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
+                _logger.LogInformation($"Question {question.Id} updated successfully");
+                return true;
+            } catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred in UpdateQuestionAsync: {ErrorMessage}", ex.Message);
+                return false;
+            }
+        }
     }
 }

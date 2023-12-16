@@ -46,7 +46,15 @@
                         </td>
                         <td class="text-end">
                             <div class="d-flex gap-1 justify-content-end">
-                                <a class="btn btn-info" asp-action="QuizAttempt" asp-route-id="@quiz.Id">View generated quiz</a>
+                                @if (quiz.Score != null)
+                                {
+                                    <a class="btn btn-success" asp-action="Details" asp-route-id="@quiz.Id">Results</a>
+                                }
+                                else
+                                {
+                                    <a class="btn btn-success disabled" asp-action="Details" asp-route-id="@quiz.Id">Results</a>
+                                }
+                                <a class="btn btn-info" asp-action="QuizAttempt" asp-route-id="@quiz.Id">Solve</a>
                                 <button class="btn btn-danger delete-btn" data-bs-toggle="modal" data-bs-target="#deleteModal" data-bs-id="@quiz.Id">Delete</button>
                             </div>
                         </td>
