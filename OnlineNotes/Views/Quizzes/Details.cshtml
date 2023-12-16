@@ -3,7 +3,44 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Hi,<br /></h1>
-<h2>details of your test will be presented here shortly</h2>
+<h3>Answered Correctly: @Model.Score / @Model.QuestionsCount</h3>
 
-<h3>Title: @Model.Title</h3>
+<table class="table">
+    <thead>
+        <tr class="table-primary">
+            <th></th> <!-- Correct/Not correct -->
+            <th></th> <!-- Question -->
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var question in Model.Questions)
+        {
+            @if (question.AnsweredCorrectly.HasValue && question.AnsweredCorrectly == true)
+            {
+                <tr class="table-success">
+                    @{
+                        var selectedOption = question.AnsweredCorrectly.HasValue ? question.AnsweredCorrectly.Value ? "✔" : "❌" : "";
+                    }
+                    <td>@selectedOption</td>
+
+                    <td>@question.QuestionText</td>
+                </tr>
+            } else
+            {
+                <tr class="table-danger">
+                    @{
+                        var selectedOption = question.AnsweredCorrectly.HasValue ? question.AnsweredCorrectly.Value ? "✔" : "❌" : "";
+                    }
+                    <td>@selectedOption</td>
+
+                    <td>@question.QuestionText</td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<div>
+    <a class="btn btn-info" asp-action="QuizAttempt" asp-route-id="@Model?.Id">Try again</a>
+    <a class="btn btn-primary" asp-action="Index">Back to List</a>
+</div>

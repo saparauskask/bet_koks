@@ -6,8 +6,6 @@
 
 <div style="text-align: center; margin-top: 20px;">
     <br />
-    <h3>Currently it is possible to generate a complete quiz, however it is not possible to solve it yet.</h3>
-    <br />
     <a class="btn btn-primary" asp-action="Create">+ create a new quiz</a>
     <hr />
 </div>
@@ -35,14 +33,17 @@
                         <td>@quiz.Difficulty</td>
                         <!-- <td>@quiz.Score</td> -->
                         <td>
-                            @if (quiz.Score != null)
+                            @if (quiz.Score != null && quiz.QuestionsCount > 0)
                             {
-                                @quiz.Score
+                                var percentage = ((double)quiz.Score / quiz.QuestionsCount) * 100;
+                                @percentage.ToString("0.##")
                             }
                             else
                             {
-                                @("-")
+                                @("--")
                             }
+
+                            %
                         </td>
                         <td class="text-end">
                             <div class="d-flex gap-1 justify-content-end">
