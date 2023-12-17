@@ -12,7 +12,7 @@ namespace OnlineNotes.Models.Quizzes
         public string Title { get; set; } = null!;
         public string NoteContents {  get; set; } = null!;
         public QuizDifficulty Difficulty { get; set; }
-        [Range(1, 15, ErrorMessage = "Number of questions must be between 1 and 15")]
+        [Range(2, 5, ErrorMessage = "Number of questions must be between 2 and 5")]
         public int QuestionsCount { get; set; }
         public ICollection<Question> Questions { get; } = new List<Question>();
         public int? Score { get; set; }
