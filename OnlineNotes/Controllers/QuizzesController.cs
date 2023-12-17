@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OnlineNotes.ExtensionMethods;
 using OnlineNotes.Models.Quizzes;
 using OnlineNotes.Models.Requests.Quiz;
 using OnlineNotes.Services.NotesServices;
@@ -34,11 +35,12 @@ namespace OnlineNotes.Controllers
             return View(quizzes);
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(string? errorMsg = null)
         {
             IdentityUser user = await _userManager.GetUserAsync(User);
             var userId = user.Id;
             ViewBag.UserId = userId;
+            ViewBag.ErrorMsg = errorMsg;
             var notes = await _notesService.GetAllNotesToListAsync();
             if (notes != null && notes.Any())
             {
@@ -55,6 +57,12 @@ namespace OnlineNotes.Controllers
             quiz.CreationDate = DateTime.Now;
             if (ModelState.IsValid)
             {
+                var noteWordCount = quiz.NoteContents.WordCount();
+                if (noteWordCount > 500)
+                {
+                    return RedirectToAction("Create", new { errorMsg = "Your selected note should contain no more than 500 words" });
+                }
+
                 CreateQuizRequest quizRequest = new()
                 {
                     UserId = quiz.UserId,
@@ -70,7 +78,7 @@ namespace OnlineNotes.Controllers
                     return RedirectToAction("QuizAttempt", new { id = quizeId });
                 }
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Create", new {errorMsg = "Something went wrong while generating your quiz. Please try again later or adjust the quiz generation configuration" });
             }
             return View(quiz);
         }

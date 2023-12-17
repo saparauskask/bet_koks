@@ -26,31 +26,31 @@ namespace OnlineNotes.Services.QuizzesServices
             {
                 var quiz = new Quiz(quizRequest.UserId, quizRequest.CreationDate, quizRequest.Title, quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
                 //var generatedQuiz = _quizGeneratorService.FakeGenerateQuiz(quizRequest.Title);
-                var realGeneratedQuiz = await _quizGeneratorService.GenerateQuiz(quizRequest.NoteContents,quizRequest.Difficulty, quizRequest.QuestionsCount);
-                    if (string.IsNullOrEmpty(realGeneratedQuiz))
-                    {
-                    Environment.Exit(0);
-                    }
-                // new code from this point
-                if (!string.IsNullOrEmpty(realGeneratedQuiz))
-                {
-                    quiz.NoteContents = realGeneratedQuiz;
-                    // FIXME add validation
-                    await _referencesRepository.applicationDbContext.Quiz.AddAsync(quiz);
-                    await _referencesRepository.applicationDbContext.SaveChangesAsync();
-                    var result = await CreateQuestionsAsync(realGeneratedQuiz, quiz.Id);
-                    return quiz.Id;
-                } else
+                var realGeneratedQuiz = await _quizGeneratorService.GenerateQuiz(quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
+                if (string.IsNullOrEmpty(realGeneratedQuiz))
                 {
                     return null;
                 }
+
+                quiz.NoteContents = realGeneratedQuiz;
+                await _referencesRepository.applicationDbContext.Quiz.AddAsync(quiz);
+                await _referencesRepository.applicationDbContext.SaveChangesAsync();
+                var result = await CreateQuestionsAsync(realGeneratedQuiz, quiz.Id);
+                if (result == true)
+                {
+                    return quiz.Id;
+                }
+                // delete already created quiz
+                var deleteResult = await DeleteQuizAsync(quiz.Id); // deleteResult is not important here, either way the method will return null
+
+                return null;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred in CreateQuizAsync: {ErrorMessage}", ex.Message);
                 return null;
             }
-            
+
         }
 
         public async Task<bool> DeleteQuizAsync(int? id)
@@ -121,7 +121,7 @@ namespace OnlineNotes.Services.QuizzesServices
             List<string> parsedQuestions = generatedQuiz.ParseQuestions();
             foreach (var question in parsedQuestions)
             {
-                var extractedQuestion = question.ExtractQuestions(); // check if not empty
+                var extractedQuestion = question.ExtractQuestions();
                 var parsedAnswers = question.ParseAnswers();
                 var result = await CreateQuestionAsync(extractedQuestion, parsedAnswers, quizId);
                 if (!result)
@@ -163,7 +163,7 @@ namespace OnlineNotes.Services.QuizzesServices
             }
         }
 
-        public async Task<bool> EvaluateQuiz (List<int> answers, int quizId)
+        public async Task<bool> EvaluateQuiz(List<int> answers, int quizId)
         {
             try
             {
@@ -221,7 +221,7 @@ namespace OnlineNotes.Services.QuizzesServices
                 await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 _logger.LogInformation($"Quiz {quiz.Id} updated successfully");
                 return true;
-                
+
             }
             catch (Exception ex)
             {
@@ -238,7 +238,8 @@ namespace OnlineNotes.Services.QuizzesServices
                 await _referencesRepository.applicationDbContext.SaveChangesAsync();
                 _logger.LogInformation($"Question {question.Id} updated successfully");
                 return true;
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred in UpdateQuestionAsync: {ErrorMessage}", ex.Message);
                 return false;

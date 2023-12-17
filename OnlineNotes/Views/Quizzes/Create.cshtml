@@ -5,9 +5,32 @@
     ViewData["Title"] = "Create";
 }
 
+<style>
+    .main-container {
+        margin-bottom: 200px;
+    }
+</style>
+
+<style>
+    .scrollable-notes { /* This is the scrollable div for notes selection */
+        max-height: 200px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+    }
+</style>
+
+@if (ViewBag.ErrorMsg != null)
+{
+    <div class="alert alert-dismissible alert-danger">
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        <strong>Oops!</strong> @ViewBag.ErrorMsg
+    </div>
+}
+
 <h1>Generate a new quiz</h1>
 
-<div class="row justify-content-center align-items-center" style="height: 50vh;">
+<div class="row justify-content-center align-items-center main-container" style="height: 50vh;">
     <div class="col-md-8">
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -22,10 +45,17 @@
             <div class="form-group">
                 <label asp-for="Difficulty" class="control-label"><h5>Difficulty:</h5></label>
                 <div>
-                    @foreach (var difficulty in Enum.GetValues(typeof(QuizDifficulty)))
+                    @foreach (QuizDifficulty difficulty in Enum.GetValues(typeof(QuizDifficulty)))
                     {
                         <label class="radio-inline">
-                            <input type="radio" asp-for="Difficulty" value="@difficulty" />
+                            @if (difficulty != QuizDifficulty.Easy)
+                            {
+                                <input type="radio" asp-for="Difficulty" value="@difficulty" disabled="disabled" />
+                            }
+                            else
+                            {
+                                <input type="radio" asp-for="Difficulty" value="@difficulty" />
+                            }
                             @difficulty
                         </label>
                     }
@@ -42,7 +72,7 @@
 
             <div class="form-group">
                 <label><h5>Include Notes:</h5></label>
-                <div>
+                <div class="scrollable-notes">
                     @if (ViewBag.Notes != null)
                     {
                         @foreach (var note in ViewBag.Notes)

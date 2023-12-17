@@ -1,6 +1,5 @@
 ﻿using OnlineNotes.Data;
 using OnlineNotes.Models.Enums;
-using OnlineNotes.Services.QuizzesServices;
 using OpenAI_API;
 using OpenAI_API.Completions;
 
@@ -118,7 +117,7 @@ namespace OnlineNotes.Services.OpenAIServices
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred in GenerateQuiz: {ErrorMessage}", ex.Message);
-                return "Error";
+                return "";
             }
         }
     }
