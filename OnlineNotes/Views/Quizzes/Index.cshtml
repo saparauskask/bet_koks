@@ -30,9 +30,10 @@
                 {
                     <tr>
                         <td><h6>@quiz.Title</h6></td>
-                        <td>@quiz.Difficulty</td>
+                        <td> <span class="badge bg-light">@quiz.Difficulty</span></td>
                         <!-- <td>@quiz.Score</td> -->
                         <td>
+                            <h5>
                             @if (quiz.Score != null && quiz.QuestionsCount > 0)
                             {
                                 var percentage = ((double)quiz.Score / quiz.QuestionsCount) * 100;
@@ -40,10 +41,10 @@
                             }
                             else
                             {
-                                @("--")
+                                @("—")
                             }
-
                             %
+                            </h5>
                         </td>
                         <td class="text-end">
                             <div class="d-flex gap-1 justify-content-end">

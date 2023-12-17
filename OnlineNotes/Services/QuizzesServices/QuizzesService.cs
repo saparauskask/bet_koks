@@ -25,15 +25,20 @@ namespace OnlineNotes.Services.QuizzesServices
             try
             {
                 var quiz = new Quiz(quizRequest.UserId, quizRequest.CreationDate, quizRequest.Title, quizRequest.NoteContents, quizRequest.Difficulty, quizRequest.QuestionsCount);
-                var generatedQuiz = _quizGeneratorService.FakeGenerateQuiz(quizRequest.Title);
+                //var generatedQuiz = _quizGeneratorService.FakeGenerateQuiz(quizRequest.Title);
+                var realGeneratedQuiz = await _quizGeneratorService.GenerateQuiz(quizRequest.NoteContents,quizRequest.Difficulty, quizRequest.QuestionsCount);
+                    if (string.IsNullOrEmpty(realGeneratedQuiz))
+                    {
+                    Environment.Exit(0);
+                    }
                 // new code from this point
-                if (!string.IsNullOrEmpty(generatedQuiz))
+                if (!string.IsNullOrEmpty(realGeneratedQuiz))
                 {
-                    quiz.NoteContents = generatedQuiz;
+                    quiz.NoteContents = realGeneratedQuiz;
                     // FIXME add validation
                     await _referencesRepository.applicationDbContext.Quiz.AddAsync(quiz);
                     await _referencesRepository.applicationDbContext.SaveChangesAsync();
-                    var result = await CreateQuestionsAsync(generatedQuiz, quiz.Id);
+                    var result = await CreateQuestionsAsync(realGeneratedQuiz, quiz.Id);
                     return quiz.Id;
                 } else
                 {
