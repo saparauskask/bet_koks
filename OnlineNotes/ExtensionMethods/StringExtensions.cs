@@ -92,5 +92,15 @@ namespace OnlineNotes.ExtensionMethods
             }
             return "";
         }
+
+        public static string RemoveLinesAboveFirstQuestion(this string input)
+        {
+            int indexOfQ1 = input.IndexOf("Q1.");
+            if (indexOfQ1 != -1)
+            {
+                return input.Substring(indexOfQ1);
+            }
+            return input;
+        }
     }
 }

@@ -118,6 +118,7 @@ namespace OnlineNotes.Services.QuizzesServices
 
         public async Task<bool> CreateQuestionsAsync(string generatedQuiz, int quizId)
         {
+            generatedQuiz = generatedQuiz.RemoveLinesAboveFirstQuestion();
             List<string> parsedQuestions = generatedQuiz.ParseQuestions();
             foreach (var question in parsedQuestions)
             {
