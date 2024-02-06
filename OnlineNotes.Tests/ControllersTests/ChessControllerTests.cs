@@ -1,8 +1,5 @@
 ﻿using FakeItEasy;
-using Microsoft.AspNetCore.Mvc;
 using OnlineNotes.Controllers;
-using OnlineNotes.Data;
-using System.Net;
 
 namespace OnlineNotes.Tests.ControllersTests
 {
@@ -16,7 +13,7 @@ namespace OnlineNotes.Tests.ControllersTests
 
             // Configure the behavior of fakeHttpClient if needed
 
-            _chessController = new ChessController(_httpClient);
+            _chessController = new ChessController(null, _httpClient);
         }
 
         [Fact]
