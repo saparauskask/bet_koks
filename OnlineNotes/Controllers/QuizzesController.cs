@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using OnlineNotes.ExtensionMethods;
 using OnlineNotes.Models.Quizzes;
 using OnlineNotes.Models.Requests.Quiz;
 using OnlineNotes.Services.NotesServices;
@@ -34,11 +35,12 @@ namespace OnlineNotes.Controllers
             return View(quizzes);
         }
 
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(string? errorMsg = null)
         {
             IdentityUser user = await _userManager.GetUserAsync(User);
             var userId = user.Id;
             ViewBag.UserId = userId;
+            ViewBag.ErrorMsg = errorMsg;
             var notes = await _notesService.GetAllNotesToListAsync();
             if (notes != null && notes.Any())
             {
@@ -50,11 +52,17 @@ namespace OnlineNotes.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Quiz quiz) // lacking async method to be called
+        public async Task<IActionResult> Create(Quiz quiz)
         {
             quiz.CreationDate = DateTime.Now;
             if (ModelState.IsValid)
             {
+                var noteWordCount = quiz.NoteContents.WordCount();
+                if (noteWordCount > 500)
+                {
+                    return RedirectToAction("Create", new { errorMsg = "Your selected note should contain no more than 500 words" });
+                }
+
                 CreateQuizRequest quizRequest = new()
                 {
                     UserId = quiz.UserId,
@@ -70,7 +78,7 @@ namespace OnlineNotes.Controllers
                     return RedirectToAction("QuizAttempt", new { id = quizeId });
                 }
 
-                return RedirectToAction("Index");
+                return RedirectToAction("Create", new {errorMsg = "Something went wrong while generating your quiz. Please try again later or adjust the quiz generation configuration" });
             }
             return View(quiz);
         }
@@ -86,6 +94,40 @@ namespace OnlineNotes.Controllers
             return NotFound();
         }
 
+        [HttpPost]
+        [Route("Quizzes/SubmitAnswers")]
+        public async Task<IActionResult> SubmitAnswers(IFormCollection formCollection)
+        {
+            List<int> answers = new();
+            int quizId = 0;
+            foreach (var key in formCollection.Keys)
+            {
+                if (key.StartsWith("question_"))
+                {
+                    var questionId = key.Substring("question_".Length);
+                    var selectedOptionId = formCollection[key];
+                    if (!string.IsNullOrEmpty(selectedOptionId))
+                    {
+                        answers.Add(int.Parse(selectedOptionId));
+                    }
+                    
+                }
+                if(key.Equals("QuizId"))
+                {
+                    quizId = int.Parse(formCollection[key]);
+                }
+            }
+            if (answers.Any() && quizId > 0)
+            {
+                var result = await _quizzesService.EvaluateQuiz(answers, quizId);
+                if (result == true)
+                {
+                    return RedirectToAction("Details", new { id = quizId });
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
         [HttpDelete]
         [Route("Quizzes/Delete/{id}")]
         public async Task<IActionResult> Delete(int? id)
@@ -98,6 +140,17 @@ namespace OnlineNotes.Controllers
             {
                 return NotFound();
             }
+        }
+
+        public async Task<IActionResult> Details(int id)
+        {
+            var quiz = await _quizzesService.GetQuizByIdAsync(id);
+            if (quiz != null && id >= 0)
+            {
+                return View(quiz);
+            }
+
+            return NotFound();
         }
     }
 }

@@ -75,7 +75,7 @@ namespace OnlineNotes.ExtensionMethods
                     string answerText = matchedGroup.Substring(2).Trim();
 
                     // Add each answer option to the list with IsCorrect set to false
-                    parsedAnswers.Add(($"{letter}. {answerText}", isCorrect));
+                    parsedAnswers.Add(($"{letter} {answerText}", isCorrect));
                 }
             }
 
@@ -91,6 +91,16 @@ namespace OnlineNotes.ExtensionMethods
                 return trimmedLine;
             }
             return "";
+        }
+
+        public static string RemoveLinesAboveFirstQuestion(this string input)
+        {
+            int indexOfQ1 = input.IndexOf("Q1.");
+            if (indexOfQ1 != -1)
+            {
+                return input.Substring(indexOfQ1);
+            }
+            return input;
         }
     }
 }
